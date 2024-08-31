@@ -1,0 +1,1 @@
+web: gunicorn slotted_need.wsgi
