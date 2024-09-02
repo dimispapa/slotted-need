@@ -1,12 +1,20 @@
 import nested_admin
 from django.contrib import admin
 from .models import (Product, Option, OptionValue, Component, Finish,
-                     FinishOptionValue, FinishOption)
+                     FinishOptionValue, FinishOption, ProductComponent)
 
 
 # Define inline classes to use in the admin pages
+class ProductComponentInline(nested_admin.NestedTabularInline):
+    model = ProductComponent
+    extra = 1
+    verbose_name = "Component"
+    verbose_name_plural = "Components"
+
+
 class OptionValueInline(nested_admin.NestedTabularInline):
     model = OptionValue
+    inlines = [ProductComponentInline]
     extra = 1
 
 
