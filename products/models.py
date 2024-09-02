@@ -31,6 +31,36 @@ class Component(models.Model):
         return f"{self.name} | €{self.unit_cost} per {self.measurement_unit}"
 
 
+class Finish(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
+
+    class Meta:
+        # Define the plural correctly
+        verbose_name_plural = 'Finishes'
+
+    def __str__(self):
+        return self.name
+
+
+class FinishOption(models.Model):
+    finish = models.ForeignKey(Finish, related_name='options',
+                               on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.finish.name} - {self.name}"
+
+
+class FinishOptionValue(models.Model):
+    finish_option = models.ForeignKey(FinishOption, related_name='values',
+                                      on_delete=models.CASCADE)
+    value = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.finish_option.name}: {self.value}"
+
+
 # Create Product model class as the main parent model
 class Product(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -40,6 +70,7 @@ class Product(models.Model):
                                      decimal_places=2,
                                      validators=[MinValueValidator(0.00)])
     components = models.ManyToManyField(Component, through='ProductComponent')
+    finishes = models.ManyToManyField(Finish, blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
