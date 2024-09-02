@@ -61,3 +61,23 @@ class ProductComponent(models.Model):
     def __str__(self):
         return (f"{self.product.name} - {self.component.name} "
                 f"x ({self.quantity})")
+
+
+# Create an Option model to define the options for a product config that can
+# be created along with a product
+class Option(models.Model):
+    name = models.CharField(max_length=100)
+    product = models.ForeignKey(Product, related_name='options',
+                                on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.product.name} - {self.name}"
+
+
+class OptionValue(models.Model):
+    option = models.ForeignKey(Option, related_name='values',
+                               on_delete=models.CASCADE)
+    value = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.option.name}: {self.value}"
