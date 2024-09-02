@@ -1,0 +1,202 @@
+[{
+    "model": "products.finish",
+    "pk": 1,
+    "fields": {
+        "name": "Paint",
+        "description": ""
+    }
+}, {
+    "model": "products.finishoption",
+    "pk": 1,
+    "fields": {
+        "finish": 1,
+        "name": "Colour"
+    }
+}, {
+    "model": "products.finishoptionvalue",
+    "pk": 1,
+    "fields": {
+        "finish_option": 1,
+        "value": "Honest Blue"
+    }
+}, {
+    "model": "products.finishoptionvalue",
+    "pk": 2,
+    "fields": {
+        "finish_option": 1,
+        "value": "Pure White"
+    }
+}, {
+    "model": "products.finishoptionvalue",
+    "pk": 3,
+    "fields": {
+        "finish_option": 1,
+        "value": "Azalea Flower"
+    }
+}, {
+    "model": "products.finishoptionvalue",
+    "pk": 4,
+    "fields": {
+        "finish_option": 1,
+        "value": "Determined Orange"
+    }
+}, {
+    "model": "products.finishoptionvalue",
+    "pk": 5,
+    "fields": {
+        "finish_option": 1,
+        "value": "Haven"
+    }
+}, {
+    "model": "products.finishoptionvalue",
+    "pk": 6,
+    "fields": {
+        "finish_option": 1,
+        "value": "Cordial"
+    }
+}, {
+    "model": "products.finishoptionvalue",
+    "pk": 7,
+    "fields": {
+        "finish_option": 1,
+        "value": "Bauhaus"
+    }
+}, {
+    "model": "products.finishoptionvalue",
+    "pk": 8,
+    "fields": {
+        "finish_option": 1,
+        "value": "Black Of Night"
+    }
+}, {
+    "model": "products.finishoptionvalue",
+    "pk": 9,
+    "fields": {
+        "finish_option": 1,
+        "value": "Foggy Day"
+    }
+}, {
+    "model": "products.finishoptionvalue",
+    "pk": 10,
+    "fields": {
+        "finish_option": 1,
+        "value": "Daffodil"
+    }
+}, {
+    "model": "products.product",
+    "pk": 1,
+    "fields": {
+        "name": "Slotted Table",
+        "slug": "slotted-table",
+        "description": "",
+        "base_price": "230.00",
+        "created_on": "2024-09-02T18:22:21.054Z",
+        "updated_on": "2024-09-02T18:22:21.054Z",
+        "finishes": [1]
+    }
+}, {
+    "model": "products.option",
+    "pk": 1,
+    "fields": {
+        "name": "Leg Shape",
+        "product": 1
+    }
+}, {
+    "model": "products.optionvalue",
+    "pk": 1,
+    "fields": {
+        "option": 1,
+        "value": "Feeble"
+    }
+}, {
+    "model": "products.optionvalue",
+    "pk": 2,
+    "fields": {
+        "option": 1,
+        "value": "Husky"
+    }
+}, {
+    "model": "products.component",
+    "pk": 1,
+    "fields": {
+        "name": "Feeble Top Leg",
+        "slug": "feeble-top-leg",
+        "description": "",
+        "unit_cost": "8.00",
+        "measurement_unit": "pc",
+        "supplier_source": "CNC dude",
+        "created_on": "2024-09-02T18:15:49.373Z",
+        "updated_on": "2024-09-02T18:15:49.373Z"
+    }
+}, {
+    "model": "products.component",
+    "pk": 2,
+    "fields": {
+        "name": "Feeble Bottom Leg",
+        "slug": "feeble-bottom-leg",
+        "description": "",
+        "unit_cost": "9.00",
+        "measurement_unit": "pc",
+        "supplier_source": "CNC dude",
+        "created_on": "2024-09-02T18:16:06.597Z",
+        "updated_on": "2024-09-02T18:16:06.597Z"
+    }
+}, {
+    "model": "products.component",
+    "pk": 3,
+    "fields": {
+        "name": "Husky Top Leg",
+        "slug": "husky-top-leg",
+        "description": "",
+        "unit_cost": "7.00",
+        "measurement_unit": "pc",
+        "supplier_source": "CNC dude",
+        "created_on": "2024-09-02T18:19:10.420Z",
+        "updated_on": "2024-09-02T18:19:10.420Z"
+    }
+}, {
+    "model": "products.component",
+    "pk": 4,
+    "fields": {
+        "name": "Husky Bottom Leg",
+        "slug": "husky-bottom-leg",
+        "description": "",
+        "unit_cost": "8.00",
+        "measurement_unit": "pc",
+        "supplier_source": "CNC dude",
+        "created_on": "2024-09-02T18:19:23.187Z",
+        "updated_on": "2024-09-02T18:19:23.187Z"
+    }
+}, {
+    "model": "products.productcomponent",
+    "pk": 1,
+    "fields": {
+        "option_value": 1,
+        "component": 2,
+        "quantity": 1
+    }
+}, {
+    "model": "products.productcomponent",
+    "pk": 2,
+    "fields": {
+        "option_value": 1,
+        "component": 1,
+        "quantity": 1
+    }
+}, {
+    "model": "products.productcomponent",
+    "pk": 3,
+    "fields": {
+        "option_value": 2,
+        "component": 3,
+        "quantity": 1
+    }
+}, {
+    "model": "products.productcomponent",
+    "pk": 4,
+    "fields": {
+        "option_value": 2,
+        "component": 4,
+        "quantity": 1
+    }
+}]
