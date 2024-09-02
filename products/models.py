@@ -13,6 +13,12 @@ class Product(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return f"{self.name} | Base price at €{self.base_price}"
+
 
 # Create a Component model class as related class to Product model
 class Component(models.Model):
@@ -35,3 +41,9 @@ class Component(models.Model):
     supplier_source = models.TextField()
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return f"{self.name} | €{self.unit_cost} per {self.measurement_unit}"
