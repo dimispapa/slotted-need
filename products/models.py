@@ -9,6 +9,7 @@ class Finish(models.Model):
     class Meta:
         # Define the plural correctly
         verbose_name_plural = 'Finishes'
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
@@ -21,15 +22,6 @@ class FinishOption(models.Model):
 
     def __str__(self):
         return f"{self.finish.name} - {self.name}"
-
-
-class FinishOptionValue(models.Model):
-    finish_option = models.ForeignKey(FinishOption, related_name='values',
-                                      on_delete=models.CASCADE)
-    value = models.CharField(max_length=50)
-
-    def __str__(self):
-        return f"{self.finish_option.name}: {self.value}"
 
 
 # Create Product model class as the main parent model
@@ -77,6 +69,7 @@ class Component(models.Model):
     name = models.CharField(max_length=50, unique=True)
     slug = models.SlugField(max_length=50, unique=True)
     description = models.TextField(blank=True, null=True)
+    finishes = models.ManyToManyField(Finish, blank=True)
     unit_cost = models.DecimalField(max_digits=7,
                                     decimal_places=2,
                                     validators=[MinValueValidator(0.00)])
