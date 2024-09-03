@@ -1,13 +1,13 @@
 import nested_admin
 from django.contrib import admin
 from .models import (Product, Option, OptionValue, Component, Finish,
-                     FinishOptionValue, FinishOption, ProductComponent)
+                     FinishOption, ProductComponent)
 
 
 # Define inline classes to use in the admin pages
 class ProductComponentInline(nested_admin.NestedTabularInline):
     model = ProductComponent
-    extra = 1
+    extra = 0
     verbose_name = "Component"
     verbose_name_plural = "Components"
 
@@ -15,7 +15,7 @@ class ProductComponentInline(nested_admin.NestedTabularInline):
 class OptionValueInline(nested_admin.NestedTabularInline):
     model = OptionValue
     inlines = [ProductComponentInline]
-    extra = 1
+    extra = 0
 
 
 class OptionInline(nested_admin.NestedStackedInline):
@@ -24,14 +24,8 @@ class OptionInline(nested_admin.NestedStackedInline):
     extra = 0
 
 
-class FinishOptionValueInline(nested_admin.NestedTabularInline):
-    model = FinishOptionValue
-    extra = 1
-
-
 class FinishOptionInline(nested_admin.NestedStackedInline):
     model = FinishOption
-    inlines = [FinishOptionValueInline]
     extra = 0
 
 
@@ -54,6 +48,8 @@ class ComponentAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug', 'description', 'unit_cost',
                     'measurement_unit', 'supplier_source', 'created_on',
                     'updated_on')
+    # Allows for the selection of multiple finishes
+    filter_horizontal = ['finishes',]
     search_fields = ['name', 'description', 'supplier_source']
     list_filter = ('supplier_source', 'created_on',)
     prepopulated_fields = {'slug': ('name',)}
