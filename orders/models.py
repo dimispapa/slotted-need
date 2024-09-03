@@ -5,6 +5,7 @@ from products.models import Product, OptionValue, FinishOption
 # Create your models here.
 class Order(models.Model):
     customer_name = models.CharField(max_length=100)
+    customer_phone = models.CharField(max_length=20)
     customer_email = models.EmailField()
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
@@ -19,8 +20,8 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, related_name='order_items',
                                 on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
-    option_value = models.ManyToManyField(OptionValue,
-                                          related_name='order_items')
+    option_values = models.ManyToManyField(OptionValue,
+                                           related_name='order_items')
     finishes = models.ManyToManyField(FinishOption, blank=True)
 
     def __str__(self):
