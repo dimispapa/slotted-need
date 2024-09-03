@@ -3,7 +3,7 @@ from django.core.validators import MinValueValidator
 
 
 class Finish(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50)
     description = models.TextField(blank=True, null=True)
 
     class Meta:
