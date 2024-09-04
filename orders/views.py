@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.contrib import messages
 from django.forms import modelformset_factory
+from django.http import JsonResponse
 from .models import Order, OrderItem
 from products.models import (Product, Option, OptionValue, Finish,
                              FinishOption)
@@ -19,10 +20,6 @@ def create_order(request):
 
     # fetch all the required data to pass to the context
     products = Product.objects.all()
-    options = Option.objects.all()
-    option_values = OptionValue.objects.all()
-    finishes = Finish.objects.all()
-    finish_options = FinishOption.objects.all()
 
     if request.method == 'POST':
         # pass the post request to the formset object
@@ -62,8 +59,19 @@ def create_order(request):
     # render the template with formset context passed
     return render(request, 'orders/create_order.html',
                   {'formset': formset,
-                   'products': products,
-                   'options': options,
-                   'option_values': option_values,
-                   'finishes': finishes,
-                   'finish_options': finish_options})
+                   'products': products, })
+
+
+def get_options_data(request):
+    # Serialize data into JSON-serializable format
+    options = list(Option.objects.values())
+    option_values = list(OptionValue.objects.values())
+    finishes = list(Finish.objects.values())
+    finish_options = list(FinishOption.objects.values())
+
+    return JsonResponse({
+        'options': options,
+        'option_values': option_values,
+        'finishes': finishes,
+        'finish_options': finish_options
+    })
