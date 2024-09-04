@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
   <div class="container mt-5">
     <h1>Create an Order</h1>
@@ -75,4 +76,8 @@
       </div>
     </form>
   </div>
+{% endblock %}
+
+{% block extras %}
+  <script src="{% static 'js/orders.js' %}"></script>
 {% endblock %}
