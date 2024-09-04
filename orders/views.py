@@ -5,6 +5,10 @@ from .models import Order, OrderItem
 from .forms import OrderItemForm
 
 
+def home(request):
+    return render(request, 'orders/index.html')
+
+
 def create_order(request):
     # create a formset object to allow multiple forms in the same view
     OrderItemFormSet = modelformset_factory(OrderItem,
