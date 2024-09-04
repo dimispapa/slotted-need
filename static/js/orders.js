@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (productId) {
                         // Add option dropdowns based on selected product
                         const relatedOptions = options.filter(option => option.product == productId);
-
+debugger;
                         relatedOptions.forEach(option => {
                             let optionSelectHTML = `
                         <div class="col-md-6">
