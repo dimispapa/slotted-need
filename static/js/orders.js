@@ -44,6 +44,12 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <option value="">Select ${option.name}</option>
                     `;
 
+                            // Add option values related to this option
+                            const relatedOptionValues = optionValues.filter(ov => ov.option == option.id);
+                            relatedOptionValues.forEach(optionValue => {
+                                optionSelectHTML += `<option value="${optionValue.id}">${optionValue.value}</option>`;
+                            });
+
                             optionSelectHTML += '</select></div>';
                             optionContainer.innerHTML += optionSelectHTML;
                         });
