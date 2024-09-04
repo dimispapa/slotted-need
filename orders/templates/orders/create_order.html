@@ -1,22 +1,77 @@
 {% extends 'base.html' %}
 {% block content %}
   <div class="container mt-5">
-    <h2>Create an Order</h2>
+    <h1>Create an Order</h1>
+    <br />
+    <h2>Customer Details:</h2>
     <form method="post">
       {% csrf_token %}
+
       <!-- Customer Information -->
       <div class="row mb-3">
         <div class="col-md-6">
           <label for="customer_name" class="form-label">Customer Name</label>
           <input type="text" id="customer_name" name="customer_name" class="form-control" placeholder="Enter full name" />
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
           <label for="customer_phone" class="form-label">Customer Phone</label>
           <input type="tel" id="customer_phone" name="customer_phone" class="form-control" placeholder="Enter phone number" />
         </div>
         <div class="col-md-6">
           <label for="customer_email" class="form-label">Customer Email</label>
           <input type="email" id="customer_email" name="customer_email" class="form-control" placeholder="Enter email address" />
+        </div>
+      </div>
+
+      <!-- Display any formset errors -->
+      {% if formset.non_form_errors %}
+        <div class="alert alert-danger" role="alert">{{ formset.non_form_errors }}</div>
+      {% endif %}
+
+      <!-- Formset for Order Items -->
+      <div id="order-items">
+        {{ formset.management_form }}
+
+        {% for form in formset %}
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">Order Item {{ forloop.counter }}</h5>
+
+              <div class="row mb-3">
+                <div class="col-md-4">
+                  <label for="{{ form.product.id_for_label }}" class="form-label">Product</label>
+                  {{ form.product }}
+                </div>
+                <div class="col-md-2">
+                  <label for="{{ form.quantity.id_for_label }}" class="form-label">Quantity</label>
+                  {{ form.quantity }}
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="{{ form.option_values.id_for_label }}" class="form-label">Options</label>
+                  {{ form.option_values }}
+                </div>
+                <div class="col-md-6">
+                  <label for="{{ form.finishes.id_for_label }}" class="form-label">Finishes</label>
+                  {{ form.finishes }}
+                </div>
+              </div>
+
+              <!-- Display form errors for this item -->
+              {% if form.errors %}
+                <div class="alert alert-danger" role="alert">{{ form.errors }}</div>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Add more items or submit -->
+      <div class="row">
+        <div class="col-md-6">
+          <button type="submit" class="btn btn-primary">Place Order</button>
         </div>
       </div>
     </form>
