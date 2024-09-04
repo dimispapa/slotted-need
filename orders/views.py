@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.contrib import messages
 from django.forms import modelformset_factory
 from .models import Order, OrderItem
+from products.models import (Product, Option, OptionValue, Finish,
+                             FinishOption)
 from .forms import OrderItemForm
 
 
@@ -14,6 +16,13 @@ def create_order(request):
     OrderItemFormSet = modelformset_factory(OrderItem,
                                             form=OrderItemForm,
                                             extra=1)
+
+    # fetch all the required data to pass to the context
+    products = Product.objects.all()
+    options = Option.objects.all()
+    option_values = OptionValue.objects.all()
+    finishes = Finish.objects.all()
+    finish_options = FinishOption.objects.all()
 
     if request.method == 'POST':
         # pass the post request to the formset object
@@ -51,4 +60,10 @@ def create_order(request):
         formset = OrderItemFormSet(queryset=OrderItem.objects.none())
 
     # render the template with formset context passed
-    return render(request, 'orders/create_order.html', {'formset': formset})
+    return render(request, 'orders/create_order.html',
+                  {'formset': formset,
+                   'products': products,
+                   'options': options,
+                   'option_values': option_values,
+                   'finishes': finishes,
+                   'finish_options': finish_options})
