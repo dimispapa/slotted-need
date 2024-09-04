@@ -4,7 +4,7 @@
     <h1>Create an Order</h1>
     <br />
     <h2>Customer Details:</h2>
-    <form method="post">
+    <form method="post" id="orderForm">
       {% csrf_token %}
 
       <!-- Customer Information -->
@@ -30,33 +30,32 @@
 
       <!-- Formset for Order Items -->
       <div id="order-items">
-        {{ formset.management_form }}
-
         {% for form in formset %}
-          <div class="card mb-3">
+          <div class="card mb-3 order-item">
             <div class="card-body">
               <h5 class="card-title">Order Item {{ forloop.counter }}</h5>
 
+              <!-- Product Dropdown -->
               <div class="row mb-3">
-                <div class="col-md-4">
-                  <label for="{{ form.product.id_for_label }}" class="form-label">Product</label>
-                  {{ form.product }}
-                </div>
-                <div class="col-md-2">
-                  <label for="{{ form.quantity.id_for_label }}" class="form-label">Quantity</label>
-                  {{ form.quantity }}
+                <div class="col-md-6">
+                  <label for="product_{{ forloop.counter }}" class="form-label">Product</label>
+                  <select class="form-control product-dropdown" name="product_{{ forloop.counter }}" id="product_{{ forloop.counter }}">
+                    <option value="">Select a product</option>
+                    {% for product in products %}
+                      <option value="{{ product.id }}">{{ product.name }}</option>
+                    {% endfor %}
+                  </select>
                 </div>
               </div>
 
-              <div class="row mb-3">
-                <div class="col-md-6">
-                  <label for="{{ form.option_values.id_for_label }}" class="form-label">Options</label>
-                  {{ form.option_values }}
-                </div>
-                <div class="col-md-6">
-                  <label for="{{ form.finishes.id_for_label }}" class="form-label">Finishes</label>
-                  {{ form.finishes }}
-                </div>
+              <!-- Dynamic Option Dropdowns (Will be populated by JS) -->
+              <div class="row mb-3" id="option-container-{{ forloop.counter }}">
+                <!-- JS will inject the option dropdowns here -->
+              </div>
+
+              <!-- Dynamic Finish Dropdowns (Will be populated by JS) -->
+              <div class="row mb-3" id="finish-container-{{ forloop.counter }}">
+                <!-- JS will inject the finish dropdowns here -->
               </div>
 
               <!-- Display form errors for this item -->
