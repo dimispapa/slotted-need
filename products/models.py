@@ -32,10 +32,10 @@ class Component(models.Model):
     unit_cost = models.DecimalField(max_digits=7, decimal_places=2,
                                     validators=[MinValueValidator(0.00)])
     # create a units mapping to use as choices for measurement_unit
-    UNITS = (('g', 'gram'),
-             ('kg', 'kilogram'),
-             ('l', 'litre'),
-             ('pc', 'piece'))
+    UNITS = {'g': 'gram',
+             'kg': 'kilogram',
+             'l': 'litre',
+             'pc': 'piece'}
     measurement_unit = models.CharField(
         max_length=2,
         choices=UNITS,

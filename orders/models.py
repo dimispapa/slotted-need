@@ -18,13 +18,14 @@ class Order(models.Model):
                                on_delete=models.SET_NULL,
                                blank=True, null=True)
     discount = models.DecimalField(max_digits=7, decimal_places=2,
-                                   validators=[MinValueValidator(0.00)])
+                                   validators=[MinValueValidator(0.00)],
+                                   default=0.00)
     # create a status mapping to use as choices for order_status
-    STATUS = ((1, 'Not Started'),
-              (2, 'In Progress'),
-              (3, 'Made'),
-              (4, 'Delivered'))
-    order_status = models.CharField(
+    STATUS = {1: 'Not Started',
+              2: 'In Progress',
+              3: 'Made',
+              4: 'Delivered'}
+    order_status = models.IntegerField(
         choices=STATUS,
         default=1
     )
@@ -32,7 +33,7 @@ class Order(models.Model):
     updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Order #{self.id} by {self.customer_name}"
+        return f"Order #{self.id} by {self.client.client_name}"
 
 
 class OrderItem(models.Model):
