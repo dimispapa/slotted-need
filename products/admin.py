@@ -4,33 +4,24 @@ from .models import (Product, Option, OptionValue, Component, Finish,
                      FinishOption, ProductComponent)
 
 
-# Define inline classes to use in the admin pages
-class ProductComponentInline(nested_admin.NestedStackedInline):
-    model = ProductComponent
-    extra = 0
-    verbose_name = "Component"
-    verbose_name_plural = "Components"
-
-
-class OptionValueInline(nested_admin.NestedTabularInline):
-    model = OptionValue
-    extra = 0
-
-
-class OptionInline(nested_admin.NestedStackedInline):
-    model = Option
-    inlines = [OptionValueInline]
-    extra = 0
-
-
-class FinishOptionInline(nested_admin.NestedStackedInline):
-    model = FinishOption
-    extra = 0
-
-
 # Define the ProductAdmin page with OptionInline to add Options in same view
 @admin.register(Product)
 class ProductAdmin(nested_admin.NestedModelAdmin):
+
+    class OptionInline(nested_admin.NestedStackedInline):
+        class OptionValueInline(nested_admin.NestedTabularInline):
+            model = OptionValue
+            extra = 0
+        model = Option
+        inlines = [OptionValueInline]
+        extra = 0
+
+    class ProductComponentInline(nested_admin.NestedStackedInline):
+        model = ProductComponent
+        extra = 0
+        verbose_name = "Component"
+        verbose_name_plural = "Components"
+
     list_display = ('name', 'slug', 'description', 'base_price',)
     inlines = [OptionInline, ProductComponentInline, ]
     # Allows for the selection of multiple finishes
@@ -53,6 +44,11 @@ class ComponentAdmin(admin.ModelAdmin):
 
 @admin.register(Finish)
 class FinishAdmin(nested_admin.NestedModelAdmin):
+
+    class FinishOptionInline(nested_admin.NestedStackedInline):
+        model = FinishOption
+        extra = 0
+
     list_display = ['name']
     search_fields = ['name']
     inlines = [FinishOptionInline,]
