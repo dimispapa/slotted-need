@@ -5,7 +5,7 @@ from .models import (Product, Option, OptionValue, Component, Finish,
 
 
 # Define inline classes to use in the admin pages
-class ProductComponentInline(nested_admin.NestedTabularInline):
+class ProductComponentInline(nested_admin.NestedStackedInline):
     model = ProductComponent
     extra = 0
     verbose_name = "Component"
@@ -14,7 +14,6 @@ class ProductComponentInline(nested_admin.NestedTabularInline):
 
 class OptionValueInline(nested_admin.NestedTabularInline):
     model = OptionValue
-    inlines = [ProductComponentInline]
     extra = 0
 
 
@@ -32,13 +31,11 @@ class FinishOptionInline(nested_admin.NestedStackedInline):
 # Define the ProductAdmin page with OptionInline to add Options in same view
 @admin.register(Product)
 class ProductAdmin(nested_admin.NestedModelAdmin):
-    list_display = ('name', 'slug', 'description', 'base_price', 'created_on',
-                    'updated_on')
-    inlines = [OptionInline,]
+    list_display = ('name', 'slug', 'description', 'base_price',)
+    inlines = [OptionInline, ProductComponentInline, ]
     # Allows for the selection of multiple finishes
     filter_horizontal = ['finishes',]
     search_fields = ['name', 'description']
-    list_filter = ('created_on',)
     prepopulated_fields = {'slug': ('name',)}
 
 
@@ -46,12 +43,11 @@ class ProductAdmin(nested_admin.NestedModelAdmin):
 @admin.register(Component)
 class ComponentAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug', 'description', 'unit_cost',
-                    'measurement_unit', 'supplier_source', 'created_on',
-                    'updated_on')
+                    'measurement_unit', 'supplier_details', )
     # Allows for the selection of multiple finishes
     filter_horizontal = ['finishes',]
-    search_fields = ['name', 'description', 'supplier_source']
-    list_filter = ('supplier_source', 'created_on',)
+    search_fields = ['name', 'description', 'supplier_details']
+    list_filter = ('supplier_details', )
     prepopulated_fields = {'slug': ('name',)}
 
 
