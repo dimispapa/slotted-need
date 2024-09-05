@@ -24,6 +24,34 @@ class FinishOption(models.Model):
         return f"{self.finish.name} - {self.name}"
 
 
+# Create a Component model class as related class to Product model
+class Component(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=50, unique=True)
+    description = models.TextField(blank=True, null=True)
+    unit_cost = models.DecimalField(max_digits=7, decimal_places=2,
+                                    validators=[MinValueValidator(0.00)])
+    # create a units mapping to use as choices for measurement_unit
+    UNITS = (('g', 'gram'),
+             ('kg', 'kilogram'),
+             ('l', 'litre'),
+             ('pc', 'piece'))
+    measurement_unit = models.CharField(
+        max_length=2,
+        choices=UNITS,
+        default='pc'
+    )
+    supplier_details = models.TextField()
+    finishes = models.ManyToManyField(Finish, blank=True,
+                                      related_name='components')
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return f"{self.name} | €{self.unit_cost} per {self.measurement_unit}"
+
+
 # Create Product model class as the main parent model
 class Product(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -32,9 +60,10 @@ class Product(models.Model):
     base_price = models.DecimalField(max_digits=7,
                                      decimal_places=2,
                                      validators=[MinValueValidator(0.00)])
-    finishes = models.ManyToManyField(Finish, blank=True)
-    created_on = models.DateTimeField(auto_now_add=True)
-    updated_on = models.DateTimeField(auto_now=True)
+    components = models.ManyToManyField(Component, through="ProductComponent",
+                                        related_name='products')
+    finishes = models.ManyToManyField(Finish, blank=True,
+                                      related_name='products')
 
     class Meta:
         ordering = ["name"]
@@ -64,53 +93,14 @@ class OptionValue(models.Model):
         return f"{self.option.name}: {self.value}"
 
 
-# Create a Component model class as related class to Product model
-class Component(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-    slug = models.SlugField(max_length=50, unique=True)
-    description = models.TextField(blank=True, null=True)
-    product_option = models.ForeignKey(OptionValue,
-                                       related_name='option_components',
-                                       blank=True,
-                                       null=True,
-                                       on_delete=models.CASCADE)
-    product = models.ForeignKey(Product,
-                                related_name='product_components',
-                                blank=True,
-                                null=True,
-                                on_delete=models.CASCADE)
-    finishes = models.ManyToManyField(Finish, blank=True)
-    unit_cost = models.DecimalField(max_digits=7,
-                                    decimal_places=2,
-                                    validators=[MinValueValidator(0.00)])
-    # create a units mapping to use as choices for measurement_unit
-    UNITS = {'g': 'gram',
-             'kg': 'kilogram',
-             'l': 'litre',
-             'pc': 'piece'}
-    measurement_unit = models.CharField(
-        max_length=2,
-        choices=UNITS,
-        default='pc'
-    )
-    supplier_source = models.TextField()
-    created_on = models.DateTimeField(auto_now_add=True)
-    updated_on = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["name"]
-
-    def __str__(self):
-        return f"{self.name} | €{self.unit_cost} per {self.measurement_unit}"
-
-
 # Create a ProductComponent intermediary model to link the Product with its
-# componets and to be able to define a quantity of each component that make up
-# the product
+# components in the many-to-many relationship and to be able to define a
+# quantity of each component that make up the product
 class ProductComponent(models.Model):
-    option_value = models.ForeignKey(OptionValue, related_name='components',
-                                     on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     component = models.ForeignKey(Component, on_delete=models.CASCADE)
+    option_value = models.ForeignKey(OptionValue, on_delete=models.SET_NULL,
+                                     blank=True, null=True)
     quantity = models.PositiveIntegerField(default=1)
 
     def __str__(self):
