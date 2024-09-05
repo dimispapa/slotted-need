@@ -1,12 +1,30 @@
 from django.db import models
+from django.core.validators import MinValueValidator
 from products.models import Product, OptionValue, FinishOption
 
 
-# Create your models here.
+class Client(models.Model):
+    client_name = models.CharField(max_length=100)
+    client_phone = models.CharField(max_length=20)
+    client_email = models.EmailField()
+    created_on = models.DateField(auto_now_add=True)
+
+
 class Order(models.Model):
-    customer_name = models.CharField(max_length=100)
-    customer_phone = models.CharField(max_length=20)
-    customer_email = models.EmailField()
+    client = models.ForeignKey(Client, related_name='orders',
+                               on_delete=models.SET_NULL,
+                               blank=True, null=True)
+    discount = models.DecimalField(max_digits=7, decimal_places=2,
+                                   validators=[MinValueValidator(0.00)])
+    # create a status mapping to use as choices for order_status
+    STATUS = ((1, 'Not Started'),
+              (2, 'In Progress'),
+              (3, 'Made'),
+              (4, 'Delivered'))
+    order_status = models.CharField(
+        choices=STATUS,
+        default=1
+    )
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
