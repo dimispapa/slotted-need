@@ -69,6 +69,16 @@ class Component(models.Model):
     name = models.CharField(max_length=50, unique=True)
     slug = models.SlugField(max_length=50, unique=True)
     description = models.TextField(blank=True, null=True)
+    product_option = models.ForeignKey(OptionValue,
+                                       related_name='option_components',
+                                       blank=True,
+                                       null=True,
+                                       on_delete=models.CASCADE)
+    product = models.ForeignKey(Product,
+                                related_name='product_components',
+                                blank=True,
+                                null=True,
+                                on_delete=models.CASCADE)
     finishes = models.ManyToManyField(Finish, blank=True)
     unit_cost = models.DecimalField(max_digits=7,
                                     decimal_places=2,
