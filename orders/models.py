@@ -9,6 +9,9 @@ class Client(models.Model):
     client_email = models.EmailField()
     created_on = models.DateField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.client_name}"
+
 
 class Order(models.Model):
     client = models.ForeignKey(Client, related_name='orders',
