@@ -4,24 +4,38 @@
   <div class="container mt-5">
     <h1>Create an Order</h1>
     <br />
-    <h2>Customer Details:</h2>
+
+    <!-- Display messages (success, error, etc.) -->
+    {% if messages %}
+      <div class="alert-messages">
+        {% for message in messages %}
+          <div class="alert {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Form start -->
     <form method="post" id="orderForm">
       {% csrf_token %}
 
-      <!-- Customer Information -->
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <label for="customer_name" class="form-label">Customer Name</label>
-          <input type="text" id="customer_name" name="customer_name" class="form-control" placeholder="Enter full name" />
-        </div>
-        <div class="col-md-4">
-          <label for="customer_phone" class="form-label">Customer Phone</label>
-          <input type="tel" id="customer_phone" name="customer_phone" class="form-control" placeholder="Enter phone number" />
-        </div>
-        <div class="col-md-6">
-          <label for="customer_email" class="form-label">Customer Email</label>
-          <input type="email" id="customer_email" name="customer_email" class="form-control" placeholder="Enter email address" />
-        </div>
+      <!-- Client Information -->
+      <div class="form-group">
+        <label for="client">Select Existing Client</label>
+        {{ form.client }}
+      </div>
+
+      <h3>Or Create a New Client</h3>
+      <div class="form-group">
+        <label for="new_client_name">Client Name</label>
+        {{ form.new_client_name }}
+      </div>
+      <div class="form-group">
+        <label for="new_client_phone">Phone</label>
+        {{ form.new_client_phone }}
+      </div>
+      <div class="form-group">
+        <label for="new_client_email">Email</label>
+        {{ form.new_client_email }}
       </div>
 
       <!-- Display any formset errors -->
@@ -29,51 +43,38 @@
         <div class="alert alert-danger" role="alert">{{ formset.non_form_errors }}</div>
       {% endif %}
 
-      <!-- Formset for Order Items -->
+      <!-- Order Items -->
+      <h3>Order Items</h3>
+      {{ formset.management_form }}
       <div id="order-items">
         {% for form in formset %}
-          <div class="card mb-3 order-item">
+          <div class="card mb-3 order-item-form">
             <div class="card-body">
-              <h5 class="card-title">Order Item {{ forloop.counter }}</h5>
-
-              <!-- Product Dropdown -->
-              <div class="row mb-3">
-                <div class="col-md-6">
-                  <label for="product_{{ forloop.counter }}" class="form-label">Product</label>
-                  <select class="form-control product-dropdown" name="product_{{ forloop.counter }}" id="product_{{ forloop.counter }}">
-                    <option value="">Select a product</option>
-                    {% for product in products %}
-                      <option value="{{ product.id }}">{{ product.name }}</option>
-                    {% endfor %}
-                  </select>
-                </div>
+              <div class="form-group">
+                <label for="product">Product</label>
+                {{ form.product }}
               </div>
-
-              <!-- Dynamic Option Dropdowns (Will be populated by JS) -->
-              <div class="row mb-3" id="option-container-{{ forloop.counter }}">
-                <!-- JS will inject the option dropdowns here -->
+              <div class="form-group">
+                <label for="quantity">Quantity</label>
+                {{ form.quantity }}
               </div>
-
-              <!-- Dynamic Finish Dropdowns (Will be populated by JS) -->
-              <div class="row mb-3" id="finish-container-{{ forloop.counter }}">
-                <!-- JS will inject the finish dropdowns here -->
+              <div class="form-group">
+                <label for="option_values">Options</label>
+                {{ form.option_values }}
               </div>
-
-              <!-- Display form errors for this item -->
-              {% if form.errors %}
-                <div class="alert alert-danger" role="alert">{{ form.errors }}</div>
-              {% endif %}
+              <div class="form-group">
+                <label for="finish_options">Finish Options</label>
+                {{ form.finish_options }}
+              </div>
             </div>
           </div>
         {% endfor %}
       </div>
 
-      <!-- Add more items or submit -->
-      <div class="row">
-        <div class="col-md-6">
-          <button type="submit" class="btn btn-primary">Place Order</button>
-        </div>
-      </div>
+      <!-- Button to Add New Order Item -->
+      <button type="button" id="add-order-item" class="btn btn-secondary mb-3">Add Order Item</button>
+
+      <button type="submit" class="btn btn-primary">Submit Order</button>
     </form>
   </div>
 {% endblock %}
