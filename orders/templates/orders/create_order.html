@@ -15,53 +15,33 @@
     {% endif %}
 
     <!-- Form start -->
-    <form method="post" id="orderForm">
+    <form method="post">
       {% csrf_token %}
 
-      <!-- Client Information -->
+      <!-- Render the Order form for client information -->
       <div class="form-group">
-        <label for="client_name">Client Name</label>
-        <input type="text" id="client_name" name="client_name" class="form-control" />
-        <!-- Client name dynamic suggestions -->
-        <div id="client-suggestions" class="dropdown-menu"></div>
+        {{ form.client_name.label_tag }}
+        {{ form.client_name }}
+        <div id="client-suggestions" class="dropdown-menu"></div> <!-- Autocomplete suggestions -->
       </div>
-      <div class="form-group">
-        <label for="client_phone">Phone</label>
-        <input type="text" id="client_phone" name="client_phone" class="form-control" />
-      </div>
-      <div class="form-group">
-        <label for="client_email">Email</label>
-        <input type="email" id="client_email" name="client_email" class="form-control" />
-      </div>
+      <div class="form-group">{{ form.client_phone.label_tag }}
+        {{ form.client_phone }}</div>
+      <div class="form-group">{{ form.client_email.label_tag }}
+        {{ form.client_email }}</div>
 
-      <!-- Display any formset errors -->
-      {% if formset.non_form_errors %}
-        <div class="alert alert-danger" role="alert">{{ formset.non_form_errors }}</div>
-      {% endif %}
-
-      <!-- Order Items -->
+      <!-- Render the OrderItem forms for products and options -->
       <h3>Order Items</h3>
       {{ formset.management_form }}
       <div id="order-items">
         {% for form in formset %}
           <div class="card mb-3 order-item-form">
             <div class="card-body">
-              <div class="form-group">
-                <label for="product">Product</label>
-                {{ form.product }}
-              </div>
-              <div class="form-group">
-                <label for="quantity">Quantity</label>
-                {{ form.quantity }}
-              </div>
-              <div class="form-group">
-                <label for="option_values">Options</label>
-                {{ form.option_values }}
-              </div>
-              <div class="form-group">
-                <label for="finish_options">Finish Options</label>
-                {{ form.finish_options }}
-              </div>
+              <div class="form-group">{{ form.product.label_tag }}
+                {{ form.product }}</div>
+              <div class="form-group">{{ form.quantity.label_tag }}
+                {{ form.quantity }}</div>
+              <div class="options-container"></div> <!-- Will be populated with options using JS -->
+              <div class="finishes-container"></div> <!-- Will be populated with finishes using JS -->
             </div>
           </div>
         {% endfor %}
@@ -77,5 +57,5 @@
 
 {% block extras %}
   <script src="{% static 'js/client_search.js' %}"></script>
-  <script src="{% static 'js/orders.js' %}"></script>
+  {% comment %} <script src="{% static 'js/orders.js' %}"></script> {% endcomment %}
 {% endblock %}
