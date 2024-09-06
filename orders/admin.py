@@ -14,7 +14,7 @@ class OrderAdmin(admin.ModelAdmin):
     class OrderItemInline(admin.TabularInline):
         model = OrderItem
         extra = 0
-        filter_horizontal = ['option_values', 'finishes']
+        filter_horizontal = ['option_values', 'finish_options']
 
     list_display = ('client', 'discount',
                     'order_status', 'created_on',

@@ -44,7 +44,7 @@ class OrderItem(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     option_values = models.ManyToManyField(OptionValue,
                                            related_name='order_items')
-    finishes = models.ManyToManyField(FinishOption, blank=True)
+    finish_options = models.ManyToManyField(FinishOption, blank=True)
 
     def __str__(self):
         return f"{self.quantity}x {self.product.name}"
