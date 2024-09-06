@@ -37,11 +37,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         suggestion.classList.add('suggestion-item');
                         // show client details
                         suggestion.textContent = `${client.name} (phone:${client.phone}, email:${client.email})`;
-                        // if user clicks in phone or email then clear the suggestions as it means it is attempting to type new
+                        // if user choose a suggestion, then apply other fields and clear/hide dropdown
                         suggestion.addEventListener('click', function () {
+                            clientNameInput.value = client.name;
                             clientPhoneInput.value = client.phone;
                             clientEmailInput.value = client.email;
                             suggestions.innerHTML = ''; // Clear suggestions
+                            suggestions.classList.remove('show');  // Hide the dropdown
                         });
                         // append the suggestion item in the suggestions parent div and move to next
                         suggestions.appendChild(suggestion);
