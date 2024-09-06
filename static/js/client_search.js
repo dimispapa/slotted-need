@@ -6,12 +6,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // listen for user input
     clientNameInput.addEventListener('input', function () {
-        const query = clientNameInput.value.trim();  // Make sure there's no extra space
+        const query = clientNameInput.value.trim(); // Make sure there's no extra space
 
         // fetch data from API endpoint by passing the query client name input
         if (query.length > 2) {
-            const fetchUrl = `/api/search_clients/?q=${encodeURIComponent(query)}`;  // Safely encode query
-            console.log('Fetching from URL:', fetchUrl);  // Log the URL
+            const fetchUrl = `/api/search_clients/?q=${encodeURIComponent(query)}`; // Safely encode query
+            console.log('Fetching from URL:', fetchUrl); // Log the URL
             fetch(fetchUrl)
                 .then(response => {
                     console.log('Fetch response:', response);
@@ -37,18 +37,42 @@ document.addEventListener('DOMContentLoaded', function () {
                         suggestion.classList.add('suggestion-item');
                         // show client details
                         suggestion.textContent = `${client.name} (phone:${client.phone}, email:${client.email})`;
-                        // if user choose a suggestion, then apply other fields and clear/hide dropdown
+
+                        // Add event listener for hover effect
+                        suggestion.addEventListener('mouseenter', function () {
+                            clearActiveSuggestion(); // Clear any previously highlighted suggestion
+                            suggestion.classList.add('active'); // Highlight current suggestion
+                        });
+
+                        // handle click event for the suggestion
                         suggestion.addEventListener('click', function () {
                             clientNameInput.value = client.name;
                             clientPhoneInput.value = client.phone;
                             clientEmailInput.value = client.email;
                             suggestions.innerHTML = ''; // Clear suggestions
-                            suggestions.classList.remove('show');  // Hide the dropdown
+                            suggestions.classList.remove('show'); // Hide the dropdown
                         });
                         // append the suggestion item in the suggestions parent div and move to next
                         suggestions.appendChild(suggestion);
                     });
                 });
+        } else {
+            suggestions.innerHTML = '';
+            suggestions.classList.remove('show'); // Hide dropdown if query is too short
         }
     });
+
+    // Hide dropdown on mouseleave
+    suggestions.addEventListener('mouseleave', function () {
+        suggestions.classList.remove('show');
+    });
+
+    // Clear previously active suggestion
+    function clearActiveSuggestion() {
+        const activeItem = document.querySelector('.suggestion-item.active');
+        if (activeItem) {
+            activeItem.classList.remove('active');
+        }
+    }
+
 });

@@ -1,0 +1,12 @@
+/* CREATE ORDERS PAGE */
+/* CSS for the suggestion items */
+.suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+/* Highlight the suggestion item when hovering */
+.suggestion-item:hover, .suggestion-item.active {
+    background-color: #f0f0f0;
+}
