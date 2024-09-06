@@ -1,10 +1,10 @@
 from django.shortcuts import render
 from django.contrib import messages
 from django.http import JsonResponse
-from .models import Order, OrderItem
-from products.models import (Product, Option, OptionValue, Finish,
+from .models import Client, Order, OrderItem
+from products.models import (Option, OptionValue, Finish,
                              FinishOption)
-from .forms import OrderItemFormSet
+from .forms import OrderForm, OrderItemFormSet
 
 
 def home(request):
@@ -13,21 +13,31 @@ def home(request):
 
 def create_order(request):
     if request.method == 'POST':
-        # pass the post request to the formset object
+        # pass the post request to the form and formset objects
+        form = OrderForm(request.POST)
         formset = OrderItemFormSet(request.POST)
-        # validation of forms in formset fields ensuring no errors
-        if formset.is_valid():
-            # create an Order object instance with info from the post request
-            order = Order.objects.create(
-                customer_name=request.POST.get('customer_name'),
-                customer_phone=request.POST.get('customer_phone'),
-                customer_email=request.POST.get('customer_email')
-            )
-            # process each form in the formset
-            for form in formset:
+
+        # validation of forms and formset fields ensuring no errors
+        if form.is_valid() and formset.is_valid():
+            # handle client creation or selection
+            client = form.cleaned_data['client']
+            # check if user selected a client
+            if not client:
+                # if not then create a new client object
+                client = Client.objects.create(
+                    client_name=form.cleaned_data['new_client_name'],
+                    client_phone=form.cleaned_data['new_client_phone'],
+                    client_email=form.cleaned_data['new_client_email']
+                )
+
+            # create order object
+            order = Order.objects.create(client=client)
+
+            # process each form in the formset to save the order items
+            for form_item in formset:
                 # create associated OrderItem instance without commiting to db
-                order_item = form.save(commit=False)
-                # pass the Order instance crated above to link it with
+                order_item = form_item.save(commit=False)
+                # pass the Order instance created above to link it with
                 order_item.order = order
                 # save and commit OrderItem to db
                 order_item.save()
@@ -35,22 +45,29 @@ def create_order(request):
                 form.save_m2m()
 
             # notify user with success message
-            messages.add_message(
-                request, messages.SUCCESS,
-                'Order submitted successfully'
+            messages.success(
+                'Order created successfully!'
             )
 
-            # reset the form with no pre-loaded order items
+            # Reset the form and formset by creating new instances
+            form = OrderForm()
             formset = OrderItemFormSet(queryset=OrderItem.objects.none())
+
+        else:
+            # If the forms are not valid, display an error message
+            messages.error(
+                'There was an error with your submission. Please try again.'
+            )
 
     # if a GET request simply starting a new form
     else:
+        form = OrderForm()
         formset = OrderItemFormSet(queryset=OrderItem.objects.none())
 
-    # render the template with formset context passed
+    # render the template with form and formset context passed
     return render(request, 'orders/create_order.html',
-                  {'formset': formset,
-                   'products': products, })
+                  {'form': form,
+                   'formset': formset, })
 
 
 def get_options_data(request):
