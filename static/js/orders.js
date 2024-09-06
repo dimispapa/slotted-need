@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (productId) {
                         // Add option dropdowns based on selected product
                         const relatedOptions = options.filter(option => option.product_id == productId);
-// debugger;
+
                         relatedOptions.forEach(option => {
                             let optionSelectHTML = `
                         <div class="col-md-6">
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             <select class="form-control" name="option_${index}_${option.id}" id="option_${index}_${option.id}">
                                 <option value="">Select ${option.name}</option>
                     `;
-// debugger;
+
                             // Add option values related to this option
                             const relatedOptionValues = optionValues.filter(ov => ov.option_id == option.id);
                             relatedOptionValues.forEach(optionValue => {

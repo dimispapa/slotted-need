@@ -13,12 +13,12 @@ class OrderAdmin(admin.ModelAdmin):
 
     class OrderItemInline(admin.TabularInline):
         model = OrderItem
-        extra = 1
-        # filter_horizontal = ['option_values', 'finishes']
+        extra = 0
+        filter_horizontal = ['option_values', 'finishes']
 
     list_display = ('client', 'discount',
                     'order_status', 'created_on',
                     'updated_on')
     inlines = [OrderItemInline, ]
-    # search_fields = ['client_name', 'client_email']
+    search_fields = ['client_name', 'client_email']
     list_filter = ('created_on',)
