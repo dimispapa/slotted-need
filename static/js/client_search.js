@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 // handle response data
                 .then(data => {
-                    console.log('Data:', data)
                     // show the div
                     suggestions.classList.add('show');
                     // clear the div first
