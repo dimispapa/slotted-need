@@ -31,7 +31,7 @@
 
       <!-- Render the OrderItem forms for products and options -->
       <h3>Order Items</h3>
-      {{ formset.management_form }}
+
       <div id="order-items">
         {% for form in formset %}
           <div class="card mb-3 order-item-form">
@@ -48,12 +48,15 @@
               <div class="options-container"></div> <!-- Will be populated with JS -->
               <div class="finishes-container"></div> <!-- Will be populated with JS -->
 
-              <!-- Delete Button -->
+              <!-- Delete button -->
               <button type="button" class="btn btn-danger delete-order-item" data-form-index="{{ forloop.counter0 }}">Delete</button>
             </div>
           </div>
         {% endfor %}
       </div>
+
+      <!-- Formset management fields to handle the formset dynamically -->
+      {{ formset.management_form }}
 
       <!-- Button to Add New Order Item -->
       <button type="button" id="add-order-item" class="btn btn-secondary mb-3">Add Order Item</button>

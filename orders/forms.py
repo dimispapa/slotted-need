@@ -1,5 +1,5 @@
 from django import forms
-from .models import OrderItem, OptionValue, FinishOption, Product
+from .models import OrderItem
 
 
 class OrderForm(forms.Form):
@@ -28,26 +28,18 @@ class OrderItemForm(forms.ModelForm):
             'product': forms.Select(
                 attrs={'class': 'form-control product-dropdown'}),
             'quantity': forms.NumberInput(
-                attrs={'class': 'form-control'}),
+                attrs={'class': 'form-control', 'min': 1, 'value': 1}),
             'option_values': forms.SelectMultiple(
                 attrs={'class': 'form-control option-values-dropdown'}),
             'finish_options': forms.SelectMultiple(
                 attrs={'class': 'form-control finish-options-dropdown'})
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Populate available products as initial rendering
-        self.fields['product'].queryset = Product.objects.all()
 
-        # OptionValues and FinishOptions are dynamically updated via JavaScript
-        # based on product selection so these fields are rendered as empty
-        # initially
-        self.fields['option_values'].queryset = OptionValue.objects.none()
-        self.fields['finish_options'].queryset = FinishOption.objects.none()
-
-
-# create a formset object to allow multiple forms in the same order
-OrderItemFormSet = forms.modelformset_factory(OrderItem,
-                                              form=OrderItemForm,
-                                              extra=1)
+# Create the formset
+OrderItemFormSet = forms.modelformset_factory(
+    OrderItem,
+    form=OrderItemForm,
+    extra=1,  # Start with 1 empty form
+    can_delete=True,  # Allow deletion of forms
+)

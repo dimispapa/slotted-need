@@ -77,6 +77,13 @@ def create_order(request):
                    'formset': formset, })
 
 
+def get_products(request):
+    products = Product.objects.all()
+    product_data = [{'id': product.id, 'name': product.name}
+                    for product in products]
+    return JsonResponse({'products': product_data})
+
+
 def get_product_options(request, product_id):
     # Use get_object_or_404 to retrieve the product,
     # or return a 404 if not found
