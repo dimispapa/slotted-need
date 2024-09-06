@@ -1,4 +1,4 @@
-from django import forms
+from django.forms import forms, modelformset_factory
 from .models import (Client, Order, OrderItem, OptionValue, FinishOption,
                      Product)
 
@@ -42,3 +42,9 @@ class OrderItemForm(forms.ModelForm):
         # initially
         self.fields['option_values'].queryset = OptionValue.objects.none()
         self.fields['finish_options'].queryset = FinishOption.objects.none()
+
+
+# create a formset object to allow multiple forms in the same order
+OrderItemFormSet = modelformset_factory(OrderItem,
+                                        form=OrderItemForm,
+                                        extra=1)
