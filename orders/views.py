@@ -1,11 +1,10 @@
 from django.shortcuts import render
 from django.contrib import messages
-from django.forms import modelformset_factory
 from django.http import JsonResponse
 from .models import Order, OrderItem
 from products.models import (Product, Option, OptionValue, Finish,
                              FinishOption)
-from .forms import OrderItemForm
+from .forms import OrderItemFormSet
 
 
 def home(request):
@@ -13,14 +12,6 @@ def home(request):
 
 
 def create_order(request):
-    # create a formset object to allow multiple forms in the same view
-    OrderItemFormSet = modelformset_factory(OrderItem,
-                                            form=OrderItemForm,
-                                            extra=1)
-
-    # fetch all the required data to pass to the context
-    products = Product.objects.all()
-
     if request.method == 'POST':
         # pass the post request to the formset object
         formset = OrderItemFormSet(request.POST)
