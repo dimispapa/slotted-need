@@ -25,10 +25,14 @@ class OrderItemForm(forms.ModelForm):
         model = OrderItem
         fields = ['product', 'quantity', 'option_values', 'finish_options']
         widgets = {
-            'product': forms.Select(attrs={'class': 'form-control product-dropdown'}),
-            'quantity': forms.NumberInput(attrs={'class': 'form-control'}),
-            'option_values': forms.SelectMultiple(attrs={'class': 'form-control option-values-dropdown'}),
-            'finish_options': forms.SelectMultiple(attrs={'class': 'form-control finish-options-dropdown'})
+            'product': forms.Select(
+                attrs={'class': 'form-control product-dropdown'}),
+            'quantity': forms.NumberInput(
+                attrs={'class': 'form-control'}),
+            'option_values': forms.SelectMultiple(
+                attrs={'class': 'form-control option-values-dropdown'}),
+            'finish_options': forms.SelectMultiple(
+                attrs={'class': 'form-control finish-options-dropdown'})
         }
 
     def __init__(self, *args, **kwargs):
