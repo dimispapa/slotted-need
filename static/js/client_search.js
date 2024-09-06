@@ -6,20 +6,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // listen for user input
     clientNameInput.addEventListener('input', function () {
-        const query = clientNameInput.value;
+        const query = clientNameInput.value.trim();  // Make sure there's no extra space
 
         // fetch data from API endpoint by passing the query client name input
         if (query.length > 2) {
-            fetch(`/api/search_clients/?q=${query}`)
-                .then(response => response.json())
-                .then(data => {
-                    let suggestions = document.getElementById('client-suggestions');
-                    // create the div if not found
-                    if (!suggestions) {
-                        suggestions = document.createElement('div');
-                        suggestions.setAttribute('id', 'client-suggestions');
-                        clientNameInput.parentNode.appendChild(suggestions);
+            const fetchUrl = `/api/search_clients/?q=${encodeURIComponent(query)}`;  // Safely encode query
+            console.log('Fetching from URL:', fetchUrl);  // Log the URL
+            fetch(fetchUrl)
+                .then(response => {
+                    console.log('Fetch response:', response);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
                     }
+                    return response.json();
+                })
+                // handle response data
+                .then(data => {
+                    console.log('Data:', data)
+                    // define suggestions div
+                    let suggestions = document.getElementById('client-suggestions');
+                    // show the div
+                    suggestions.classList.add('show');
                     // clear the div first
                     suggestions.innerHTML = '';
 

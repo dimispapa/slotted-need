@@ -24,6 +24,12 @@ class OrderItemForm(forms.ModelForm):
     class Meta:
         model = OrderItem
         fields = ['product', 'quantity', 'option_values', 'finish_options']
+        widgets = {
+            'product': forms.Select(attrs={'class': 'form-control product-dropdown'}),
+            'quantity': forms.NumberInput(attrs={'class': 'form-control'}),
+            'option_values': forms.SelectMultiple(attrs={'class': 'form-control option-values-dropdown'}),
+            'finish_options': forms.SelectMultiple(attrs={'class': 'form-control finish-options-dropdown'})
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
