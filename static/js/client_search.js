@@ -3,6 +3,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const clientNameInput = document.getElementById('client_name');
     const clientPhoneInput = document.getElementById('client_phone');
     const clientEmailInput = document.getElementById('client_email');
+    const suggestions = document.getElementById('client-suggestions');
+
+    let currentIndex = -1;
+
 
     // listen for user input
     clientNameInput.addEventListener('input', function () {
@@ -11,24 +15,23 @@ document.addEventListener('DOMContentLoaded', function () {
         // fetch data from API endpoint by passing the query client name input
         if (query.length > 2) {
             const fetchUrl = `/api/search_clients/?q=${encodeURIComponent(query)}`; // Safely encode query
-            console.log('Fetching from URL:', fetchUrl); // Log the URL
             fetch(fetchUrl)
                 .then(response => {
-                    console.log('Fetch response:', response);
+                    // error handling
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
+                    // return response json file
                     return response.json();
                 })
                 // handle response data
                 .then(data => {
                     console.log('Data:', data)
-                    // define suggestions div
-                    let suggestions = document.getElementById('client-suggestions');
                     // show the div
                     suggestions.classList.add('show');
                     // clear the div first
                     suggestions.innerHTML = '';
+                    currentIndex = -1;
 
                     // loop through the clients filtered/found
                     data.clients.forEach(client => {
@@ -61,6 +64,33 @@ document.addEventListener('DOMContentLoaded', function () {
             suggestions.classList.remove('show'); // Hide dropdown if query is too short
         }
     });
+
+    // Handle arrow key navigation and Enter key selection
+    clientNameInput.addEventListener('keydown', function (e) {
+        const suggestionItems = document.querySelectorAll('.suggestion-item');
+
+        if (e.key === 'ArrowDown') {
+            // Move down the list
+            currentIndex = (currentIndex + 1) % suggestionItems.length;
+            setActiveSuggestion(suggestionItems);
+        } else if (e.key === 'ArrowUp') {
+            // Move up the list
+            currentIndex = (currentIndex - 1 + suggestionItems.length) % suggestionItems.length;
+            setActiveSuggestion(suggestionItems);
+        } else if (e.key === 'Enter' && currentIndex >= 0) {
+            // Select the current item
+            suggestionItems[currentIndex].click();
+            e.preventDefault(); // Prevent form submission on Enter
+        }
+    });
+
+    // Set active suggestion based on currentIndex
+    function setActiveSuggestion(suggestionItems) {
+        clearActiveSuggestion();
+        if (suggestionItems.length > 0) {
+            suggestionItems[currentIndex].classList.add('active');
+        }
+    }
 
     // Hide dropdown on mouseleave
     suggestions.addEventListener('mouseleave', function () {
