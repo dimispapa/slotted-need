@@ -36,12 +36,20 @@
         {% for form in formset %}
           <div class="card mb-3 order-item-form">
             <div class="card-body">
+              <!-- Product selection -->
               <div class="form-group">{{ form.product.label_tag }}
                 {{ form.product }}</div>
+
+              <!-- Quantity input -->
               <div class="form-group">{{ form.quantity.label_tag }}
                 {{ form.quantity }}</div>
-              <div class="options-container"></div> <!-- Will be populated with options using JS -->
-              <div class="finishes-container"></div> <!-- Will be populated with finishes using JS -->
+
+              <!-- Options and Finishes containers -->
+              <div class="options-container"></div> <!-- Will be populated with JS -->
+              <div class="finishes-container"></div> <!-- Will be populated with JS -->
+
+              <!-- Delete Button -->
+              <button type="button" class="btn btn-danger delete-order-item" data-form-index="{{ forloop.counter0 }}">Delete</button>
             </div>
           </div>
         {% endfor %}
@@ -51,12 +59,11 @@
       <button type="button" id="add-order-item" class="btn btn-secondary mb-3">Add Order Item</button>
 
       <button type="submit" class="btn btn-primary">Submit Order</button>
-
     </form>
   </div>
 {% endblock %}
 
 {% block extras %}
   <script src="{% static 'js/client_search.js' %}"></script>
-  {% comment %} <script src="{% static 'js/orders.js' %}"></script> {% endcomment %}
+  <script src="{% static 'js/orders.js' %}"></script>
 {% endblock %}
