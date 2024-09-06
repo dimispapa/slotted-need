@@ -1,9 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
 from django.http import JsonResponse
 from .models import Client, Order, OrderItem
-from products.models import (Option, OptionValue, Finish,
-                             FinishOption)
+from products.models import Product, Option, OptionValue, FinishOption
 from .forms import OrderForm, OrderItemFormSet
 
 
@@ -78,18 +77,47 @@ def create_order(request):
                    'formset': formset, })
 
 
-def get_options_data(request):
-    # Serialize data into JSON-serializable format
-    options = list(Option.objects.values())
-    option_values = list(OptionValue.objects.values())
-    finishes = list(Finish.objects.values())
-    finish_options = list(FinishOption.objects.values())
+def get_product_options(request, product_id):
+    # Use get_object_or_404 to retrieve the product,
+    # or return a 404 if not found
+    product = get_object_or_404(Product, id=product_id)
 
+    # Get the options related to the product,
+    # but don't raise a 404 as they are optional
+    options = Option.objects.filter(product=product)
+    options_data = []
+    for option in options:
+        # Use filter instead of get_list_or_404 to avoid raising
+        # a 404 when no option values exist as they are optional
+        option_values = OptionValue.objects.filter(option=option)
+        option_values_data = [{'id': ov.id, 'value': ov.value}
+                              for ov in option_values]
+        options_data.append({
+            'id': option.id,
+            'name': option.name,
+            'option_values': option_values_data
+        })
+
+    # Get the finishes related to the product (ManyToManyField)
+    # and their options. Returns empty list if not found
+    finishes = product.finishes.all()
+    finishes_data = []
+    for finish in finishes:
+        # use filter to retrieve finish options,
+        # without raising 404 as they are optional
+        finish_options = FinishOption.objects.filter(finish=finish)
+        finish_options_data = [{'id': fo.id, 'name': fo.name}
+                               for fo in finish_options]
+        finishes_data.append({
+            'id': finish.id,
+            'name': finish.name,
+            'finish_options': finish_options_data
+        })
+
+    # Return the data as JSON
     return JsonResponse({
-        'options': options,
-        'option_values': option_values,
-        'finishes': finishes,
-        'finish_options': finish_options
+        'options': options_data,
+        'finishes': finishes_data
     })
 
 
