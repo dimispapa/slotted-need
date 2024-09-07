@@ -7,7 +7,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to fetch and populate product dropdowns
     function populateProductDropdown(selectElement) {
         fetch('/api/get_products/')
-            .then(response => response.json())
+            .then(response => {
+                // Check if the response is OK (status in the range 200-299)
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
             .then(data => {
                 selectElement.innerHTML = '<option value="">Select a product</option>'; // Reset dropdown
                 data.products.forEach(product => {
@@ -76,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (orderItemForm) {
                 orderItemsContainer.removeChild(orderItemForm);
-                
+
                 let formCount = document.getElementById('id_form-TOTAL_FORMS').value--
                 document.getElementById('id_form-TOTAL_FORMS').setAttribute('value', formCount)
 
@@ -88,8 +94,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         // Update field names and IDs to maintain the correct formset structure
                         field.name = field.name.replace(/form-\d+-/, `form-${index}-`);
                         field.id = field.id.replace(/form-\d+-/, `form-${index}-`);
-                    // Update Order Item heading
-                    form.querySelector('h4').innerText = `Order Item #${index+1}`
+                        // Update Order Item heading
+                        form.querySelector('h4').innerText = `Order Item #${index+1}`
 
                     });
                 });
@@ -155,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     })
                     .catch(error => {
                         // Handle any errors that occurred during the fetch
-                        console.error('There was a problem with the fetch operation:', error);
+                        console.error('There was a problem fetching the product options:', error);
                     });
 
             } else {
