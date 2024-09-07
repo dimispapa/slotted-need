@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(data => {
                 selectElement.innerHTML = '<option value="">Select a product</option>'; // Reset dropdown
                 data.products.forEach(product => {
-                    const optionHTML = `<option value="${product.id}">${product.name}</option>`;
+                    let optionHTML = `<option value="${product.id}">${product.name}</option>`;
                     selectElement.innerHTML += optionHTML;
                 });
             })
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to create a new order item form dynamically (with only product and quantity fields)
     function createNewOrderItemForm(index) {
-        const newForm = document.createElement('div');
+        let newForm = document.createElement('div');
         newForm.classList.add('card', 'mb-3', 'order-item-form');
         newForm.innerHTML = `
             <div class="card-body">
@@ -34,8 +34,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     <label for="id_form-${index}-quantity">Quantity</label>
                     <input type="number" class="form-control" id="id_form-${index}-quantity" name="form-${index}-quantity" min="1" value="1">
                 </div>
-                <div class="options-container" id="options-container-${index}" style="display: none;"></div>
-                <div class="finishes-container" id="finishes-container-${index}" style="display: none;"></div>
+                <div class="options-container hidden" id="options-container-${index}"></div>
+                <div class="finishes-container hidden" id="finishes-container-${index}"></div>
 
                 <button type="button" class="btn btn-danger delete-order-item" data-form-index="${index}">Delete</button>
             </div>
@@ -46,16 +46,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Handle adding new order item forms
     addOrderItemButton.addEventListener('click', function () {
-        const currentFormCount = parseInt(totalFormsInput.value);
+        let currentFormCount = parseInt(totalFormsInput.value);
 
         // Create a new empty form (with only product and quantity fields)
-        const newForm = createNewOrderItemForm(currentFormCount);
+        let newForm = createNewOrderItemForm(currentFormCount);
 
         // Append the new form to the formset container
         orderItemsContainer.appendChild(newForm);
 
         // Populate the product dropdown dynamically
-        const productSelect = newForm.querySelector('.product-dropdown');
+        let productSelect = newForm.querySelector('.product-dropdown');
         populateProductDropdown(productSelect);
 
         // Increment the total form count
@@ -70,17 +70,17 @@ document.addEventListener('DOMContentLoaded', function () {
     // Handle dynamic deletion of order items
     document.addEventListener('click', function (event) {
         if (event.target.classList.contains('delete-order-item')) {
-            const formIndex = event.target.getAttribute('data-form-index');
-            const orderItemForm = event.target.closest('.order-item-form');
+            let formIndex = event.target.getAttribute('data-form-index');
+            let orderItemForm = event.target.closest('.order-item-form');
 
             if (orderItemForm) {
                 orderItemsContainer.removeChild(orderItemForm);
-
-                formCount--;
-                document.getElementById('id_form-TOTAL_FORMS').value = formCount;
+                
+                let formCount = document.getElementById('id_form-TOTAL_FORMS').value--
+                document.getElementById('id_form-TOTAL_FORMS').setAttribute('value', formCount)
 
                 // Re-index remaining forms to ensure they are correctly numbered
-                const orderItemForms = document.querySelectorAll('.order-item-form');
+                let orderItemForms = document.querySelectorAll('.order-item-form');
                 orderItemForms.forEach((form, index) => {
                     form.querySelector('.delete-order-item').setAttribute('data-form-index', index);
                     form.querySelectorAll('input, select').forEach(field => {
@@ -96,19 +96,26 @@ document.addEventListener('DOMContentLoaded', function () {
     // Handle dynamic product selection and show options/finishes fields
     document.addEventListener('change', function (event) {
         if (event.target.classList.contains('product-dropdown')) {
-            const productId = event.target.value;
-            const formIndex = event.target.name.match(/\d+/)[0];
-            const optionsContainer = document.getElementById(`options-container-${formIndex}`);
-            const finishesContainer = document.getElementById(`finishes-container-${formIndex}`);
-
+            let productId = event.target.value;
+            let formIndex = event.target.name.match(/\d+/)[0];
+            let optionsContainer = document.getElementById(`options-container-${formIndex}`);
+            let finishesContainer = document.getElementById(`finishes-container-${formIndex}`);
+            debugger;
             if (productId) {
                 fetch(`/api/get_product_options/${productId}/`)
-                    .then(response => response.json())
+                    .then(response => {
+                        // Check if the response is OK (status in the range 200-299)
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok ' + response.statusText);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
+                        debugger;
                         // Populate options dynamically
                         optionsContainer.innerHTML = ''; // Clear old options
                         data.options.forEach(option => {
-                            const optionHTML = `
+                            let optionHTML = `
                                 <div class="form-group">
                                     <label for="option_${option.id}">${option.name}</label>
                                     <select class="form-control" name="option_${option.id}">
@@ -121,10 +128,11 @@ document.addEventListener('DOMContentLoaded', function () {
                             optionsContainer.innerHTML += optionHTML;
                         });
 
+
                         // Populate finishes dynamically
                         finishesContainer.innerHTML = ''; // Clear old finishes
                         data.finishes.forEach(finish => {
-                            const finishHTML = `
+                            let finishHTML = `
                                 <div class="form-group">
                                     <label for="finish_${finish.id}">${finish.name}</label>
                                     <select class="form-control" name="finish_${finish.id}">
@@ -138,13 +146,18 @@ document.addEventListener('DOMContentLoaded', function () {
                         });
 
                         // Show the options and finishes containers
-                        optionsContainer.style.display = 'block';
-                        finishesContainer.style.display = 'block';
+                        optionsContainer.classList.remove('hidden');
+                        finishesContainer.classList.remove('hidden');
+                    })
+                    .catch(error => {
+                        // Handle any errors that occurred during the fetch
+                        console.error('There was a problem with the fetch operation:', error);
                     });
+
             } else {
                 // Hide the options and finishes containers if no product is selected
-                optionsContainer.style.display = 'none';
-                finishesContainer.style.display = 'none';
+                optionsContainer.classList.add('hidden');
+                finishesContainer.classList.add('hidden');
             }
         }
     });
@@ -152,11 +165,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // Handle dynamic deletion of order items
     document.addEventListener('click', function (event) {
         if (event.target.classList.contains('delete-order-item')) {
-            const form = event.target.closest('.order-item-form');
+            let form = event.target.closest('.order-item-form');
             form.remove();
 
             // Decrease the form count
-            const currentFormCount = parseInt(totalFormsInput.value) - 1;
+            let currentFormCount = parseInt(totalFormsInput.value) - 1;
             totalFormsInput.value = currentFormCount;
         }
     });
