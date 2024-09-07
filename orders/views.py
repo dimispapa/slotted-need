@@ -13,15 +13,15 @@ def home(request):
 def create_order(request):
     if request.method == 'POST':
         # pass the post request to the form and formset objects
-        form = OrderForm(request.POST)
-        formset = OrderItemFormSet(request.POST)
+        order_form = OrderForm(request.POST)
+        order_item_formset = OrderItemFormSet(request.POST)
 
         # validation of forms and formset fields ensuring no errors
-        if form.is_valid() and formset.is_valid():
+        if order_form.is_valid() and order_item_formset.is_valid():
             # handle client creation or selection
-            client_name = form.cleaned_data['client_name']
-            client_phone = form.cleaned_data['client_phone']
-            client_email = form.cleaned_data['client_email']
+            client_name = order_form.cleaned_data['client_name']
+            client_phone = order_form.cleaned_data['client_phone']
+            client_email = order_form.cleaned_data['client_email']
 
             # try to find client by name, phone or email
             client = Client.objects.filter(
@@ -32,16 +32,16 @@ def create_order(request):
             if not client:
                 # if a client is not found then create a new client object
                 client = Client.objects.create(
-                    client_name=form.cleaned_data['client_name'],
-                    client_phone=form.cleaned_data['client_phone'],
-                    client_email=form.cleaned_data['client_email']
+                    client_name=order_form.cleaned_data['client_name'],
+                    client_phone=order_form.cleaned_data['client_phone'],
+                    client_email=order_form.cleaned_data['client_email']
                 )
 
             # create order object
             order = Order.objects.create(client=client)
 
             # process each form in the formset to save the order items
-            for form_item in formset:
+            for form_item in order_item_formset:
                 # create associated OrderItem instance without commiting to db
                 order_item = form_item.save(commit=False)
                 # pass the Order instance created above to link it with
@@ -49,7 +49,7 @@ def create_order(request):
                 # save and commit OrderItem to db
                 order_item.save()
                 # save the many-to-many data for option_values and finishes
-                form.save_m2m()
+                form_item.save_m2m()
 
             # notify user with success message
             messages.success(
@@ -57,8 +57,9 @@ def create_order(request):
             )
 
             # Reset the form and formset by creating new instances
-            form = OrderForm()
-            formset = OrderItemFormSet(queryset=OrderItem.objects.none())
+            order_form = OrderForm()
+            order_item_formset = OrderItemFormSet(
+                queryset=OrderItem.objects.none())
 
         else:
             # If the forms are not valid, display an error message
@@ -68,13 +69,14 @@ def create_order(request):
 
     # if a GET request simply starting a new form
     else:
-        form = OrderForm()
-        formset = OrderItemFormSet(queryset=OrderItem.objects.none())
+        order_form = OrderForm()
+        order_item_formset = OrderItemFormSet(
+            queryset=OrderItem.objects.none())
 
     # render the template with form and formset context passed
     return render(request, 'orders/create_order.html',
-                  {'form': form,
-                   'formset': formset, })
+                  {'order_form': order_form,
+                   'order_item_formset': order_item_formset, })
 
 
 def get_products(request):
