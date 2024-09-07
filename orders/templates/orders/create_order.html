@@ -1,72 +1,75 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-  <div class="container mt-5">
-    <h1>Create an Order</h1>
-    <br />
+<div class="container mt-5">
+  <h1>Create an Order</h1>
+  <br />
 
-    <!-- Display messages (success, error, etc.) -->
-    {% if messages %}
-      <div class="alert-messages">
-        {% for message in messages %}
-          <div class="alert {{ message.tags }}">{{ message }}</div>
-        {% endfor %}
-      </div>
-    {% endif %}
-
-    <!-- Form start -->
-    <form method="post">
-      {% csrf_token %}
-
-      <!-- Render the Order form for client information -->
-      <div class="form-group">
-        {{ form.client_name.label_tag }}
-        {{ form.client_name }}
-        <div id="client-suggestions" class="dropdown-menu"></div> <!-- Autocomplete suggestions -->
-      </div>
-      <div class="form-group">{{ form.client_phone.label_tag }}
-        {{ form.client_phone }}</div>
-      <div class="form-group">{{ form.client_email.label_tag }}
-        {{ form.client_email }}</div>
-
-      <!-- Render the OrderItem forms for products and options -->
-      <h3>Order Items</h3>
-
-      <div id="order-items">
-        {% for form in formset %}
-          <div class="card mb-3 order-item-form">
-            <div class="card-body">
-              <!-- Product selection -->
-              <div class="form-group">{{ form.product.label_tag }}
-                {{ form.product }}</div>
-
-              <!-- Quantity input -->
-              <div class="form-group">{{ form.quantity.label_tag }}
-                {{ form.quantity }}</div>
-
-              <!-- Options and Finishes containers -->
-              <div class="options-container"></div> <!-- Will be populated with JS -->
-              <div class="finishes-container"></div> <!-- Will be populated with JS -->
-
-              <!-- Delete button -->
-              <button type="button" class="btn btn-danger delete-order-item" data-form-index="{{ forloop.counter0 }}">Delete</button>
-            </div>
-          </div>
-        {% endfor %}
-      </div>
-
-      <!-- Formset management fields to handle the formset dynamically -->
-      {{ formset.management_form }}
-
-      <!-- Button to Add New Order Item -->
-      <button type="button" id="add-order-item" class="btn btn-secondary mb-3">Add Order Item</button>
-
-      <button type="submit" class="btn btn-primary">Submit Order</button>
-    </form>
+  <!-- Display messages (success, error, etc.) -->
+  {% if messages %}
+  <div class="alert-messages">
+    {% for message in messages %}
+    <div class="alert {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
   </div>
+  {% endif %}
+
+  <!-- Form start -->
+  <form method="post">
+    {% csrf_token %}
+
+    <!-- Render the Order form for client information -->
+    <div class="form-group">
+      {{ order_form.client_name.label_tag }}
+      {{ order_form.client_name }}
+      <div id="client-suggestions" class="dropdown-menu"></div> <!-- Autocomplete suggestions -->
+    </div>
+    <div class="form-group">{{ order_form.client_phone.label_tag }}
+      {{ order_form.client_phone }}</div>
+    <div class="form-group">{{ order_form.client_email.label_tag }}
+      {{ order_form.client_email }}</div>
+
+    <!-- Render the OrderItem forms for products and options -->
+    <h3>Order Items</h3>
+
+    <div id="order-items">
+      {% for form in order_item_formset %}
+      <div class="card mb-3 order-item-form">
+        <div class="card-body">
+          <!-- Product selection -->
+          <div class="form-group">{{ form.product.label_tag }}
+            {{ form.product }}</div>
+
+          <!-- Quantity input -->
+          <div class="form-group">{{ form.quantity.label_tag }}
+            {{ form.quantity }}</div>
+
+          <!-- Options and finishes containers will be populated dynamically -->
+          <div class="options-container hidden" id="options-container-{{ forloop.counter0 }}"></div>
+          <div class="finishes-container hidden" id="finishes-container-{{ forloop.counter0 }}"></div>
+
+          {% if order_item_formset.can_delete %}
+          <button type="button" class="btn btn-danger delete-order-item" data-form-index="{{ forloop.counter0 }}">
+            Delete
+          </button>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Formset management fields to handle the formset dynamically -->
+    {{ order_item_formset.management_form }}
+
+    <!-- Button to Add New Order Item -->
+    <button type="button" id="add-order-item" class="btn btn-secondary mb-3">Add Order Item</button>
+
+    <button type="submit" class="btn btn-primary">Submit Order</button>
+  </form>
+</div>
 {% endblock %}
 
 {% block extras %}
-  <script src="{% static 'js/client_search.js' %}"></script>
-  <script src="{% static 'js/orders.js' %}"></script>
+<script src="{% static 'js/client_search.js' %}"></script>
+<script src="{% static 'js/orders.js' %}"></script>
 {% endblock %}
