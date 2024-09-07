@@ -36,6 +36,7 @@
       {% for form in order_item_formset %}
       <div class="card mb-3 order-item-form">
         <div class="card-body">
+          <h4>Order Item # {{ forloop.counter0|add:1 }}</h4>
           <!-- Product selection -->
           <div class="form-group">{{ form.product.label_tag }}
             {{ form.product }}</div>

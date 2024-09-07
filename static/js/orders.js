@@ -24,14 +24,15 @@ document.addEventListener('DOMContentLoaded', function () {
         newForm.classList.add('card', 'mb-3', 'order-item-form');
         newForm.innerHTML = `
             <div class="card-body">
+                <h4>Order Item #${index+1}</h4>
                 <div class="form-group">
-                    <label for="id_form-${index}-product">Product</label>
+                    <label for="id_form-${index}-product">Product:</label>
                     <select class="form-control product-dropdown" id="id_form-${index}-product" name="form-${index}-product">
                         <option value="">Loading products...</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="id_form-${index}-quantity">Quantity</label>
+                    <label for="id_form-${index}-quantity">Quantity:</label>
                     <input type="number" class="form-control" id="id_form-${index}-quantity" name="form-${index}-quantity" min="1" value="1">
                 </div>
                 <div class="options-container hidden" id="options-container-${index}"></div>
@@ -87,6 +88,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         // Update field names and IDs to maintain the correct formset structure
                         field.name = field.name.replace(/form-\d+-/, `form-${index}-`);
                         field.id = field.id.replace(/form-\d+-/, `form-${index}-`);
+                    // Update Order Item heading
+                    form.querySelector('h4').innerText = `Order Item #${index+1}`
+
                     });
                 });
             }
@@ -117,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         data.options.forEach(option => {
                             let optionHTML = `
                                 <div class="form-group">
-                                    <label for="option_${option.id}">${option.name}</label>
+                                    <label for="option_${option.id}">${option.name}:</label>
                                     <select class="form-control" name="option_${option.id}">
                                         <option value="">Select ${option.name}</option>
                             `;
