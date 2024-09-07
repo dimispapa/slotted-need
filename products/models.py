@@ -100,7 +100,8 @@ class ProductComponent(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     component = models.ForeignKey(Component, on_delete=models.CASCADE)
     option_value = models.ForeignKey(OptionValue, on_delete=models.SET_NULL,
-                                     blank=True, null=True)
+                                     blank=True, null=True,
+                                     related_name='product_components')
     quantity = models.PositiveIntegerField(default=1)
 
     def __str__(self):
