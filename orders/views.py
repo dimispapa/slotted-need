@@ -86,7 +86,7 @@ def get_products(request):
     return JsonResponse({'products': product_data})
 
 
-def get_product_options(request, product_id):
+def get_product_data(request, product_id):
     # Use get_object_or_404 to retrieve the product,
     # or return a 404 if not found
     product = get_object_or_404(Product, id=product_id)
@@ -125,6 +125,8 @@ def get_product_options(request, product_id):
 
     # Return the data as JSON
     return JsonResponse({
+        'product': product.name,
+        'base_price': product.base_price,
         'options': options_data,
         'finishes': finishes_data
     })
