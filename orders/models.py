@@ -60,8 +60,7 @@ class OrderItem(models.Model):
     discount = models.DecimalField(max_digits=10, decimal_places=2,
                                    validators=[MinValueValidator(0.00)],
                                    default=0.00, blank=True, null=True)
-    item_value = models.DecimalField(max_digits=10, decimal_places=2,
-                                     editable=False)
+    item_value = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.PositiveIntegerField(default=1)
     option_values = models.ManyToManyField(OptionValue,
                                            related_name='order_items')

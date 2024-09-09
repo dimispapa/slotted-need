@@ -19,14 +19,43 @@ class OrderForm(forms.Form):
                                         'id': 'client_email'
                                     }))
 
+    # read-only discount and order_value fields
+    discount = forms.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'readonly': 'readonly',
+            'id': 'order_discount'
+        }),
+        required=False,  # Optional as we populate it dynamically
+    )
+    order_value = forms.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'readonly': 'readonly',
+            'id': 'order_value'
+        }),
+        required=False,  # Optional as we populate it dynamically
+    )
+
 
 class OrderItemForm(forms.ModelForm):
     class Meta:
         model = OrderItem
-        fields = ['product', 'quantity', 'option_values', 'finish_options']
+        fields = ['product', 'base_price', 'discount', 'item_value',
+                  'quantity', 'option_values', 'finish_options']
         widgets = {
             'product': forms.Select(
                 attrs={'class': 'form-control product-dropdown'}),
+            'base_price': forms.NumberInput(attrs={'class': 'form-control',
+                                                   'readonly': False}),
+            'discount': forms.NumberInput(attrs={'class': 'form-control',
+                                                 'min': 0}),
+            'item_value': forms.NumberInput(attrs={'class': 'form-control',
+                                                   'readonly': True}),
             'quantity': forms.NumberInput(
                 attrs={'class': 'form-control', 'min': 1, 'value': 1}),
             'option_values': forms.SelectMultiple(
