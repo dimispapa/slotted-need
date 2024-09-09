@@ -130,6 +130,37 @@ def get_product_options(request, product_id):
     })
 
 
+# create a get_component_finishes API function to handle the finish options
+# based on the product options selected (associated with components)
+def get_component_finishes(request, option_value_id):
+    # get the option_value object and its associated product_component tables
+    option_value = get_object_or_404(OptionValue, id=option_value_id)
+    product_components = option_value.product_components.all()
+    # extract the relevant component in the product_component linking table
+    components = [c.component for c in product_components]
+    component_finishes = []
+    # loop through the components and extract the finish options
+    for component in components:
+        for finish in component.finishes:
+
+            finish_options = FinishOption.objects.filter(finish=finish)
+            finish_options_data = [{'id': fo.id, 'name': fo.name}
+                                   for fo in finish_options]
+
+            component_finishes.append({
+                'component_name': component.name,
+                'component_slug': component.slug,
+                'id': finish.id,
+                'name': finish.name,
+                'finish_options': finish_options_data
+            })
+
+    # Return the data as JSON
+    return JsonResponse({
+        'component_finishes': component_finishes
+    })
+
+
 # create search_clients API function to deal with the query request
 def search_clients(request):
     query = request.GET.get('q', '')

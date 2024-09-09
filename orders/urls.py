@@ -10,6 +10,9 @@ urlpatterns = [
     # get_product_options API, with product_id as a path parameter
     path('api/get_product_options/<int:product_id>/',
          views.get_product_options, name='get_product_options'),
+    # get_component_finishes API, with option_value_id as a path parameter
+    path('api/get_component_finishes/<int:option_value_id>/',
+         views.get_component_finishes, name='get_component_finishes'),
     # search_clients API, with client_name as a query parameter set in the view
     path('api/search_clients/', views.search_clients, name='search_clients')
 ]
