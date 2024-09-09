@@ -293,7 +293,7 @@ function createNewOrderItemForm(index) {
                 <input type="number" name="form-${index}-discount" value="0.0" class="form-control discount-field" min="0" step="0.01" id="id_form-${index}-discount">
                 
                 <label for="id_form-${index}-quantity">Quantity:</label>
-                <input type="number" class="form-control" id="id_form-${index}-quantity" name="form-${index}-quantity" min="1" value="1">
+                <input type="number" class="form-control quantity-field" id="id_form-${index}-quantity" name="form-${index}-quantity" min="1" value="1">
 
                 <label for="id_form-${index}-item_value">Item value:</label>
                 <input type="number" name="form-${index}-item_value" class="form-control" readonly="" step="0.01" id="id_form-${index}-item_value">
