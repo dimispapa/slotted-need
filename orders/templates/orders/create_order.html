@@ -38,12 +38,22 @@
         <div class="card-body">
           <h4>Order Item # {{ forloop.counter }}</h4>
           <!-- Product selection -->
-          <div class="form-group">{{ form.product.label_tag }}
-            {{ form.product }}</div>
+          {{ form.product.label_tag }}
+          {{ form.product }}
+
+          <!-- Price, discount and value fields -->
+          {{ form.base_price.label_tag }}
+          {{ form.base_price }}
+          {{ form.discount.label_tag }}
+          {{ form.discount }}
 
           <!-- Quantity input -->
-          <div class="form-group">{{ form.quantity.label_tag }}
-            {{ form.quantity }}</div>
+          {{ form.quantity.label_tag }}
+          {{ form.quantity }}
+
+          <!-- Order item value -->
+          {{ form.item_value.label_tag }}
+          {{ form.item_value }}
 
           <!-- Options and finishes containers will be populated dynamically -->
           <div class="options form-container hidden" id="options-container-{{ forloop.counter0 }}"> </div>
@@ -60,11 +70,17 @@
       {% endfor %}
     </div>
 
-    <!-- Formset management fields to handle the formset dynamically -->
-    {{ order_item_formset.management_form }}
-
     <!-- Button to Add New Order Item -->
     <button type="button" id="add-order-item" class="btn btn-secondary mb-3">Add Order Item</button>
+    <br>
+    <!-- Discount and Order Value fields -->
+    <label for="order_discount">Total discount:</label>
+    {{ order_form.discount }}
+    <label for="order_value">Total order value:</label>
+    {{ order_form.order_value }}
+
+    <!-- Formset management fields to handle the formset dynamically -->
+    {{ order_item_formset.management_form }}
 
     <button type="submit" class="btn btn-primary">Submit Order</button>
   </form>
