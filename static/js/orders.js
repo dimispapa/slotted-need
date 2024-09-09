@@ -280,16 +280,24 @@ function createNewOrderItemForm(index) {
     newForm.innerHTML = `
             <div class="card-body">
                 <h4>Order Item #${index+1}</h4>
-                <div class="form-group">
-                    <label for="id_form-${index}-product">Product:</label>
-                    <select class="form-control product-dropdown" id="id_form-${index}-product" name="form-${index}-product">
-                        <option value="">Loading products...</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="id_form-${index}-quantity">Quantity:</label>
-                    <input type="number" class="form-control" id="id_form-${index}-quantity" name="form-${index}-quantity" min="1" value="1">
-                </div>
+
+                <label for="id_form-${index}-product">Product:</label>
+                <select class="form-control product-dropdown" id="id_form-${index}-product" name="form-${index}-product">
+                    <option value="">Loading products...</option>
+                </select>
+
+                <label for="id_form-${index}-base_price">Base price:</label>
+                <input type="number" name="form-${index}-base_price" class="form-control" step="0.01" id="id_form-${index}-base_price">
+                
+                <label for="id_form-${index}-discount">Discount:</label>
+                <input type="number" name="form-${index}-discount" value="0.0" class="form-control discount-field" min="0" step="0.01" id="id_form-${index}-discount">
+                
+                <label for="id_form-${index}-quantity">Quantity:</label>
+                <input type="number" class="form-control" id="id_form-${index}-quantity" name="form-${index}-quantity" min="1" value="1">
+
+                <label for="id_form-${index}-item_value">Item value:</label>
+                <input type="number" name="form-${index}-item_value" class="form-control" readonly="" step="0.01" id="id_form-${index}-item_value">
+
                 <div class="options form-container hidden" id="options-container-${index}"></div>
                 <div class="finishes form-container hidden" id="finishes-container-${index}"></div>
                 <div class="comp-finishes form-container hidden" id="comp-finishes-container-${index}"></div>
