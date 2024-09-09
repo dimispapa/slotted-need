@@ -121,6 +121,9 @@ document.addEventListener('DOMContentLoaded', function () {
             let formIndex = event.target.name.match(/\d+/)[0];
             let optionsContainer = document.getElementById(`options-container-${formIndex}`);
             let finishesContainer = document.getElementById(`finishes-container-${formIndex}`);
+            let basePriceField = document.getElementById(`id_form-${formIndex}-base_price`);
+            let discountField = document.getElementById(`id_form-${formIndex}-discount`);
+            let itemValueField = document.getElementById(`id_form-${formIndex}-item_value`);
 
             if (productId) {
                 fetch(`/api/get_product_options/${productId}/`)
@@ -132,6 +135,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         return response.json();
                     })
                     .then(data => {
+                        // Set the base price field with the product's base price
+                        basePriceField.value = data.base_price;
+                        // Calculate the item value automatically
+                        let discount = parseFloat(discountField.value) || 0;
+                        let basePrice = parseFloat(basePriceField.value) || 0;
+                        itemValueField.value = (basePrice - discount).toFixed(2);
                         // Clear old options
                         optionsContainer.innerHTML = '';
                         // Populate options dynamically
@@ -184,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     })
                     .catch(error => {
                         // Handle any errors that occurred during the fetch
-                        console.error('There was a problem fetching the product options:', error);
+                        console.error('There was a problem fetching the product data:', error);
                     });
 
             } else {
