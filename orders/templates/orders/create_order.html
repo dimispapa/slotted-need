@@ -29,10 +29,9 @@
     <div class="form-group">{{ order_form.client_email.label_tag }}
       {{ order_form.client_email }}</div>
 
-    <!-- Render the OrderItem forms for products and options -->
-    <h3>Order Items</h3>
-
     <div id="order-items">
+      <!-- Render the OrderItem forms for products and options -->
+      <h3>Order Items</h3>
       {% for form in order_item_formset %}
       <div class="card mb-3 order-item-form" data-form-index="{{ forloop.counter0 }}">
         <div class="card-body">

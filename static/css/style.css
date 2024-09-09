@@ -15,3 +15,8 @@
 .hidden {
     display: none;
 }
+
+/* form-container */
+#order-items, .form-container, .btn {
+    margin-top: 10px;
+}
