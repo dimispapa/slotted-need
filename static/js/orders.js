@@ -31,6 +31,8 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('click', function (event) {
         if (event.target.classList.contains('delete-order-item')) {
             deleteOrderItem(event.target);
+            // update the running total
+            updateOrderTotals();
         }
     });
 
@@ -38,7 +40,15 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('change', function (event) {
         // Handle dynamic product selection and show relevant options/finishes fields
         if (event.target.classList.contains('product-dropdown')) {
-            updateProductOptionsFinishes(event.target);
+            // Call updateProductDetails first, and then updateOrderTotals            
+            updateProductDetails(event.target)
+                .then(() => {
+                    // update the running total
+                    updateOrderTotals();
+                })
+                .catch(error => {
+                    console.error('Error in updating totals:', error);
+                });
         };
 
         // Handle dynamic option_values selection and show related finishes fields
@@ -54,46 +64,13 @@ document.addEventListener('DOMContentLoaded', function () {
             event.target.classList.contains('discount-field') ||
             event.target.classList.contains('quantity-field')
         ) {
-            // execute the updateItemValue function with a second delay
-            debounce(updateItemValue(event.target), 1000)
+            // execute the updateItemValue function with 300ms delay
+            updateItemValue(event.target)
+            // update the running total
+            updateOrderTotals();
         }
     });
 });
-
-// define a debounce function to execute other operations with a delay
-function debounce(func, wait) {
-    let timeout;
-    return function (...args) {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(this, args), wait);
-    };
-}
-
-function updateItemValue(target) {
-    // Recalculate order value on discount change
-    if (target.classList.contains('discount-field')) {
-        let formIndex = target.name.match(/\d+/)[0];
-        let basePriceField = document.getElementById(`id_form-${formIndex}-base_price`);
-        let quantityField = document.getElementById(`id_form-${formIndex}-quantity`);
-        let itemValueField = document.getElementById(`id_form-${formIndex}-item_value`);
-        let discount = parseFloat(target.value) || 0;
-        let basePrice = parseFloat(basePriceField.value) || 0;
-        let quantity = parseInt(quantityField.value) || 0;
-        itemValueField.value = ((basePrice - discount) * quantity).toFixed(2);
-    }
-
-    // Recalculate order value on quantity change
-    if (target.classList.contains('quantity-field')) {
-        let formIndex = target.name.match(/\d+/)[0];
-        let basePriceField = document.getElementById(`id_form-${formIndex}-base_price`);
-        let discountField = document.getElementById(`id_form-${formIndex}-discount`);
-        let itemValueField = document.getElementById(`id_form-${formIndex}-item_value`);
-        let quantity = parseInt(target.value) || 0;
-        let basePrice = parseFloat(basePriceField.value) || 0;
-        let discount = parseFloat(discountField.value) || 0;
-        itemValueField.value = ((basePrice - discount) * quantity).toFixed(2);
-    }
-};
 
 function updateComponentFinishes(target) {
     let optionValueId = target.value;
@@ -147,7 +124,7 @@ function updateComponentFinishes(target) {
     }
 };
 
-function updateProductOptionsFinishes(target) {
+function updateProductDetails(target) {
     let productId = target.value;
     let formIndex = target.name.match(/\d+/)[0];
     let optionsContainer = document.getElementById(`options-container-${formIndex}`);
@@ -157,75 +134,80 @@ function updateProductOptionsFinishes(target) {
     let itemValueField = document.getElementById(`id_form-${formIndex}-item_value`);
 
     if (productId) {
-        fetch(`/api/get_product_options/${productId}/`)
-            .then(response => {
-                // Check if the response is OK (status in the range 200-299)
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Set the base price field with the product's base price
-                basePriceField.value = data.base_price;
-                // Calculate the item value automatically
-                let discount = parseFloat(discountField.value) || 0;
-                let basePrice = parseFloat(basePriceField.value) || 0;
-                itemValueField.value = (basePrice - discount).toFixed(2);
-                // Clear old options
-                optionsContainer.innerHTML = '';
-                // Populate options dynamically
-                data.options.forEach(option => {
-                    let optionHTML = `
+        return new Promise((resolve, reject) => {
+            fetch(`/api/get_product_options/${productId}/`)
+                .then(response => {
+                    // Check if the response is OK (status in the range 200-299)
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Set the base price field with the product's base price
+                    basePriceField.value = data.base_price;
+                    // Calculate the item value automatically
+                    let discount = parseFloat(discountField.value) || 0;
+                    let basePrice = parseFloat(basePriceField.value) || 0;
+                    itemValueField.value = (basePrice - discount).toFixed(2);
+                    // Clear old options
+                    optionsContainer.innerHTML = '';
+                    // Populate options dynamically
+                    data.options.forEach(option => {
+                        let optionHTML = `
                         <div class="form-group">
                             <label for="option_${option.id}">${option.name}:</label>
                             <select class="form-control options-dropdown" name="option_${option.id}">
                                 <option value="">Select ${option.name}</option>
                     `;
-                    option.option_values.forEach(optionValue => {
-                        optionHTML += `<option value="${optionValue.id}">${optionValue.value}</option>`;
+                        option.option_values.forEach(optionValue => {
+                            optionHTML += `<option value="${optionValue.id}">${optionValue.value}</option>`;
+                        });
+                        optionHTML += '</select></div>';
+                        optionsContainer.innerHTML += optionHTML;
                     });
-                    optionHTML += '</select></div>';
-                    optionsContainer.innerHTML += optionHTML;
-                });
-                if (optionsContainer.childElementCount > 0) {
-                    // add heading
-                    let optionsHeading = document.createElement("h5")
-                    optionsHeading.innerHTML = "<h5>Configuration Options</h5>"
-                    optionsContainer.prepend(optionsHeading)
-                    // Show the options container
-                    optionsContainer.classList.remove('hidden');
-                }
+                    if (optionsContainer.childElementCount > 0) {
+                        // add heading
+                        let optionsHeading = document.createElement("h5")
+                        optionsHeading.innerHTML = "<h5>Configuration Options</h5>"
+                        optionsContainer.prepend(optionsHeading)
+                        // Show the options container
+                        optionsContainer.classList.remove('hidden');
+                    }
 
-                // Clear old finishes
-                finishesContainer.innerHTML = '';
-                // Populate finishes dynamically
-                data.finishes.forEach(finish => {
-                    let finishHTML = `
+                    // Clear old finishes
+                    finishesContainer.innerHTML = '';
+                    // Populate finishes dynamically
+                    data.finishes.forEach(finish => {
+                        let finishHTML = `
                         <div class="form-group">
                             <label for="product_finish_${finish.id}">Product ${finish.name}</label>
                             <select class="form-control" name="product_finish_${finish.id}">
                                 <option value="">Select ${finish.name}</option>
                     `;
-                    finish.finish_options.forEach(finishOption => {
-                        finishHTML += `<option value="${finishOption.id}">${finishOption.name}</option>`;
+                        finish.finish_options.forEach(finishOption => {
+                            finishHTML += `<option value="${finishOption.id}">${finishOption.name}</option>`;
+                        });
+                        finishHTML += '</select></div>';
+                        finishesContainer.innerHTML += finishHTML;
                     });
-                    finishHTML += '</select></div>';
-                    finishesContainer.innerHTML += finishHTML;
+                    if (finishesContainer.childElementCount > 0) {
+                        // add heading
+                        let finishesHeading = document.createElement("h5")
+                        finishesHeading.innerHTML = "<h5>Product Finishes</h5>"
+                        finishesContainer.prepend(finishesHeading)
+                        // show the finishes container
+                        finishesContainer.classList.remove('hidden');
+                    }
+                    // Once the product details have been updated, resolve the promise
+                    resolve();
+                })
+                .catch(error => {
+                    // Handle any errors that occurred during the fetch
+                    console.error('There was a problem fetching the product data:', error);
+                    reject(error);
                 });
-                if (finishesContainer.childElementCount > 0) {
-                    // add heading
-                    let finishesHeading = document.createElement("h5")
-                    finishesHeading.innerHTML = "<h5>Product Finishes</h5>"
-                    finishesContainer.prepend(finishesHeading)
-                    // show the finishes container
-                    finishesContainer.classList.remove('hidden');
-                }
-            })
-            .catch(error => {
-                // Handle any errors that occurred during the fetch
-                console.error('There was a problem fetching the product data:', error);
-            });
+        });
 
     } else {
         // Hide the options and finishes containers if no product is selected
@@ -239,12 +221,12 @@ function deleteOrderItem(target) {
     let orderItemForm = target.closest('.order-item-form');
 
     if (orderItemForm) {
+        // formset management update
+        let formCount = document.getElementById('id_form-TOTAL_FORMS').value - 1
+        document.getElementById('id_form-TOTAL_FORMS').setAttribute('value', formCount)
+
         // remove orderItemForm from container
         orderItemsContainer.removeChild(orderItemForm);
-
-        // formset management update
-        let formCount = document.getElementById('id_form-TOTAL_FORMS').value--
-        document.getElementById('id_form-TOTAL_FORMS').setAttribute('value', formCount)
 
         // Re-index remaining forms to ensure they are correctly numbered
         let orderItemForms = document.querySelectorAll('.order-item-form');
@@ -326,4 +308,46 @@ function populateProductDropdown(selectElement) {
             });
         })
         .catch(error => console.error('Error fetching products:', error));
+};
+
+function updateOrderTotals() {
+    const orderFormOrderValueField = document.getElementById('order_value');
+    let totalOrderValue = 0;
+
+    document.querySelectorAll('.order-item-form').forEach((form, index) => {
+        let itemValueField = document.getElementById(`id_form-${index}-item_value`)
+        let itemValue = parseFloat(itemValueField.value) || 0
+
+        // Sum up item values for the order
+        totalOrderValue += itemValue;
+    });
+
+    // Update the Order form with the calculated totals
+    orderFormOrderValueField.value = totalOrderValue.toFixed(2);
+}
+
+function updateItemValue(target) {
+    // Recalculate order value on discount change
+    if (target.classList.contains('discount-field')) {
+        let formIndex = target.name.match(/\d+/)[0];
+        let basePriceField = document.getElementById(`id_form-${formIndex}-base_price`);
+        let quantityField = document.getElementById(`id_form-${formIndex}-quantity`);
+        let itemValueField = document.getElementById(`id_form-${formIndex}-item_value`);
+        let discount = parseFloat(target.value) || 0;
+        let basePrice = parseFloat(basePriceField.value) || 0;
+        let quantity = parseInt(quantityField.value) || 0;
+        itemValueField.value = ((basePrice - discount) * quantity).toFixed(2);
+    }
+
+    // Recalculate order value on quantity change
+    if (target.classList.contains('quantity-field')) {
+        let formIndex = target.name.match(/\d+/)[0];
+        let basePriceField = document.getElementById(`id_form-${formIndex}-base_price`);
+        let discountField = document.getElementById(`id_form-${formIndex}-discount`);
+        let itemValueField = document.getElementById(`id_form-${formIndex}-item_value`);
+        let quantity = parseInt(target.value) || 0;
+        let basePrice = parseFloat(basePriceField.value) || 0;
+        let discount = parseFloat(discountField.value) || 0;
+        itemValueField.value = ((basePrice - discount) * quantity).toFixed(2);
+    }
 };
