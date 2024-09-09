@@ -52,12 +52,14 @@ class OrderItemForm(forms.ModelForm):
                 attrs={'class': 'form-control product-dropdown'}),
             'base_price': forms.NumberInput(attrs={'class': 'form-control',
                                                    'readonly': False}),
-            'discount': forms.NumberInput(attrs={'class': 'form-control',
+            'discount': forms.NumberInput(attrs={'class':
+                                                 'form-control discount-field',
                                                  'min': 0}),
             'item_value': forms.NumberInput(attrs={'class': 'form-control',
                                                    'readonly': True}),
             'quantity': forms.NumberInput(
-                attrs={'class': 'form-control', 'min': 1, 'value': 1}),
+                attrs={'class': 'form-control quantity-field',
+                       'min': 1, 'value': 1}),
             'option_values': forms.SelectMultiple(
                 attrs={'class': 'form-control option-values-dropdown'}),
             'finish_options': forms.SelectMultiple(

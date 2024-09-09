@@ -202,10 +202,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 finishesContainer.classList.add('hidden');
             }
         }
-    });
 
-    // Handle dynamic option_values selection and show related finishes fields
-    document.addEventListener('change', function (event) {
+        // Handle dynamic option_values selection and show related finishes fields
         if (event.target.classList.contains('options-dropdown')) {
             let optionValueId = event.target.value;
             let formIndex = event.target.closest('.order-item-form').getAttribute('data-form-index');
@@ -257,6 +255,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 compFinishesContainer.classList.add('hidden');
             }
         }
+
+
+    });
+
+    // Trigger update on input event when user is typing (for dynamic updates)
+    document.addEventListener('input', function (event) {
+        // if a user input is detected in the discount or quantity field
+        if (
+            event.target.classList.contains('discount-field') ||
+            event.target.classList.contains('quantity-field')
+        ) {
+            // execute the updateItemValue function with a second delay
+            debounce(updateItemValue(event.target), 1000)
+        }
     });
 
     // Handle dynamic deletion of order items
@@ -271,3 +283,38 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+// define a debounce function to execute other operations with a delay
+function debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
+function updateItemValue(target) {
+    // Recalculate order value on discount change
+    if (target.classList.contains('discount-field')) {
+        let formIndex = event.target.name.match(/\d+/)[0];
+        let basePriceField = document.getElementById(`id_form-${formIndex}-base_price`);
+        let quantityField = document.getElementById(`id_form-${formIndex}-quantity`);
+        let itemValueField = document.getElementById(`id_form-${formIndex}-item_value`);
+        let discount = parseFloat(event.target.value) || 0;
+        let basePrice = parseFloat(basePriceField.value) || 0;
+        let quantity = parseInt(quantityField.value) || 0;
+        itemValueField.value = ((basePrice - discount) * quantity).toFixed(2);
+    }
+
+    // Recalculate order value on quantity change
+    if (target.classList.contains('quantity-field')) {
+        let formIndex = event.target.name.match(/\d+/)[0];
+        let basePriceField = document.getElementById(`id_form-${formIndex}-base_price`);
+        let discountField = document.getElementById(`id_form-${formIndex}-discount`);
+        let itemValueField = document.getElementById(`id_form-${formIndex}-item_value`);
+        let quantity = parseInt(event.target.value) || 0;
+        let basePrice = parseFloat(basePriceField.value) || 0;
+        let discount = parseFloat(discountField.value) || 0;
+        itemValueField.value = ((basePrice - discount) * quantity).toFixed(2);
+    }
+};
