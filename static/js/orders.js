@@ -103,14 +103,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Handle dynamic product selection and show options/finishes fields
+    // Handle dynamic product selection and show relevant options/finishes fields
     document.addEventListener('change', function (event) {
         if (event.target.classList.contains('product-dropdown')) {
             let productId = event.target.value;
             let formIndex = event.target.name.match(/\d+/)[0];
             let optionsContainer = document.getElementById(`options-container-${formIndex}`);
             let finishesContainer = document.getElementById(`finishes-container-${formIndex}`);
-            debugger;
+
             if (productId) {
                 fetch(`/api/get_product_options/${productId}/`)
                     .then(response => {
@@ -121,14 +121,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         return response.json();
                     })
                     .then(data => {
-                        debugger;
                         // Populate options dynamically
                         optionsContainer.innerHTML = ''; // Clear old options
                         data.options.forEach(option => {
                             let optionHTML = `
                                 <div class="form-group">
                                     <label for="option_${option.id}">${option.name}:</label>
-                                    <select class="form-control" name="option_${option.id}">
+                                    <select class="form-control options-dropdown" name="option_${option.id}">
                                         <option value="">Select ${option.name}</option>
                             `;
                             option.option_values.forEach(optionValue => {
@@ -144,8 +143,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         data.finishes.forEach(finish => {
                             let finishHTML = `
                                 <div class="form-group">
-                                    <label for="finish_${finish.id}">${finish.name}</label>
-                                    <select class="form-control" name="finish_${finish.id}">
+                                    <label for="product_finish_${finish.id}">Product ${finish.name}</label>
+                                    <select class="form-control" name="product_finish_${finish.id}">
                                         <option value="">Select ${finish.name}</option>
                             `;
                             finish.finish_options.forEach(finishOption => {
@@ -168,6 +167,54 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Hide the options and finishes containers if no product is selected
                 optionsContainer.classList.add('hidden');
                 finishesContainer.classList.add('hidden');
+            }
+        }
+    });
+
+    // Handle dynamic option_values selection and show related finishes fields
+    document.addEventListener('change', function (event) {
+        if (event.target.classList.contains('options-dropdown')) {
+            let optionValueId = event.target.value;
+            let formIndex = event.target.name.match(/\d+/)[0];
+            let compFinishesContainer = document.getElementById(`comp-finishes-container-${formIndex}`);
+debugger;
+            if (optionValueId) {
+                fetch(`/api/get_component_finishes/${optionValueId}/`)
+                    .then(response => {
+                        // Check if the response is OK (status in the range 200-299)
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok ' + response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Populate finishes dynamically
+                        compFinishesContainer.innerHTML = ''; // Clear old finishes
+                        data.component_finishes.forEach(finish => {
+                            let finishHTML = `
+                                <div class="form-group">
+                                    <label for="${finish.component_slug}-${finish.id}">${finish.component_name} ${finish.name}</label>
+                                    <select class="form-control" name="${finish.component_slug}-${finish.id}">
+                                        <option value="">Select ${finish.name}</option>
+                            `;
+                            finish.finish_options.forEach(finishOption => {
+                                finishHTML += `<option value="${finishOption.id}">${finishOption.name}</option>`;
+                            });
+                            finishHTML += '</select></div>';
+                            finishesContainer.innerHTML += finishHTML;
+                        });
+                        
+                        // show the component-finishes-container
+                        compFinishesContainer.classList.remove('hidden');
+                    })
+                    .catch(error => {
+                        // Handle any errors that occurred during the fetch
+                        console.error('There was a problem fetching the component finish options:', error);
+                    });
+
+            } else {
+                // Hide the component finishes containers if no product is selected
+                compFinishesContainer.classList.add('hidden');
             }
         }
     });
