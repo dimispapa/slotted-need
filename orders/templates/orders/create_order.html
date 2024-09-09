@@ -34,7 +34,7 @@
 
     <div id="order-items">
       {% for form in order_item_formset %}
-      <div class="card mb-3 order-item-form">
+      <div class="card mb-3 order-item-form" data-form-index="{{ forloop.counter0 }}">
         <div class="card-body">
           <h4>Order Item # {{ forloop.counter }}</h4>
           <!-- Product selection -->
@@ -46,12 +46,12 @@
             {{ form.quantity }}</div>
 
           <!-- Options and finishes containers will be populated dynamically -->
-          <div class="options-container hidden" id="options-container-{{ forloop.counter0 }}"></div>
-          <div class="finishes-container hidden" id="finishes-container-{{ forloop.counter0 }}"></div>
-          <div class="comp-finishes-container hidden" id="comp-finishes-container-{{ forloop.counter }}"></div>
+          <div class="options form-container hidden" id="options-container-{{ forloop.counter0 }}"> </div>
+          <div class="finishes form-container hidden" id="finishes-container-{{ forloop.counter0 }}"></div>
+          <div class="comp-finishes form-container hidden" id="comp-finishes-container-{{ forloop.counter0 }}"></div>
 
           {% if order_item_formset.can_delete %}
-          <button type="button" class="btn btn-danger delete-order-item" data-form-index="{{ forloop.counter0 }}">
+          <button type="button" class="btn btn-danger delete-order-item">
             Delete
           </button>
           {% endif %}

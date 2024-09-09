@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function createNewOrderItemForm(index) {
         let newForm = document.createElement('div');
         newForm.classList.add('card', 'mb-3', 'order-item-form');
+        newForm.setAttribute('data-form-index', index);
         newForm.innerHTML = `
             <div class="card-body">
                 <h4>Order Item #${index+1}</h4>
@@ -41,10 +42,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     <label for="id_form-${index}-quantity">Quantity:</label>
                     <input type="number" class="form-control" id="id_form-${index}-quantity" name="form-${index}-quantity" min="1" value="1">
                 </div>
-                <div class="options-container hidden" id="options-container-${index}"></div>
-                <div class="finishes-container hidden" id="finishes-container-${index}"></div>
+                <div class="options form-container hidden" id="options-container-${index}"></div>
+                <div class="finishes form-container hidden" id="finishes-container-${index}"></div>
+                <div class="comp-finishes form-container hidden" id="comp-finishes-container-${index}"></div>
 
-                <button type="button" class="btn btn-danger delete-order-item" data-form-index="${index}">Delete</button>
+                <button type="button" class="btn btn-danger delete-order-item">Delete</button>
             </div>
         `;
         return newForm;
@@ -53,10 +55,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Handle adding new order item forms
     addOrderItemButton.addEventListener('click', function () {
-        let currentFormCount = parseInt(totalFormsInput.value);
+        let newFormIndex = parseInt(totalFormsInput.value);
 
         // Create a new empty form (with only product and quantity fields)
-        let newForm = createNewOrderItemForm(currentFormCount);
+        let newForm = createNewOrderItemForm(newFormIndex);
 
         // Append the new form to the formset container
         orderItemsContainer.appendChild(newForm);
@@ -66,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
         populateProductDropdown(productSelect);
 
         // Increment the total form count
-        totalFormsInput.value = currentFormCount + 1;
+        totalFormsInput.value = newFormIndex + 1;
     });
 
     // Populate product dropdowns for existing forms on page load
@@ -77,7 +79,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Handle dynamic deletion of order items
     document.addEventListener('click', function (event) {
         if (event.target.classList.contains('delete-order-item')) {
-            let formIndex = event.target.getAttribute('data-form-index');
             let orderItemForm = event.target.closest('.order-item-form');
 
             if (orderItemForm) {
@@ -89,14 +90,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Re-index remaining forms to ensure they are correctly numbered
                 let orderItemForms = document.querySelectorAll('.order-item-form');
                 orderItemForms.forEach((form, index) => {
-                    form.querySelector('.delete-order-item').setAttribute('data-form-index', index);
+                    form.setAttribute('data-form-index', index);
+                    // Update Order Item heading
+                    form.querySelector('h4').innerText = `Order Item #${index+1}`
+                    // update select and input elements
                     form.querySelectorAll('input, select').forEach(field => {
                         // Update field names and IDs to maintain the correct formset structure
                         field.name = field.name.replace(/form-\d+-/, `form-${index}-`);
                         field.id = field.id.replace(/form-\d+-/, `form-${index}-`);
-                        // Update Order Item heading
-                        form.querySelector('h4').innerText = `Order Item #${index+1}`
-
+                    });
+                    // update label elements
+                    form.querySelectorAll('label').forEach(field => {
+                        // Update for to align label to correct elements
+                        field.htmlFor = field.htmlFor.replace(/form-\d+-/, `form-${index}-`);
+                    });
+                    // update options/finishes containers
+                    form.querySelectorAll('.form-container').forEach(field => {
+                        // update container ids
+                        field.id = field.id.replace(/-container-\d+/, `-container-${index}`);
                     });
                 });
             }
@@ -121,8 +132,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         return response.json();
                     })
                     .then(data => {
+                        // Clear old options
+                        optionsContainer.innerHTML = '';
                         // Populate options dynamically
-                        optionsContainer.innerHTML = ''; // Clear old options
                         data.options.forEach(option => {
                             let optionHTML = `
                                 <div class="form-group">
@@ -136,10 +148,18 @@ document.addEventListener('DOMContentLoaded', function () {
                             optionHTML += '</select></div>';
                             optionsContainer.innerHTML += optionHTML;
                         });
+                        if (optionsContainer.childElementCount > 0) {
+                            // add heading
+                            let optionsHeading = document.createElement("h5")
+                            optionsHeading.innerHTML = "<h5>Configuration Options</h5>"
+                            optionsContainer.prepend(optionsHeading)
+                            // Show the options container
+                            optionsContainer.classList.remove('hidden');
+                        }
 
-
+                        // Clear old finishes
+                        finishesContainer.innerHTML = '';
                         // Populate finishes dynamically
-                        finishesContainer.innerHTML = ''; // Clear old finishes
                         data.finishes.forEach(finish => {
                             let finishHTML = `
                                 <div class="form-group">
@@ -153,10 +173,14 @@ document.addEventListener('DOMContentLoaded', function () {
                             finishHTML += '</select></div>';
                             finishesContainer.innerHTML += finishHTML;
                         });
-
-                        // Show the options and finishes containers
-                        optionsContainer.classList.remove('hidden');
-                        finishesContainer.classList.remove('hidden');
+                        if (finishesContainer.childElementCount > 0) {
+                            // add heading
+                            let finishesHeading = document.createElement("h5")
+                            finishesHeading.innerHTML = "<h5>Product Finishes</h5>"
+                            finishesContainer.prepend(finishesHeading)
+                            // show the finishes container
+                            finishesContainer.classList.remove('hidden');
+                        }
                     })
                     .catch(error => {
                         // Handle any errors that occurred during the fetch
@@ -175,9 +199,9 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('change', function (event) {
         if (event.target.classList.contains('options-dropdown')) {
             let optionValueId = event.target.value;
-            let formIndex = event.target.name.match(/\d+/)[0];
+            let formIndex = event.target.closest('.order-item-form').getAttribute('data-form-index');
             let compFinishesContainer = document.getElementById(`comp-finishes-container-${formIndex}`);
-debugger;
+            debugger;
             if (optionValueId) {
                 fetch(`/api/get_component_finishes/${optionValueId}/`)
                     .then(response => {
@@ -188,24 +212,31 @@ debugger;
                         return response.json();
                     })
                     .then(data => {
+                        // Clear old finishes
+                        compFinishesContainer.innerHTML = '';
                         // Populate finishes dynamically
-                        compFinishesContainer.innerHTML = ''; // Clear old finishes
                         data.component_finishes.forEach(finish => {
-                            let finishHTML = `
+                            let compFinishHTML = `
                                 <div class="form-group">
                                     <label for="${finish.component_slug}-${finish.id}">${finish.component_name} ${finish.name}</label>
                                     <select class="form-control" name="${finish.component_slug}-${finish.id}">
                                         <option value="">Select ${finish.name}</option>
                             `;
                             finish.finish_options.forEach(finishOption => {
-                                finishHTML += `<option value="${finishOption.id}">${finishOption.name}</option>`;
+                                compFinishHTML += `<option value="${finishOption.id}">${finishOption.name}</option>`;
                             });
-                            finishHTML += '</select></div>';
-                            finishesContainer.innerHTML += finishHTML;
+                            compFinishHTML += '</select></div>';
+                            compFinishesContainer.innerHTML += compFinishHTML;
                         });
-                        
-                        // show the component-finishes-container
-                        compFinishesContainer.classList.remove('hidden');
+                        if (compFinishesContainer.childElementCount > 0) {
+                            // add heading
+                            let compFinishesHeading = document.createElement("h5")
+                            compFinishesHeading.innerHTML = "<h5>Component Finishes</h5>"
+                            compFinishesContainer.prepend(compFinishesHeading)
+
+                            // show the component-finishes-container
+                            compFinishesContainer.classList.remove('hidden');
+                        }
                     })
                     .catch(error => {
                         // Handle any errors that occurred during the fetch
