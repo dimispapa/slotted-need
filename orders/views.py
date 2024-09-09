@@ -141,7 +141,7 @@ def get_component_finishes(request, option_value_id):
     component_finishes = []
     # loop through the components and extract the finish options
     for component in components:
-        for finish in component.finishes:
+        for finish in component.finishes.all():
 
             finish_options = FinishOption.objects.filter(finish=finish)
             finish_options_data = [{'id': fo.id, 'name': fo.name}
