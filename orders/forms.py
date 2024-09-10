@@ -40,6 +40,15 @@ class OrderForm(forms.Form):
         }),
         required=False,  # Optional as we populate it dynamically
     )
+    deposit = forms.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'id': 'order_deposit'
+        }),
+        required=False,  # Optional as not all orders pay deposit
+    )
 
 
 class OrderItemForm(forms.ModelForm):

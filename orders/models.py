@@ -19,6 +19,8 @@ class Order(models.Model):
                                blank=True, null=True)
     discount = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, editable=False)
+    deposit = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0, editable=False)
     order_value = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, editable=False)
     # create a status mapping to use as choices for order_status
