@@ -20,15 +20,7 @@
     {% csrf_token %}
 
     <!-- Render the Order form for client information -->
-    <div class="form-group">
-      {{ order_form.client_name.label_tag }}
-      {{ order_form.client_name }}
-      <div id="client-suggestions" class="dropdown-menu"></div> <!-- Autocomplete suggestions -->
-    </div>
-    <div class="form-group">{{ order_form.client_phone.label_tag }}
-      {{ order_form.client_phone }}</div>
-    <div class="form-group">{{ order_form.client_email.label_tag }}
-      {{ order_form.client_email }}</div>
+    {% crispy order_form %}
 
     <div id="order-items">
       <!-- Render the OrderItem forms for products and options -->
@@ -74,8 +66,8 @@
     <button type="button" id="add-order-item" class="btn btn-secondary mb-3">Add Order Item</button>
     <br>
     <!-- Deposit and Order Value fields -->
-     {{ order_form.deposit.label_tag }}
-     {{ order_form.deposit }}
+    {{ order_form.deposit.label_tag }}
+    {{ order_form.deposit }}
     <label for="order_value">Total order value:</label>
     {{ order_form.order_value }}
 

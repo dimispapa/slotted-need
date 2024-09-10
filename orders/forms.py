@@ -1,4 +1,6 @@
 from django import forms
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Row, Column, HTML
 from .models import OrderItem
 
 
@@ -39,6 +41,26 @@ class OrderForm(forms.Form):
         }),
         required=False,  # Optional as not all orders pay deposit
     )
+
+    # define initialisation with a specific layout
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.layout = Layout(
+            Row(
+                Column('client_name', css_class='form-group col-md-4 mb-0'),
+                # Add a custom HTML div element that will be used by the
+                # search_client.js to show suggestions
+                HTML("""
+                    <div id="client-suggestions" class="dropdown-menu"></div>
+                    """),
+                Column('client_phone', css_class='form-group col-md-4 mb-0'),
+                Column('client_email', css_class='form-group col-md-4 mb-0'),
+            ),
+            # Exclude 'deposit' and 'order_value' from automatic layout and
+            # manually define position in template at the bottom
+        )
 
 
 class OrderItemForm(forms.ModelForm):
