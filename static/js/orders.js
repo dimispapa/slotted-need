@@ -126,7 +126,7 @@ function updateComponentFinishes(target) {
 
 function updateProductDetails(target) {
     let productId = target.value;
-    let formIndex = target.name.match(/\d+/)[0];
+    let formIndex = target.closest('.order-item-form').getAttribute('data-form-index');
     let optionsContainer = document.getElementById(`options-container-${formIndex}`);
     let finishesContainer = document.getElementById(`finishes-container-${formIndex}`);
     let basePriceField = document.getElementById(`id_form-${formIndex}-base_price`);
@@ -134,8 +134,10 @@ function updateProductDetails(target) {
     let itemValueField = document.getElementById(`id_form-${formIndex}-item_value`);
 
     if (productId) {
+        // Return a promise when a productId is present
         return new Promise((resolve, reject) => {
-            fetch(`/api/get_product_options/${productId}/`)
+            // fetch product data from the API
+            fetch(`/api/get_product_data/${productId}/`)
                 .then(response => {
                     // Check if the response is OK (status in the range 200-299)
                     if (!response.ok) {
@@ -166,6 +168,7 @@ function updateProductDetails(target) {
                         optionHTML += '</select></div>';
                         optionsContainer.innerHTML += optionHTML;
                     });
+                    // Show the options container if there are options
                     if (optionsContainer.childElementCount > 0) {
                         // add heading
                         let optionsHeading = document.createElement("h5")
@@ -191,6 +194,7 @@ function updateProductDetails(target) {
                         finishHTML += '</select></div>';
                         finishesContainer.innerHTML += finishHTML;
                     });
+                    // Show the finishes container if there are finishes
                     if (finishesContainer.childElementCount > 0) {
                         // add heading
                         let finishesHeading = document.createElement("h5")
@@ -213,6 +217,12 @@ function updateProductDetails(target) {
         // Hide the options and finishes containers if no product is selected
         optionsContainer.classList.add('hidden');
         finishesContainer.classList.add('hidden');
+        // set the base price and discount to zero to reset
+        basePriceField.value = 0;
+        discountField.value = 0;
+        itemValueField.value = 0;
+        // resolve the promise with an empty selection
+        return Promise.resolve();
     }
 };
 

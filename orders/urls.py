@@ -8,7 +8,7 @@ urlpatterns = [
     # get_products API
     path('api/get_products/', views.get_products, name='get_products'),
     # get_product_options API, with product_id as a path parameter
-    path('api/get_product_options/<int:product_id>/',
+    path('api/get_product_data/<int:product_id>/',
          views.get_product_data, name='get_product_data'),
     # get_component_finishes API, with option_value_id as a path parameter
     path('api/get_component_finishes/<int:option_value_id>/',
