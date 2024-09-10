@@ -105,5 +105,5 @@ class ProductComponent(models.Model):
     quantity = models.PositiveIntegerField(default=1)
 
     def __str__(self):
-        return (f"{self.option_value.value} - "
+        return (f"{self.option_value} - "
                 f"{self.component.name} (x{self.quantity})")
