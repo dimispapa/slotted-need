@@ -21,7 +21,7 @@
 
     <!-- Render the Order form for client information -->
     <div class="form-group">
-      {{ order_form.client_name.label_tag | crispy }}
+      {{ order_form.client_name.label_tag }}
       {{ order_form.client_name }}
       <div id="client-suggestions" class="dropdown-menu"></div> <!-- Autocomplete suggestions -->
     </div>
