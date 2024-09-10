@@ -19,17 +19,7 @@ class OrderForm(forms.Form):
                                         'id': 'client_email'
                                     }))
 
-    # read-only discount and order_value fields
-    discount = forms.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        widget=forms.NumberInput(attrs={
-            'class': 'form-control',
-            'readonly': 'readonly',
-            'id': 'order_discount'
-        }),
-        required=False,  # Optional as we populate it dynamically
-    )
+    # read-only deposit and order_value fields
     order_value = forms.DecimalField(
         max_digits=10,
         decimal_places=2,
