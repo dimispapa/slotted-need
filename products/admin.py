@@ -1,7 +1,7 @@
 import nested_admin
 from django.contrib import admin
 from .models import (Product, Option, OptionValue, Component, Finish,
-                     FinishOption, ProductComponent)
+                     FinishOption, ProductComponent, ComponentPart)
 
 
 # Define the ProductAdmin page with OptionInline to add Options in same view
@@ -32,9 +32,16 @@ class ProductAdmin(nested_admin.NestedModelAdmin):
 
 # Define the ComponentAdmin page to add components
 @admin.register(Component)
-class ComponentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'description', 'unit_cost',
-                    'measurement_unit', 'supplier_details', )
+class ComponentAdmin(nested_admin.NestedModelAdmin):
+
+    # define component part inline
+    class ComponentPartInLine(nested_admin.NestedStackedInline):
+        model = ComponentPart
+        extra = 0
+        prepopulated_fields = {'slug': ('name',)}
+
+    list_display = ('name', 'slug', 'description', 'supplier_details', )
+    inlines = [ComponentPartInLine, ]
     # Allows for the selection of multiple finishes
     filter_horizontal = ['finishes',]
     search_fields = ['name', 'description', 'supplier_details']

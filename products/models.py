@@ -24,6 +24,29 @@ class FinishOption(models.Model):
         return f"{self.finish.name} - {self.name}"
 
 
+# Create a ComponentPart model class for defining the lowest granular level of
+# parts that make up a complete Component
+
+class ComponentPart(models.Model):
+    """Represents the most granular parts of a component."""
+    name = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=50, unique=True)
+    description = models.TextField(blank=True, null=True)
+    unit_cost = models.DecimalField(max_digits=7, decimal_places=2,
+                                    validators=[MinValueValidator(0.00)])
+    component = models.ForeignKey('Component', related_name='parts',
+                                  on_delete=models.CASCADE)
+    # How many parts make up a complete component
+    quantity = models.PositiveIntegerField(default=1,
+                                           validators=[MinValueValidator(1)])
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return f"{self.name} x {self.quantity} | @ €{self.unit_cost}"
+
+
 # Create a Component model class as related class to Product model
 class Component(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -31,16 +54,6 @@ class Component(models.Model):
     description = models.TextField(blank=True, null=True)
     unit_cost = models.DecimalField(max_digits=7, decimal_places=2,
                                     validators=[MinValueValidator(0.00)])
-    # create a units mapping to use as choices for measurement_unit
-    UNITS = {'g': 'gram',
-             'kg': 'kilogram',
-             'l': 'litre',
-             'pc': 'piece'}
-    measurement_unit = models.CharField(
-        max_length=2,
-        choices=UNITS,
-        default='pc'
-    )
     supplier_details = models.TextField()
     finishes = models.ManyToManyField(Finish, blank=True,
                                       related_name='components')
@@ -49,7 +62,34 @@ class Component(models.Model):
         ordering = ["name"]
 
     def __str__(self):
-        return f"{self.name} | €{self.unit_cost} per {self.measurement_unit}"
+        # Get the component parts if they exist
+        parts = self.parts.all()
+        if parts.exists():
+            # Create a string representation of the parts
+            parts_str = ', '.join(
+                [f"{part.name} (x{part.quantity})" for part in parts]
+            )
+            return f"{self.name} @ €{self.unit_cost} | Parts: {parts_str}"
+        else:
+            return f"{self.name} @ €{self.unit_cost}"
+
+    def calculate_unit_cost(self):
+        """
+        If the component has parts, calculate the total unit cost as the sum
+        of the unit costs of its parts multiplied by the quantity of each part.
+        Otherwise, keep the current unit cost.
+        """
+        parts = self.parts.all()
+        if parts.exists():
+            total_cost = sum(part.unit_cost * part.quantity for part in parts)
+            self.unit_cost = total_cost
+        return self.unit_cost
+
+    def save(self, *args, **kwargs):
+        # Calculate the unit cost based on the component parts
+        # (if any) before saving
+        self.calculate_unit_cost()
+        super().save(*args, **kwargs)
 
 
 # Create Product model class as the main parent model
@@ -80,7 +120,7 @@ class Option(models.Model):
                                 on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.product.name} - {self.name}"
+        return f"{self.name}"
 
 
 # Create the OptionValue model that defines the options for an Option model
@@ -90,7 +130,7 @@ class OptionValue(models.Model):
     value = models.CharField(max_length=50)
 
     def __str__(self):
-        return f"{self.option.name}: {self.value}"
+        return f"{self.value}"
 
 
 # Create a ProductComponent intermediary model to link the Product with its
@@ -102,8 +142,8 @@ class ProductComponent(models.Model):
     option_value = models.ForeignKey(OptionValue, on_delete=models.SET_NULL,
                                      blank=True, null=True,
                                      related_name='product_components')
-    quantity = models.PositiveIntegerField(default=1)
+    quantity = models.PositiveIntegerField(default=1,
+                                           validators=[MinValueValidator(1)])
 
     def __str__(self):
-        return (f"{self.option_value} - "
-                f"{self.component.name} (x{self.quantity})")
+        return (f"{self.component.name} (x{self.quantity})")
