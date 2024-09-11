@@ -2,7 +2,8 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
 from django.http import JsonResponse
 from .models import Client, Order, OrderItem
-from products.models import Product, Option, OptionValue, FinishOption
+from products.models import (Product, Option, OptionValue, FinishOption,
+                             ProductComponent)
 from .forms import OrderForm, OrderItemFormSet
 
 
@@ -134,10 +135,16 @@ def get_product_data(request, product_id):
 
 # create a get_component_finishes API function to handle the finish options
 # based on the product options selected (associated with components)
-def get_finishes(request, option_value_id):
+def get_finishes(request, product_id, option_value_id):
     # get the option_value object and its associated product_component tables
     option_value = get_object_or_404(OptionValue, id=option_value_id)
-    product_components = option_value.product_components.all()
+
+    # Filter ProductComponent by both product_id and option_value_id
+    product_components = ProductComponent.objects.filter(
+        product_id=product_id,
+        option_value=option_value
+    )
+
     # extract the relevant component in the product_component linking table
     components = [c.component for c in product_components]
     component_finishes = []

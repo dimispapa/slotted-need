@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         data.options.forEach(option => {
                             // create a row for options and finishes
                             let row = document.createElement('div');
-                            row.classList.add('row', 'mb-3');
+                            row.classList.add('row', 'mb-3', 'bg-light', 'p-2');
 
                             // create an option column
                             let optionCol = document.createElement('div');
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                             // Fetch finishes dynamically when the option value changes
                             document.getElementById(`option-${option.id}-${formIndex}`).addEventListener('change', function () {
-                                updateFinishes(formIndex, option.id, this.value);
+                                updateFinishes(formIndex, productId, option.id, this.value);
                             });
 
                             if (optionsContainer.childElementCount > 0) {
@@ -123,13 +123,13 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     // Define function to update finishes based on selected option
-    function updateFinishes(formIndex, optionId, optionValueId) {
+    function updateFinishes(formIndex, productId, optionId, optionValueId) {
 
         let finishContainer = document.getElementById(`finish-container-${optionId}-${formIndex}`);
 
         // Check if an actual option value was selected
         if (optionValueId) {
-            fetch(`/api/get_finishes/${optionValueId}/`)
+            fetch(`/api/get_finishes/${productId}/${optionValueId}/`)
                 .then(response => {
                     // Check if the response is OK (status in the range 200-299)
                     if (!response.ok) {
