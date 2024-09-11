@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             // create an option column
                             let optionCol = document.createElement('div');
                             // Full width on larger screens, half on mobile
-                            optionCol.classList.add('col-sm-6', 'col-md-12')
+                            optionCol.classList.add('col-6')
 
                             let optionHTML = `
                                     <label for="option-${option.id}-${formIndex}" class="form-label">${option.name}</label>
