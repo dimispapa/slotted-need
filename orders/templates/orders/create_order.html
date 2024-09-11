@@ -29,28 +29,13 @@
       <div class="card mb-3 order-item-form" data-form-index="{{ forloop.counter0 }}">
         <div class="card-body">
           <h4>Order Item # {{ forloop.counter }}</h4>
-          <!-- Product selection -->
-          {{ order_item.product.label_tag }}
-          {{ order_item.product }}
+          {% crispy order_item %}
 
-          <!-- Price, discount and value fields -->
-          {{ order_item.base_price.label_tag }}
-          {{ order_item.base_price }}
-          {{ order_item.discount.label_tag }}
-          {{ order_item.discount }}
-
-          <!-- Quantity input -->
-          {{ order_item.quantity.label_tag }}
-          {{ order_item.quantity }}
-
-          <!-- Order item value -->
-          {{ order_item.item_value.label_tag }}
-          {{ order_item.item_value }}
-
-          <!-- Options and finishes containers will be populated dynamically -->
-          <div class="options form-container hidden" id="options-container-{{ forloop.counter0 }}"> </div>
-          <div class="finishes form-container hidden" id="finishes-container-{{ forloop.counter0 }}"></div>
-          <div class="comp-finishes form-container hidden" id="comp-finishes-container-{{ forloop.counter0 }}"></div>
+          <div class="container-fluid">
+            <div id="dynamic-options-container-{{ forloop.counter0 }}" class="row">
+              <!-- Options and finishes will be populated here -->
+            </div>
+          </div>
 
           {% if order_item_formset.can_delete %}
           <button type="button" class="btn btn-danger delete-order-item">

@@ -134,7 +134,7 @@ def get_product_data(request, product_id):
 
 # create a get_component_finishes API function to handle the finish options
 # based on the product options selected (associated with components)
-def get_component_finishes(request, option_value_id):
+def get_finishes(request, option_value_id):
     # get the option_value object and its associated product_component tables
     option_value = get_object_or_404(OptionValue, id=option_value_id)
     product_components = option_value.product_components.all()

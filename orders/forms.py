@@ -10,16 +10,14 @@ class OrderForm(forms.Form):
         'autocomplete': 'off',  # Disable browser autocomplete
         'id': 'client_name'
     }))
-    client_phone = forms.CharField(required=False,
-                                   widget=forms.TextInput(attrs={
-                                       'class': 'form-control',
-                                       'id': 'client_phone'
-                                   }))
-    client_email = forms.EmailField(required=False,
-                                    widget=forms.EmailInput(attrs={
-                                        'class': 'form-control',
-                                        'id': 'client_email'
-                                    }))
+    client_phone = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'id': 'client_phone'
+    }))
+    client_email = forms.EmailField(widget=forms.EmailInput(attrs={
+        'class': 'form-control',
+        'id': 'client_email'
+    }))
 
     # read-only deposit and order_value fields
     order_value = forms.DecimalField(
@@ -42,7 +40,7 @@ class OrderForm(forms.Form):
         required=False,  # Optional as not all orders pay deposit
     )
 
-    # define initialisation with a specific layout
+    # initialisation with a defined form layout
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
@@ -71,21 +69,44 @@ class OrderItemForm(forms.ModelForm):
         widgets = {
             'product': forms.Select(
                 attrs={'class': 'form-control product-dropdown'}),
-            'base_price': forms.NumberInput(attrs={'class': 'form-control',
-                                                   'readonly': False}),
-            'discount': forms.NumberInput(attrs={'class':
-                                                 'form-control discount-field',
-                                                 'min': 0}),
-            'item_value': forms.NumberInput(attrs={'class': 'form-control',
-                                                   'readonly': True}),
             'quantity': forms.NumberInput(
                 attrs={'class': 'form-control quantity-field',
                        'min': 1, 'value': 1}),
-            'option_values': forms.SelectMultiple(
-                attrs={'class': 'form-control option-values-dropdown'}),
-            'finish_options': forms.SelectMultiple(
-                attrs={'class': 'form-control finish-options-dropdown'})
+            'base_price': forms.NumberInput(
+                attrs={'class': 'form-control base-price-field',
+                       'readonly': False}),
+            'discount': forms.NumberInput(
+                attrs={'class': 'form-control discount-field',
+                       'min': 0}),
+            'item_value': forms.NumberInput(
+                attrs={'class': 'form-control',
+                       'readonly': True}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            Row(
+                Column('product', css_class='form-group col-md-9'),
+                Column('quantity', css_class='form-group col-md-3'),
+            ),
+            HTML("""
+                <div class="row options form-container hidden col-md-12 col-mb"
+                    id="options-container-{{ forloop.counter0 }}">
+                </div>
+                """),
+            HTML("""
+                <div class="row finishes form-container hidden"
+                    id="finishes-container-{{ forloop.counter0 }}">
+                </div>
+                """),
+            Row(
+                Column('base_price'),
+                Column('discount'),
+                Column('item_value'),
+            ),
+        )
 
 
 # Create the formset
