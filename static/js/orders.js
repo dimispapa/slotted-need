@@ -59,15 +59,15 @@ document.addEventListener('DOMContentLoaded', function () {
                         data.options.forEach(option => {
                             // create a row for options and finishes
                             let row = document.createElement('div');
-                            row.classList.add('row', 'mb-3', 'bg-light', 'p-2');
+                            row.classList.add('row', 'mb-1', 'bg-light', 'p-2', 'p-md-3', 'border');
 
                             // create an option column
                             let optionCol = document.createElement('div');
                             // Full width on larger screens, half on mobile
-                            optionCol.classList.add('col-6')
+                            optionCol.classList.add('col-12' , 'col-md-6')
 
                             let optionHTML = `
-                                    <label for="option-${option.id}-${formIndex}" class="form-label">${option.name}</label>
+                                    <label for="option-${option.id}-${formIndex}" class="form-label requiredField">${option.name}*</label>
                                     <select class="form-select mb-3 options-dropdown" name="option_${option.id}_${formIndex}"
                                     id="option-${option.id}-${formIndex}" required aria-required="true">
                                         <option value="">Select ${option.name}</option>

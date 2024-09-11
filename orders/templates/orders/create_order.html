@@ -27,7 +27,7 @@
       <h3>Order Items</h3>
       {% for order_item in order_item_formset %}
       <div class="card mb-3 order-item-form" data-form-index="{{ forloop.counter0 }}">
-        <div class="card-body">
+        <div class="card-body card-body container-fluid bg-secondary text-white">
           <h4>Order Item # {{ forloop.counter }}</h4>
           {% crispy order_item %}
 

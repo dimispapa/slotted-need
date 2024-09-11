@@ -65,7 +65,7 @@ class OrderItemForm(forms.ModelForm):
     class Meta:
         model = OrderItem
         fields = ['product', 'base_price', 'discount', 'item_value',
-                  'quantity', 'option_values', 'finish_options']
+                  'quantity']
         widgets = {
             'product': forms.Select(
                 attrs={'class': 'form-control product-dropdown'}),
@@ -88,20 +88,28 @@ class OrderItemForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.layout = Layout(
             Row(
-                Column('product', css_class='form-group col-md-9'),
-                Column('quantity', css_class='form-group col-md-3'),
+                Column(
+                    'product',
+                    css_class=('form-group col-md-9 bg-secondary text-white '
+                               'p-2 p-md-3')),
+                Column(
+                    'quantity',
+                    css_class=('form-group col-md-3 bg-secondary text-white '
+                               'p-2 p-md-3')),
             ),
-            HTML("""
-                <div class="container-fluid">
+            Row(
+                HTML("""
                   <div id="dynamic-options-container-{{ forloop.counter0 }}"
-                    class="row">
+                    class="col-12 p-2 p-md-3 hidden">
                   </div>
-                </div>
-                """),
+                    """),
+            ),
+
             Row(
                 Column('base_price'),
                 Column('discount'),
                 Column('item_value'),
+                css_class="bg-secondary text-white p-2 p-md-3"
             ),
         )
 
