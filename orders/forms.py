@@ -92,13 +92,10 @@ class OrderItemForm(forms.ModelForm):
                 Column('quantity', css_class='form-group col-md-3'),
             ),
             HTML("""
-                <div class="row options form-container hidden col-md-12 col-mb"
-                    id="options-container-{{ forloop.counter0 }}">
-                </div>
-                """),
-            HTML("""
-                <div class="row finishes form-container hidden"
-                    id="finishes-container-{{ forloop.counter0 }}">
+                <div class="container-fluid">
+                  <div id="dynamic-options-container-{{ forloop.counter0 }}"
+                    class="row">
+                  </div>
                 </div>
                 """),
             Row(

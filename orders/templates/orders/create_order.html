@@ -31,12 +31,6 @@
           <h4>Order Item # {{ forloop.counter }}</h4>
           {% crispy order_item %}
 
-          <div class="container-fluid">
-            <div id="dynamic-options-container-{{ forloop.counter0 }}" class="row">
-              <!-- Options and finishes will be populated here -->
-            </div>
-          </div>
-
           {% if order_item_formset.can_delete %}
           <button type="button" class="btn btn-danger delete-order-item">
             Delete
