@@ -91,25 +91,22 @@ class OrderItemForm(forms.ModelForm):
                 Column(
                     'product',
                     css_class=('form-group col-md-9 bg-secondary text-white '
-                               'p-2 p-md-3')),
+                               'p-1 p-md-2')),
                 Column(
                     'quantity',
                     css_class=('form-group col-md-3 bg-secondary text-white '
-                               'p-2 p-md-3')),
+                               'p-1 p-md-2')),
             ),
-            Row(
-                HTML("""
-                  <div id="dynamic-options-container-{{ forloop.counter0 }}"
-                    class="col-12 p-2 p-md-3 hidden">
-                  </div>
-                    """),
-            ),
-
+            HTML("""
+                <div id="options-container-{{ forloop.counter0 }}"
+                class="row p-1 p-md-2 bg-light text-dark hidden">
+                </div>
+                """),
             Row(
                 Column('base_price'),
                 Column('discount'),
                 Column('item_value'),
-                css_class="bg-secondary text-white p-2 p-md-3"
+                css_class="bg-secondary text-white p-1 p-md-2"
             ),
         )
 

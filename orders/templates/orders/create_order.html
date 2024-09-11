@@ -26,7 +26,7 @@
       <!-- Render the OrderItem forms for products and options -->
       <h3>Order Items</h3>
       {% for order_item in order_item_formset %}
-      <div class="card mb-3 order-item-form" data-form-index="{{ forloop.counter0 }}">
+      <div class="card mb-1 mb-md-2 order-item-form" data-form-index="{{ forloop.counter0 }}">
         <div class="card-body card-body container-fluid bg-secondary text-white">
           <h4>Order Item # {{ forloop.counter }}</h4>
           {% crispy order_item %}
@@ -42,7 +42,7 @@
     </div>
 
     <!-- Button to Add New Order Item -->
-    <button type="button" id="add-order-item" class="btn btn-secondary mb-3">Add Order Item</button>
+    <button type="button" id="add-order-item" class="btn btn-secondary mb-1 mb-md-2">Add Order Item</button>
     <br>
     <!-- Deposit and Order Value fields -->
     {{ order_form.deposit.label_tag }}

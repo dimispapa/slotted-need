@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateProductDetails(target) {
         let productId = target.value;
         let formIndex = target.closest('.order-item-form').getAttribute('data-form-index');
-        let optionsContainer = document.getElementById(`dynamic-options-container-${formIndex}`);
+        let optionsContainer = document.getElementById(`options-container-${formIndex}`);
         // let finishesContainer = document.getElementById(`finishes-container-${formIndex}`);
         let basePriceField = document.getElementById(`id_form-${formIndex}-base_price`);
         let discountField = document.getElementById(`id_form-${formIndex}-discount`);
@@ -57,37 +57,34 @@ document.addEventListener('DOMContentLoaded', function () {
                         optionsContainer.innerHTML = '';
                         // Populate options dynamically
                         data.options.forEach(option => {
-                            // create a row for options and finishes
-                            let row = document.createElement('div');
-                            row.classList.add('row', 'mb-1', 'bg-light', 'p-2', 'p-md-3', 'border');
-
-                            // create an option column
+                            // create columns for options
                             let optionCol = document.createElement('div');
-                            // Full width on larger screens, half on mobile
-                            optionCol.classList.add('col-12' , 'col-md-6')
+                            optionCol.classList.add('col-12', 'col-sm-6', 'col-md-4', 'col-lg-3', 'p-2', 'p-md-3', 'border');
 
-                            let optionHTML = `
+                            let optionDiv = document.createElement('div');
+                            let optionDivHTML = `
+                                <div class="row">
                                     <label for="option-${option.id}-${formIndex}" class="form-label requiredField">${option.name}*</label>
-                                    <select class="form-select mb-3 options-dropdown" name="option_${option.id}_${formIndex}"
+                                    <select class="form-select mb-1 mb-md-2 options-dropdown" name="option_${option.id}_${formIndex}"
                                     id="option-${option.id}-${formIndex}" required aria-required="true">
                                         <option value="">Select ${option.name}</option>
-                        `;
+                                </div>
+                        `;  
                             option.option_values.forEach(optionValue => {
-                                optionHTML += `<option value="${optionValue.id}">${optionValue.value}</option>`;
+                                optionDivHTML += `<option value="${optionValue.id}">${optionValue.value}</option>`;
                             });
-                            optionHTML += '</select>';
-                            optionCol.innerHTML = optionHTML;
+                            optionDivHTML += '</select>';
+                            optionDiv.innerHTML = optionDivHTML;
+                            optionCol.appendChild(optionDiv);
 
-                            // Create a finish column
-                            let finishCol = document.createElement('div');
-                            // Full width on larger screens, half on mobile
-                            finishCol.classList.add('col-6');
-                            finishCol.id = `finish-container-${option.id}-${formIndex}`;
+                            // Create a finish row
+                            let finishRow = document.createElement('div');
+                            finishRow.classList.add('row');
+                            finishRow.id = `finish-${option.id}-${formIndex}`;
+                            optionCol.appendChild(finishRow);
 
-                            // append the columns to the row and the row to the container
-                            row.appendChild(optionCol);
-                            row.appendChild(finishCol);
-                            optionsContainer.appendChild(row);
+                            // append the column to the container
+                            optionsContainer.appendChild(optionCol);
 
                             // Fetch finishes dynamically when the option value changes
                             document.getElementById(`option-${option.id}-${formIndex}`).addEventListener('change', function () {
@@ -111,8 +108,9 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
         } else {
-            // Hide the options container if no product is selected
+            // Hide the options and finishes container if no product is selected
             optionsContainer.classList.add('hidden');
+            finishesContainer.classList.remove('hidden');
             // set the base price and discount to zero to reset
             basePriceField.value = 0;
             discountField.value = 0;
@@ -125,7 +123,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Define function to update finishes based on selected option
     function updateFinishes(formIndex, productId, optionId, optionValueId) {
 
-        let finishContainer = document.getElementById(`finish-container-${optionId}-${formIndex}`);
+        let finishesContainer = document.getElementById(`finishes-container-${formIndex}`);
+        let finishRow = document.getElementById(`finish-${optionId}-${formIndex}`);
 
         // Check if an actual option value was selected
         if (optionValueId) {
@@ -139,23 +138,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 .then(data => {
                     // Clear old finishes
-                    finishContainer.innerHTML = '';
+                    finishRow.innerHTML = '';
                     // Populate finishes dynamically
                     data.component_finishes.forEach(finish => {
                         let finishHTML = `
-                                <label for="finish-${optionId}-${finish.id}-${formIndex}" class="form-label">${finish.name}</label>
-                                <select class="form-select mb-3 finish-dropdown" id="finish-${optionId}-${finish.id}-${formIndex}" name="finish_${optionId}_${finish.id}_${formIndex}">
+                                <label for="finish-${optionId}-${finish.id}-${formIndex}" class="form-label text-dark">${finish.name}</label>
+                                <select class="form-select mb-1 mb-md-2 finish-dropdown" id="finish-${optionId}-${finish.id}-${formIndex}" name="finish_${optionId}_${finish.id}_${formIndex}">
                                     <option value="">Select ${finish.name}</option>
                         `;
                         finish.finish_options.forEach(finishOption => {
                             finishHTML += `<option value="${finishOption.id}">${finishOption.name}</option>`;
                         });
                         finishHTML += '</select>';
-                        finishContainer.innerHTML += finishHTML;
+                        finishRow.innerHTML += finishHTML;
                     });
-                    if (finishContainer.childElementCount > 0) {
+                    if (finishRow.childElementCount > 0) {
                         // show the component-finishes-container
-                        finishContainer.classList.remove('hidden');
+                        finishRow.classList.remove('hidden');
                     };
                 })
                 .catch(error => {
@@ -165,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         } else {
             // Hide the component finishes containers if no product is selected
-            finishContainer.classList.add('hidden');
+            finishRow.classList.add('hidden');
         };
     };
 
