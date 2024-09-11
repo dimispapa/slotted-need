@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             // Create a finish column
                             let finishCol = document.createElement('div');
                             // Full width on larger screens, half on mobile
-                            finishCol.classList.add('col-sm-6', 'col-md-12');
+                            finishCol.classList.add('col-6');
                             finishCol.id = `finish-container-${option.id}-${formIndex}`;
 
                             // append the columns to the row and the row to the container
