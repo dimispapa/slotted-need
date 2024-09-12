@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     <label for="option-${option.id}-${formIndex}" class="form-label requiredField">${option.name}*</label>
                                     <select class="form-select options-dropdown" name="option_${option.id}_${formIndex}"
                                     id="option-${option.id}-${formIndex}" required aria-required="true">
-                                        <option value="">Select ${option.name}</option>
+                                        <option value="">------------</option>
                                 </div>
                         `;
                             option.option_values.forEach(optionValue => {
@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div class="col-12 form-group mb-1 mb-md-2">
                                 <label for="finish-${optionId}-${finish.id}-${formIndex}" class="form-label text-dark">${finish.name}</label>
                                 <select class="form-select finish-dropdown" id="finish-${optionId}-${finish.id}-${formIndex}" name="finish_${optionId}_${finish.id}_${formIndex}">
-                                    <option value="">Select ${finish.name}</option>
+                                    <option value="">------------</option>
                             </div>
                         `;
                         finish.finish_options.forEach(finishOption => {
@@ -155,10 +155,19 @@ document.addEventListener('DOMContentLoaded', function () {
                         finishHTML += '</select>';
                         finishRow.innerHTML += finishHTML;
                     });
+
                     if (finishRow.childElementCount > 0) {
                         // show the component-finishes-container
                         finishRow.classList.remove('d-none');
                     };
+
+                    // Add event listeners to each finish dropdown to handle the deselection of others
+                    finishRow.querySelectorAll('.finish-dropdown').forEach(finishDropdown => {
+                        finishDropdown.addEventListener('change', function () {
+                            deselectOtherFinishes(finishDropdown, finishRow);
+                        });
+                    });
+
                 })
                 .catch(error => {
                     // Handle any errors that occurred during the fetch
@@ -170,6 +179,17 @@ document.addEventListener('DOMContentLoaded', function () {
             finishRow.classList.add('d-none');
         };
     };
+
+    // Define function to deselect other finishes in the same option container
+    function deselectOtherFinishes(selectedDropdown, finishRow) {
+        // Loop through all finish dropdowns within the same finishRow
+        finishRow.querySelectorAll('.finish-dropdown').forEach(dropdown => {
+            // If it's not the dropdown that was selected, reset its value
+            if (dropdown !== selectedDropdown) {
+                dropdown.value = '';
+            }
+        });
+    }
 
     // Define function to create a new order item form dynamically (with only product and quantity fields)
     function addNewOrderItemForm() {
