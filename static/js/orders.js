@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Define function to update product details based on product selection
     function updateProductDetails(target) {
+
         let productId = target.value;
         let formIndex = target.closest('.order-item-form').getAttribute('data-form-index');
         let optionsContainer = document.getElementById(`options-container-${formIndex}`);
@@ -45,6 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         return response.json();
                     })
                     .then(data => {
+
                         // Set the base price field with the product's base price
                         basePriceField.value = data.base_price;
                         // Calculate the item value automatically
@@ -177,8 +179,9 @@ document.addEventListener('DOMContentLoaded', function () {
         // Get the current form count
         let formIndex = parseInt(totalFormsInput.value);
 
-        // Clone the empty form template
-        let newFormHtml = document.getElementById('empty-form-template').innerHTML.replace(/__index__/g, formIndex).replace(/__itemnum__/g, formIndex + 1);
+        // Clone the empty form template. Replace placeholders with appropriate index values and item heading number
+        let newFormHtml = document.getElementById('empty-form-template').innerHTML.replace(/__prefix__/g, formIndex)
+        newFormHtml = newFormHtml.replace(/__itemnum__/g, formIndex + 1).replace(/options-container-/g, `options-container-${formIndex}`);
 
         // Append the new form to the container
         orderItemsContainer.insertAdjacentHTML('beforeend', newFormHtml);
@@ -227,42 +230,25 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     // Define function that updates the item value based on discount
-    function updateItemValue(target) {
-        debugger;
-        // Recalculate order value on discount change
-        if (target.classList.contains('discount-field')) {
-            let formIndex = target.name.match(/\d+/)[0];
+    function updateOrderValue(target) {
+        // if a user input is detected in the discount, quantity or base price field
+        if (
+            target.classList.contains('discount-field') ||
+            target.classList.contains('quantity-field') ||
+            target.classList.contains('base-price-field')
+        ) {
+            let formIndex = target.closest('.order-item-form').getAttribute('data-form-index');
             let basePriceField = document.getElementById(`id_form-${formIndex}-base_price`);
+            let discountField = document.getElementById(`id_form-${formIndex}-discount`);
             let quantityField = document.getElementById(`id_form-${formIndex}-quantity`);
             let itemValueField = document.getElementById(`id_form-${formIndex}-item_value`);
-            let discount = parseFloat(target.value) || 0;
+            // Recalculate item value
+            let discount = parseFloat(discountField.value) || 0;
             let basePrice = parseFloat(basePriceField.value) || 0;
             let quantity = parseInt(quantityField.value) || 0;
             itemValueField.value = ((basePrice - discount) * quantity).toFixed(2);
-        }
-
-        // Recalculate order value on quantity change
-        else if (target.classList.contains('quantity-field')) {
-            let formIndex = target.name.match(/\d+/)[0];
-            let basePriceField = document.getElementById(`id_form-${formIndex}-base_price`);
-            let discountField = document.getElementById(`id_form-${formIndex}-discount`);
-            let itemValueField = document.getElementById(`id_form-${formIndex}-item_value`);
-            let quantity = parseInt(target.value) || 0;
-            let basePrice = parseFloat(basePriceField.value) || 0;
-            let discount = parseFloat(discountField.value) || 0;
-            itemValueField.value = ((basePrice - discount) * quantity).toFixed(2);
-        }
-
-        // Recalculate order value on base price change
-        else if (target.classList.contains('base-price-field')) {
-            let formIndex = target.name.match(/\d+/)[0];
-            let basePriceField = document.getElementById(`id_form-${formIndex}-base_price`);
-            let discountField = document.getElementById(`id_form-${formIndex}-discount`);
-            let itemValueField = document.getElementById(`id_form-${formIndex}-item_value`);
-            let quantity = parseInt(target.value) || 0;
-            let basePrice = parseFloat(basePriceField.value) || 0;
-            let discount = parseFloat(discountField.value) || 0;
-            itemValueField.value = ((basePrice - discount) * quantity).toFixed(2);
+            // update the running total
+            updateOrderTotals();
         }
     };
 
@@ -313,15 +299,15 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     });
 
-    // Add Change event listener for changes to the form (focusing on dropdown selections)
+    // Add Change event listener for changes to the form
     document.addEventListener('change', function (event) {
-        // Handle dynamic product selection and show relevant options/finishes fields
+        // If change is to product-dropdown, handle dynamic product selection and show relevant options/finishes fields
         if (event.target.classList.contains('product-dropdown')) {
-            // Call updateProductDetails first, and then updateOrderTotals            
+            // Call updateProductDetails first, and then updateOrderValue         
             updateProductDetails(event.target)
                 .then(() => {
                     // update the running totals
-                    updateItemValue(event.target);
+                    updateOrderValue(event.target);
                     updateOrderTotals();
                 })
                 .catch(error => {
@@ -333,16 +319,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Add Input event listener to trigger update of item & order values 
     // when user is typing in those fields (for dynamic updates)
     document.addEventListener('input', function (event) {
-        // if a user input is detected in the discount or quantity field
-        if (
-            event.target.classList.contains('discount-field') ||
-            event.target.classList.contains('quantity-field') ||
-            event.target.classList.contains('base-price-field')
-        ) {
-            // execute the updateItemValue function with 300ms delay
-            updateItemValue(event.target)
-            // update the running total
-            updateOrderTotals();
-        }
+
+        // execute the updateOrderValue function
+        updateOrderValue(event.target)
     });
 });
