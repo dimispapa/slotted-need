@@ -90,23 +90,24 @@ class OrderItemForm(forms.ModelForm):
             Row(
                 Column(
                     'product',
-                    css_class=('form-group col-md-9 bg-secondary text-white '
-                               'p-1 p-md-2')),
+                    css_class='form-group col-md-9 mb-1 mb-md-2'),
                 Column(
                     'quantity',
-                    css_class=('form-group col-md-3 bg-secondary text-white '
-                               'p-1 p-md-2')),
+                    css_class='form-group col-md-3 mb-2 mb-md-3'),
             ),
             HTML("""
                 <div id="options-container-{{ forloop.counter0 }}"
-                class="row p-1 p-md-2 bg-light text-dark hidden">
+                class="row p-1 p-md-2 bg-light text-dark mb-1 hidden">
                 </div>
                 """),
             Row(
-                Column('base_price'),
-                Column('discount'),
-                Column('item_value'),
-                css_class="bg-secondary text-white p-1 p-md-2"
+                Column('base_price',
+                       css_class='col-sm-6 col-md-12 mb-1 mb-md-2'),
+                Column('discount',
+                       css_class='col-sm-6 col-md-12 mb-1 mb-md-2'),
+                Column('item_value',
+                       css_class='col-12'),
+                css_class="row bg-secondary text-white mb-1"
             ),
         )
 

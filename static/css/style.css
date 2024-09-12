@@ -10,13 +10,3 @@
 .suggestion-item:hover, .suggestion-item.active {
     background-color: #f0f0f0;
 }
-
-/* hide element */
-.hidden {
-    display: none;
-}
-
-/* form-container */
-#order-items, .form-container, .btn {
-    margin-top: 10px;
-}

@@ -59,13 +59,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         data.options.forEach(option => {
                             // create columns for options
                             let optionCol = document.createElement('div');
-                            optionCol.classList.add('col-12', 'col-sm-6', 'col-md-4', 'col-lg-3', 'p-2', 'p-md-3', 'border');
+                            optionCol.classList.add('col-12', 'col-sm-6', 'col-md-4', 'col-lg-3', 'border', 'mb-1', 'mb-md-2');
 
                             let optionDiv = document.createElement('div');
+                            optionDiv.classList.add('row');
                             let optionDivHTML = `
-                                <div class="row">
+                                <div class="col-12 form-group mb-1 mb-md-2">
                                     <label for="option-${option.id}-${formIndex}" class="form-label requiredField">${option.name}*</label>
-                                    <select class="form-select mb-1 mb-md-2 options-dropdown" name="option_${option.id}_${formIndex}"
+                                    <select class="form-select options-dropdown" name="option_${option.id}_${formIndex}"
                                     id="option-${option.id}-${formIndex}" required aria-required="true">
                                         <option value="">Select ${option.name}</option>
                                 </div>
@@ -93,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                             if (optionsContainer.childElementCount > 0) {
                                 // Show the options container
-                                optionsContainer.classList.remove('hidden');
+                                optionsContainer.classList.remove('d-none');
                             };
                         });
 
@@ -109,8 +110,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         } else {
             // Hide the options and finishes container if no product is selected
-            optionsContainer.classList.add('hidden');
-            finishesContainer.classList.remove('hidden');
+            optionsContainer.classList.add('d-none');
+            finishesContainer.classList.remove('d-none');
             // set the base price and discount to zero to reset
             basePriceField.value = 0;
             discountField.value = 0;
@@ -142,9 +143,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Populate finishes dynamically
                     data.component_finishes.forEach(finish => {
                         let finishHTML = `
+                            <div class="col-12 form-group mb-1 mb-md-2">
                                 <label for="finish-${optionId}-${finish.id}-${formIndex}" class="form-label text-dark">${finish.name}</label>
-                                <select class="form-select mb-1 mb-md-2 finish-dropdown" id="finish-${optionId}-${finish.id}-${formIndex}" name="finish_${optionId}_${finish.id}_${formIndex}">
+                                <select class="form-select finish-dropdown" id="finish-${optionId}-${finish.id}-${formIndex}" name="finish_${optionId}_${finish.id}_${formIndex}">
                                     <option value="">Select ${finish.name}</option>
+                            </div>
                         `;
                         finish.finish_options.forEach(finishOption => {
                             finishHTML += `<option value="${finishOption.id}">${finishOption.name}</option>`;
@@ -154,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
                     if (finishRow.childElementCount > 0) {
                         // show the component-finishes-container
-                        finishRow.classList.remove('hidden');
+                        finishRow.classList.remove('d-none');
                     };
                 })
                 .catch(error => {
@@ -164,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         } else {
             // Hide the component finishes containers if no product is selected
-            finishRow.classList.add('hidden');
+            finishRow.classList.add('d-none');
         };
     };
 
@@ -194,9 +197,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 <label for="id_form-${index}-item_value">Item value:</label>
                 <input type="number" name="form-${index}-item_value" class="form-control" readonly="" step="0.01" id="id_form-${index}-item_value">
 
-                <div class="options form-container hidden" id="options-container-${index}"></div>
-                <div class="finishes form-container hidden" id="finishes-container-${index}"></div>
-                <div class="comp-finishes form-container hidden" id="comp-finishes-container-${index}"></div>
+                <div class="options form-container d-none" id="options-container-${index}"></div>
+                <div class="finishes form-container d-none" id="finishes-container-${index}"></div>
+                <div class="comp-finishes form-container d-none" id="comp-finishes-container-${index}"></div>
 
                 <button type="button" class="btn btn-danger delete-order-item">Delete</button>
             </div>
