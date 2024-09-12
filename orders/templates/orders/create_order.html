@@ -2,7 +2,7 @@
 {% load static %}
 {% load crispy_forms_tags %}
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-3 mt-md-5">
   <h1>Create an Order</h1>
   <br />
 
@@ -27,14 +27,17 @@
       <h3>Order Items</h3>
       {% for order_item in order_item_formset %}
       <div class="card order-item-form" data-form-index="{{ forloop.counter0 }}">
-        <div class="card-body container-fluid bg-secondary text-white">
+        <div class="card-body container-fluid bg-secondary text-white rounded">
           <h4>Order Item # {{ forloop.counter }}</h4>
           {% crispy order_item %}
 
+          <!-- Delete order item button -->
           {% if order_item_formset.can_delete %}
-          <button type="button" class="btn btn-danger delete-order-item">
-            Delete Order Item
-          </button>
+          <div class="form-group d-grid d-flex justify-content-end">
+            <button type="button" class="btn btn-danger delete-order-item">
+              Delete Order Item
+            </button>
+          </div>
           {% endif %}
         </div>
       </div>
@@ -42,18 +45,36 @@
     </div>
 
     <!-- Button to Add New Order Item -->
-    <button type="button" id="add-order-item" class="btn btn-secondary mb-2">Add Order Item</button>
-    <br>
+    <button type="button" id="add-order-item" class="btn btn-secondary mb-3 mt-2">Add Order Item</button>
+
+    <!-- Hidden template for cloning -->
+    <div id="empty-form-template" class="d-none">
+      <div class="card order-item-form" data-form-index="__index__">
+        <div class="card-body container-fluid bg-secondary text-white rounded">
+          <h4>Order Item # __itemnum__</h4>
+          {% crispy order_item_formset.empty_form %}
+          <button type="button" class="btn btn-danger delete-order-item">Delete Order Item</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Deposit and Order Value fields -->
-    {{ order_form.deposit.label_tag }}
-    {{ order_form.deposit }}
-    <label for="order_value">Total order value:</label>
-    {{ order_form.order_value }}
+    <div class="row bg-primary text-white p-1 p-md-2 pb-3 pb-md-4 m-0 rounded">
+      <div class="col-12 col-md-6">
+        {{ order_form.deposit.label_tag }}
+        {{ order_form.deposit }}
+      </div>
+      <div class="col-12 col-md-6">
+        <label for="order_value">Total order value:</label>
+        {{ order_form.order_value }}
+      </div>
+    </div>
 
     <!-- Formset management fields to handle the formset dynamically -->
     {{ order_item_formset.management_form }}
 
-    <button type="submit" class="btn btn-primary">Submit Order</button>
+    <!-- Order submit button -->
+    <button type="submit" class="btn btn-lg btn-primary mb-2 mt-2">Submit Order</button>
   </form>
 </div>
 {% endblock %}

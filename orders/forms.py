@@ -97,7 +97,7 @@ class OrderItemForm(forms.ModelForm):
             ),
             HTML("""
                 <div id="options-container-{{ forloop.counter0 }}"
-                class="row p-1 p-md-2 bg-light text-dark mb-1 hidden">
+                class="row p-1 p-md-2 bg-light text-dark mb-1 d-none">
                 </div>
                 """),
             Row(

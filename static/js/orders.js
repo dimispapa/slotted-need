@@ -1,7 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-    const addOrderItemButton = document.getElementById('add-order-item');
-
     // ************** SECTION A: FUNCTION DEFINITIONS ********************************************************************
 
     // Define function to fetch and populate product dropdowns
@@ -70,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     id="option-${option.id}-${formIndex}" required aria-required="true">
                                         <option value="">Select ${option.name}</option>
                                 </div>
-                        `;  
+                        `;
                             option.option_values.forEach(optionValue => {
                                 optionDivHTML += `<option value="${optionValue.id}">${optionValue.value}</option>`;
                             });
@@ -172,39 +170,21 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     // Define function to create a new order item form dynamically (with only product and quantity fields)
-    function createNewOrderItemForm(index) {
-        let newForm = document.createElement('div');
-        newForm.classList.add('card', 'mb-3', 'order-item-form');
-        newForm.setAttribute('data-form-index', index);
-        newForm.innerHTML = `
-            <div class="card-body">
-                <h4>Order Item #${index+1}</h4>
+    function addNewOrderItemForm() {
 
-                <label for="id_form-${index}-product">Product:</label>
-                <select class="form-control product-dropdown" id="id_form-${index}-product" name="form-${index}-product">
-                    <option value="">Loading products...</option>
-                </select>
+        const totalFormsInput = document.getElementById('id_form-TOTAL_FORMS');
+        const orderItemsContainer = document.getElementById('order-items');
+        // Get the current form count
+        let formIndex = parseInt(totalFormsInput.value);
 
-                <label for="id_form-${index}-base_price">Base price:</label>
-                <input type="number" name="form-${index}-base_price" class="form-control" step="0.01" id="id_form-${index}-base_price">
-                
-                <label for="id_form-${index}-discount">Discount:</label>
-                <input type="number" name="form-${index}-discount" value="0.0" class="form-control discount-field" min="0" step="0.01" id="id_form-${index}-discount">
-                
-                <label for="id_form-${index}-quantity">Quantity:</label>
-                <input type="number" class="form-control quantity-field" id="id_form-${index}-quantity" name="form-${index}-quantity" min="1" value="1">
+        // Clone the empty form template
+        let newFormHtml = document.getElementById('empty-form-template').innerHTML.replace(/__index__/g, formIndex).replace(/__itemnum__/g, formIndex + 1);
 
-                <label for="id_form-${index}-item_value">Item value:</label>
-                <input type="number" name="form-${index}-item_value" class="form-control" readonly="" step="0.01" id="id_form-${index}-item_value">
+        // Append the new form to the container
+        orderItemsContainer.insertAdjacentHTML('beforeend', newFormHtml);
 
-                <div class="options form-container d-none" id="options-container-${index}"></div>
-                <div class="finishes form-container d-none" id="finishes-container-${index}"></div>
-                <div class="comp-finishes form-container d-none" id="comp-finishes-container-${index}"></div>
-
-                <button type="button" class="btn btn-danger delete-order-item">Delete</button>
-            </div>
-        `;
-        return newForm;
+        // Increment the total forms count
+        totalFormsInput.value = formIndex + 1;
     };
 
     // Define function that deletes an order item and remaining items index
@@ -248,6 +228,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Define function that updates the item value based on discount
     function updateItemValue(target) {
+        debugger;
         // Recalculate order value on discount change
         if (target.classList.contains('discount-field')) {
             let formIndex = target.name.match(/\d+/)[0];
@@ -291,11 +272,15 @@ document.addEventListener('DOMContentLoaded', function () {
         let totalOrderValue = 0;
 
         document.querySelectorAll('.order-item-form').forEach((form, index) => {
-            let itemValueField = document.getElementById(`id_form-${index}-item_value`)
-            let itemValue = parseFloat(itemValueField.value) || 0
+            // add a check to ignore if the div is the empty-form-template used for cloning
+            if (form.parentElement.id !== "empty-form-template") {
+                let itemValueField = document.getElementById(`id_form-${index}-item_value`)
+                let itemValue = parseFloat(itemValueField.value) || 0
 
-            // Sum up item values for the order
-            totalOrderValue += itemValue;
+                // Sum up item values for the order
+                totalOrderValue += itemValue;
+            };
+
         });
 
         // Update the Order form with the calculated totals
@@ -310,32 +295,22 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Add Click event listener to handle adding new order item forms
+    const addOrderItemButton = document.getElementById('add-order-item');
     addOrderItemButton.addEventListener('click', function () {
-        const totalFormsInput = document.getElementById('id_form-TOTAL_FORMS');
-        const orderItemsContainer = document.getElementById('order-items');
-        let newFormIndex = parseInt(totalFormsInput.value);
 
-        // Create a new empty form (with only product and quantity fields)
-        let newForm = createNewOrderItemForm(newFormIndex);
-
-        // Append the new form to the formset container
-        orderItemsContainer.appendChild(newForm);
-
-        // Populate the product dropdown dynamically
-        let productSelect = newForm.querySelector('.product-dropdown');
-        populateProductDropdown(productSelect);
-
-        // Increment the total form count
-        totalFormsInput.value = newFormIndex + 1;
+        // Create a new empty form
+        addNewOrderItemForm();
     });
 
     // Add Click event listener to handle dynamic deletion of order items
     document.addEventListener('click', function (event) {
         if (event.target.classList.contains('delete-order-item')) {
-            deleteOrderItem(event.target);
-            // update the running total
-            updateOrderTotals();
-        }
+            if (confirm("Are you sure you want to delete the item?")) {
+                deleteOrderItem(event.target);
+                // update the running total
+                updateOrderTotals();
+            };
+        };
     });
 
     // Add Change event listener for changes to the form (focusing on dropdown selections)
@@ -345,18 +320,14 @@ document.addEventListener('DOMContentLoaded', function () {
             // Call updateProductDetails first, and then updateOrderTotals            
             updateProductDetails(event.target)
                 .then(() => {
-                    // update the running total
+                    // update the running totals
+                    updateItemValue(event.target);
                     updateOrderTotals();
                 })
                 .catch(error => {
                     console.error('Error in updating totals:', error);
                 });
         };
-
-        // Handle dynamic option_values selection and show related finishes fields
-        // if (event.target.classList.contains('options-dropdown')) {
-        //     updateFinishes(event.target);
-        // };
     });
 
     // Add Input event listener to trigger update of item & order values 
