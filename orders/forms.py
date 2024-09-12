@@ -96,17 +96,65 @@ class OrderItemForm(forms.ModelForm):
                     css_class='form-group col-md-3 mb-2 mb-md-3'),
             ),
             HTML("""
-                <div id="options-container-{{ forloop.counter0 }}"
+                <div id="options-form-{{ forloop.counter0 }}-container"
                 class="row p-1 p-md-2 bg-light text-dark mb-1 d-none">
                 </div>
                 """),
             Row(
-                Column('base_price',
-                       css_class='col-sm-6 col-md-12 mb-1 mb-md-2'),
-                Column('discount',
-                       css_class='col-sm-6 col-md-12 mb-1 mb-md-2'),
-                Column('item_value',
-                       css_class='col-12'),
+                Column(
+                    HTML("""
+                <label for="id_form-{{ forloop.counter0 }}-base_price"
+                class="form-label requiredField">
+                    Base price<span class="asteriskField">*</span>
+                </label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">€</span>
+                    </div>
+                    <input type="number"
+                    name="form-{{ forloop.counter0 }}-base_price"
+                    class="form-control base-price-field" step="0.01"
+                    id="id_form-{{ forloop.counter0 }}-base_price">
+                </div>
+                """),
+                    css_class='col-sm-6 col-md-12 mb-1 mb-md-2'
+                ),
+                Column(
+                    HTML("""
+                <label for="id_form-{{ forloop.counter0 }}-discount"
+                class="form-label requiredField">
+                    Discount<span class="asteriskField">*</span>
+                </label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">€</span>
+                    </div>
+                    <input type="number"
+                    name="form-{{ forloop.counter0 }}-discount"
+                    class="form-control discount-field" step="0.01"
+                    id="id_form-{{ forloop.counter0 }}-discount">
+                </div>
+                """),
+                    css_class='col-sm-6 col-md-12 mb-1 mb-md-2'
+                ),
+                Column(
+                    HTML("""
+                <label for="id_form-{{ forloop.counter0 }}-item_value"
+                class="form-label requiredField">
+                    Item value<span class="asteriskField">*</span>
+                </label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">€</span>
+                    </div>
+                    <input type="number"
+                    name="form-{{ forloop.counter0 }}-item_value"
+                    class="form-control" step="0.01"
+                    id="id_form-{{ forloop.counter0 }}-item_value">
+                </div>
+                """),
+                    css_class='col-12'
+                ),
                 css_class="row bg-secondary text-white mb-1"
             ),
         )

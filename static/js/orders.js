@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         let productId = target.value;
         let formIndex = target.closest('.order-item-form').getAttribute('data-form-index');
-        let optionsContainer = document.getElementById(`options-container-${formIndex}`);
+        let optionsContainer = document.getElementById(`options-form-${formIndex}-container`);
         // let finishesContainer = document.getElementById(`finishes-container-${formIndex}`);
         let basePriceField = document.getElementById(`id_form-${formIndex}-base_price`);
         let discountField = document.getElementById(`id_form-${formIndex}-discount`);
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         data.options.forEach(option => {
                             // create columns for options
                             let optionCol = document.createElement('div');
-                            optionCol.classList.add('col-12', 'col-sm-6', 'col-md-4', 'col-lg-3', 'border', 'mb-1', 'mb-md-2');
+                            optionCol.classList.add('col-12', 'col-sm-6', 'col-md-4', 'col-lg-3', 'shadow', 'border', 'mb-1', 'mb-md-2');
 
                             let optionDiv = document.createElement('div');
                             optionDiv.classList.add('row');
@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Clone the empty form template. Replace placeholders with appropriate index values and item heading number
         let newFormHtml = document.getElementById('empty-form-template').innerHTML.replace(/__prefix__/g, newFormIndex)
-        newFormHtml = newFormHtml.replace(/__itemnum__/g, itemNum).replace(/options-container-/g, `options-container-${newFormIndex}`);
+        newFormHtml = newFormHtml.replace(/__itemnum__/g, itemNum).replace(/form--/g, `form-${newFormIndex}-`);
 
         // Append the new form to the container
         orderItemsContainer.insertAdjacentHTML('beforeend', newFormHtml);
@@ -222,10 +222,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Update for to align label to correct elements
                     field.htmlFor = field.htmlFor.replace(/form-\d+-/, `form-${index}-`);
                 });
-                // update options/finishes containers
-                form.querySelectorAll('.form-container').forEach(field => {
+                // update relevant div containers that include this id
+                form.querySelectorAll('div[id*="form-"]').forEach(div => {
                     // update container ids
-                    field.id = field.id.replace(/-container-\d+/, `-container-${index}`);
+                    div.id = div.id.replace(/form-\d+-/, `form-${index}-`);
                 });
             });
         }
@@ -260,16 +260,13 @@ document.addEventListener('DOMContentLoaded', function () {
         let totalOrderValue = 0;
 
         // Select all elements with class .order-item-form but exclude those inside #empty-form-template
-        document.querySelectorAll('.order-item-form:not(#empty-form-template .order-item-form)').forEach((form, index) => {
-            // add a check to ignore if the div is the empty-form-template used for cloning
-            if (form.parentElement.id !== "empty-form-template") {
-                let itemValueField = document.getElementById(`id_form-${index}-item_value`)
-                let itemValue = parseFloat(itemValueField.value) || 0
+        document.querySelectorAll('.order-item-form:not(#empty-form-template .order-item-form)').forEach((_, index) => {
 
-                // Sum up item values for the order
-                totalOrderValue += itemValue;
-            };
+            let itemValueField = document.getElementById(`id_form-${index}-item_value`)
+            let itemValue = parseFloat(itemValueField.value) || 0
 
+            // Sum up item values for the order
+            totalOrderValue += itemValue;
         });
 
         // Update the Order form with the calculated totals

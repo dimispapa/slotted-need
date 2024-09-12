@@ -65,15 +65,26 @@
       </div>
     </div>
 
-    <!-- Deposit and Order Value fields -->
     <div class="row bg-primary text-white p-1 p-md-2 pb-3 pb-md-4 m-0 rounded">
+      <!-- Deposit fields -->
       <div class="col-12 col-md-6">
         {{ order_form.deposit.label_tag }}
-        {{ order_form.deposit }}
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">€</span>
+          </div>
+          {{ order_form.deposit }}
+        </div>
       </div>
+      <!-- Order Value fields -->
       <div class="col-12 col-md-6">
         <label for="order_value">Total order value:</label>
-        {{ order_form.order_value }}
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">€</span>
+          </div>
+          {{ order_form.order_value }}
+        </div>
       </div>
     </div>
 
