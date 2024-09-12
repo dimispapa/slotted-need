@@ -53,7 +53,14 @@
         <div class="card-body container-fluid bg-secondary text-white rounded">
           <h4>Order Item # __itemnum__</h4>
           {% crispy order_item_formset.empty_form %}
-          <button type="button" class="btn btn-danger delete-order-item">Delete Order Item</button>
+          <!-- Delete order item button -->
+          {% if order_item_formset.can_delete %}
+          <div class="form-group d-grid d-flex justify-content-end">
+            <button type="button" class="btn btn-danger delete-order-item">
+              Delete Order Item
+            </button>
+          </div>
+          {% endif %}
         </div>
       </div>
     </div>

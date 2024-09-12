@@ -176,18 +176,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const totalFormsInput = document.getElementById('id_form-TOTAL_FORMS');
         const orderItemsContainer = document.getElementById('order-items');
-        // Get the current form count
-        let formIndex = parseInt(totalFormsInput.value);
+        // Get the current form count which will also be the index of the new form (as we use zero index for IDs of form elements)
+        let newFormIndex = formCount = parseInt(totalFormsInput.value);
+        let itemNum = newFormIndex + 1; // increment the item number showing on the heading
 
         // Clone the empty form template. Replace placeholders with appropriate index values and item heading number
-        let newFormHtml = document.getElementById('empty-form-template').innerHTML.replace(/__prefix__/g, formIndex)
-        newFormHtml = newFormHtml.replace(/__itemnum__/g, formIndex + 1).replace(/options-container-/g, `options-container-${formIndex}`);
+        let newFormHtml = document.getElementById('empty-form-template').innerHTML.replace(/__prefix__/g, newFormIndex)
+        newFormHtml = newFormHtml.replace(/__itemnum__/g, itemNum).replace(/options-container-/g, `options-container-${newFormIndex}`);
 
         // Append the new form to the container
         orderItemsContainer.insertAdjacentHTML('beforeend', newFormHtml);
 
         // Increment the total forms count
-        totalFormsInput.value = formIndex + 1;
+        totalFormsInput.value = formCount + 1;
     };
 
     // Define function that deletes an order item and remaining items index
@@ -197,17 +198,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (orderItemForm) {
             // formset management update
-            let formCount = document.getElementById('id_form-TOTAL_FORMS').value - 1
-            document.getElementById('id_form-TOTAL_FORMS').setAttribute('value', formCount)
+            let newFormCount = document.getElementById('id_form-TOTAL_FORMS').value - 1
+            document.getElementById('id_form-TOTAL_FORMS').setAttribute('value', newFormCount)
 
             // remove orderItemForm from container
             orderItemsContainer.removeChild(orderItemForm);
 
             // Re-index remaining forms to ensure they are correctly numbered
-            let orderItemForms = document.querySelectorAll('.order-item-form');
+            // Select all elements with class .order-item-form but exclude those inside #empty-form-template with CSS pseudo-class selector
+            let orderItemForms = document.querySelectorAll('.order-item-form:not(#empty-form-template .order-item-form)');
             orderItemForms.forEach((form, index) => {
                 form.setAttribute('data-form-index', index);
-                // Update Order Item heading
+                // Update Order Item heading (+1 as not zero indexing)
                 form.querySelector('h4').innerText = `Order Item #${index+1}`
                 // update select and input elements
                 form.querySelectorAll('input, select').forEach(field => {
@@ -257,7 +259,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const orderFormOrderValueField = document.getElementById('order_value');
         let totalOrderValue = 0;
 
-        document.querySelectorAll('.order-item-form').forEach((form, index) => {
+        // Select all elements with class .order-item-form but exclude those inside #empty-form-template
+        document.querySelectorAll('.order-item-form:not(#empty-form-template .order-item-form)').forEach((form, index) => {
             // add a check to ignore if the div is the empty-form-template used for cloning
             if (form.parentElement.id !== "empty-form-template") {
                 let itemValueField = document.getElementById(`id_form-${index}-item_value`)
