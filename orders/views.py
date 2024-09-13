@@ -1,9 +1,10 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
 from django.http import JsonResponse
+from django.db.models import Count
 from .models import Client, Order, OrderItem
 from products.models import (Product, Option, OptionValue, FinishOption,
-                             ProductComponent)
+                             ProductComponent, Component)
 from .forms import OrderForm, OrderItemFormSet
 
 
@@ -124,12 +125,43 @@ def get_product_data(request, product_id):
             'finish_options': finish_options_data
         })
 
+    # Get the components of the product and their associated finishes
+    # Filter components that are not associated with
+    # any OptionValue and filter for the product through ProductComponent
+    components_without_options = Component.objects.filter(
+        productcomponent__product=product
+    ).annotate(
+        option_value_count=Count('productcomponent__option_value')
+    ).filter(option_value_count=0)
+
+    # initialise empty component finishes data list
+    comp_finish_data = []
+
+    for component in components_without_options:
+        # retrieve finishes of component
+        finishes = component.finishes.all()
+
+        for finish in finishes:
+            # use filter to retrieve finish options,
+            # without raising 404 as they are optional
+            finish_options = FinishOption.objects.filter(finish=finish)
+            finish_options_data = [{'id': fo.id, 'name': fo.name}
+                                   for fo in finish_options]
+            comp_finish_data.append({
+                'id': finish.id,
+                'name': finish.name,
+                'options': finish_options_data,
+                'component_id': component.id,
+                'component_name': component.name
+            })
+
     # Return the data as JSON
     return JsonResponse({
         'product': product.name,
         'base_price': product.base_price,
         'options': options_data,
-        'finishes': finishes_data
+        'finishes': finishes_data,
+        'component_finishes': comp_finish_data
     })
 
 
