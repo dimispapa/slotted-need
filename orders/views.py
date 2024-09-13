@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
 from django.http import JsonResponse
-from django.db.models import Count
+from django.db.models import Count, Q
 from .models import Client, Order, OrderItem
 from products.models import (Product, Option, OptionValue, FinishOption,
                              ProductComponent, Component)
@@ -25,19 +25,31 @@ def create_order(request):
             client_phone = order_form.cleaned_data['client_phone']
             client_email = order_form.cleaned_data['client_email']
 
-            # try to find client by name, phone or email
-            client = Client.objects.filter(
+            # Attempt to find an existing client with a case-insensitive
+            # partial match (match name and phone or email to avoid duplicates)
+            existing_client = Client.objects.filter(
+                Q(client_name=client_name) &
+                (Q(client_phone__iexact=client_phone) |
+                 Q(client_email__iexact=client_email))
+            ).first()
+
+            if existing_client:
+                # Return JSON response for the modal
+                return JsonResponse({
+                    'exists': True,
+                    'client': {
+                        'name': existing_client.client_name,
+                        'phone': existing_client.client_phone,
+                        'email': existing_client.client_email,
+                    }
+                })                
+
+            # Proceed to create a new client and save the order if no conflict
+            client, created = Client.objects.get_or_create(
                 client_name=client_name,
                 client_phone=client_phone,
-                client_email=client_email).first()
-
-            if not client:
-                # if a client is not found then create a new client object
-                client = Client.objects.create(
-                    client_name=order_form.cleaned_data['client_name'],
-                    client_phone=order_form.cleaned_data['client_phone'],
-                    client_email=order_form.cleaned_data['client_email']
-                )
+                client_email=client_email,
+            )
 
             # create order object
             order = Order.objects.create(client=client)
