@@ -1,3 +1,9 @@
+// Global constants definition for common Bootstrap style classes used accross
+const OPTION_COL_STYLES = ['col-12', 'col-sm-6', 'col-md-4', 'col-lg-3', 'shadow', 'border',
+    'mb-2', 'mb-md-3', 'pt-1', 'pt-md-2', 'rounded'];
+
+const OPTION_GROUP_STYLES = "col-12 form-group mb-2 mb-md-3";
+
 document.addEventListener('DOMContentLoaded', function () {
 
     // ************** SECTION A: FUNCTION DEFINITIONS ********************************************************************
@@ -98,12 +104,12 @@ document.addEventListener('DOMContentLoaded', function () {
             data.options.forEach(option => {
                 // create columns for options
                 let optionCol = document.createElement('div');
-                optionCol.classList.add('col-12', 'col-sm-6', 'col-md-4', 'col-lg-3', 'shadow', 'border', 'mb-1', 'mb-md-2', 'rounded');
+                optionCol.classList.add(...OPTION_COL_STYLES);
 
                 let optionDiv = document.createElement('div');
                 optionDiv.classList.add('row');
                 let optionDivHTML = `
-                                <div class="col-12 form-group mb-1 mb-md-2">
+                                <div class="${OPTION_GROUP_STYLES}">
                                     <label for="option-${option.id}-${formIndex}" class="form-label requiredField">${option.name}<span class="asteriskField">*</span></label>
                                     <select class="form-select options-dropdown" name="option_${option.id}_${formIndex}"
                                     id="option-${option.id}-${formIndex}" required aria-required="true">
@@ -139,14 +145,15 @@ document.addEventListener('DOMContentLoaded', function () {
         if (data.component_finishes && data.component_finishes.length > 0) {
             // create a column for product finishes
             let finishCol = document.createElement('div');
-            finishCol.classList.add('col-12', 'col-sm-6', 'col-md-4', 'col-lg-3', 'shadow', 'border', 'mb-1', 'mb-md-2', 'rounded');
+            // add column styles from list constant
+            finishCol.classList.add(...OPTION_COL_STYLES);
             // Populate component-level finishes (not driven by config options) dynamically
             data.component_finishes.forEach(finish => {
 
                 let finishDiv = document.createElement('div');
                 finishDiv.classList.add('row');
                 let finishDivHTML = `
-                            <div class="col-12 form-group mb-1 mb-md-2">
+                            <div class="${OPTION_GROUP_STYLES}">
                                 <label for="finish-${finish.id}-${productId}-${finish.component_id}-${formIndex}" class="form-label requiredField">${finish.component_name} ${finish.name}<span class="asteriskField">*</span></label>
                                 <select class="form-select comp-finish-dropdown-${formIndex}" name="finish-${finish.id}-${productId}-${finish.component_id}-${formIndex}"
                                 id="finish-${finish.id}-${productId}-${finish.component_id}-${formIndex}" required aria-required="true">
@@ -195,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Populate finishes dynamically
                     data.component_finishes.forEach(finish => {
                         let finishHTML = `
-                            <div class="col-12 form-group mb-1 mb-md-2">
+                            <div class="${OPTION_GROUP_STYLES}">
                                 <label for="finish-${optionId}-${finish.id}-${formIndex}" class="form-label text-dark">${finish.name}</label>
                                 <select class="form-select finish-dropdown-${formIndex}" id="finish-${optionId}-${finish.id}-${formIndex}" name="finish_${optionId}_${finish.id}_${formIndex}">
                                     <option value="">------------</option>

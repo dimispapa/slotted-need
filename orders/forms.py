@@ -99,7 +99,8 @@ class OrderItemForm(forms.ModelForm):
             ),
             HTML("""
                 <div id="options-form-{{ forloop.counter0 }}-container"
-                class="row p-1 p-md-2 bg-light text-dark mb-1 d-none rounded">
+                class="row p-1 p-md-2 bg-light text-dark mb-2 mb-md-3 d-none
+                rounded">
                 </div>
                 """),
             Row(
