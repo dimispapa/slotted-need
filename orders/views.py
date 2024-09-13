@@ -15,8 +15,8 @@ def home(request):
 def create_order(request):
     if request.method == 'POST':
         # pass the post request to the form and formset objects
-        order_form = OrderForm(request.POST)
-        order_item_formset = OrderItemFormSet(request.POST)
+        order_form = OrderForm(data=request.POST)
+        order_item_formset = OrderItemFormSet(data=request.POST)
 
         # validation of forms and formset fields ensuring no errors
         if order_form.is_valid() and order_item_formset.is_valid():

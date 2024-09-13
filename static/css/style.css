@@ -4,15 +4,15 @@
 
 /* CSS for the suggestion items */
 .suggestion-item {
-    padding: 10px;
-    cursor: pointer;
-    border-bottom: 1px solid #eee;
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
 }
 
 /* Highlight the suggestion item when hovering */
 .suggestion-item:hover,
 .suggestion-item.active {
-    background-color: #f0f0f0;
+  background-color: #f0f0f0;
 }
 
 /* Set up Flexbox and media queries for dynamic positioning
@@ -20,35 +20,59 @@ of the suggestions div depending on viewport size */
 
 /* Default styles for mobile (small devices) */
 .client-form-container {
-    display: flex;
-    /* Position suggestions below client_name */
-    flex-direction: column;
-    /* Ensure dropdown is positioned relative to this container */
-    position: relative;
+  display: flex;
+  /* Position suggestions below client_name */
+  flex-direction: column;
 }
 
+/* Default mobile order */
+#client-name-div {
+  order: 1;
+  /* Client name comes first */
+}
+
+/* Search dropdown second */
 #client-suggestions {
-    position: absolute;
-    top: 100%; /* Place the dropdown right below the input */
-    left: 0;
-    width: 100%; /* Make sure it takes the full width of the input field */
-    z-index: 1000; /* Ensure it's on top of other elements */
-    background-color: #fff; /* Keep background color white for readability */
-    border: 1px solid #ddd; /* Add a border to differentiate it */
-    max-height: 200px; /* Optional: limit the height of the dropdown */
-    overflow-y: auto; /* Add scrolling if there are too many options */
+  /* Position it relative to the client_name field, directly below it */
+  position: relative;
+  order: 2;
+  top: 0;
+  left: 0;
+  width: 100%;
+  /* Make sure it takes the full width of the input field */
+  z-index: 1;
+  /* Ensure it's on top of other elements */
+  background-color: #fff;
+  /* Keep background color white for readability */
+  border: 1px solid #ddd;
+  /* Add a border to differentiate it */
+  max-height: 200px;
+  /* limit the height of the dropdown */
+  overflow-y: auto;
+  /* Add scrolling if there are too many options */
+}
+
+/* Phone third */
+#client-phone-div {
+  order: 3;
+}
+
+/* Email fourth */
+#client-email-div {
+  order: 4;
+}
+
+/* For larger devices, reorder the dropdown */
+@media (min-width: 768px) {
+  .client-form-container {
+    flex-direction: row;
+    flex-wrap: wrap;
   }
-  
-  /* For larger devices */
-  @media (min-width: 768px) {
-    .client-form-container {
-      flex-direction: row;
-    }
-  
-    #client-suggestions {
-      position: absolute; /* Keep absolute positioning for larger screens */
-      top: 100%;
-      left: 0;
-      width: 100%; /* Align below the client email or other fields */
-    }
+
+  #client-suggestions {
+    order: 5;
+    /* Place suggestions after all client fields on larger devices */
+    width: 100%;
+    /* Align below the client name */
   }
+}

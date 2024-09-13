@@ -47,13 +47,15 @@ class OrderForm(forms.Form):
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
             Row(
-                Column('client_name', css_class='form-group col-md-4 mb-0'),
-                Column('client_phone', css_class='form-group col-md-4 mb-0'),
-                Column('client_email', css_class='form-group col-md-4 mb-0'),
+                Column('client_name', css_id='client-name-div',
+                       css_class='form-group col-md-4 mb-0'),
+                Column('client_phone', css_id='client-phone-div',
+                       css_class='form-group col-md-4 mb-0'),
+                Column('client_email', css_id='client-email-div',
+                       css_class='form-group col-md-4 mb-0'),
                 # Add a custom HTML div element that will be used by the
                 # search_client.js to show suggestions
-                Div(css_id="client-suggestions",
-                    css_class="dropdown-menu"),
+                Div(css_id="client-suggestions", css_class="dropdown-menu"),
                 css_class='client-form-container'
             ),
             # Exclude 'deposit' and 'order_value' from automatic layout and
