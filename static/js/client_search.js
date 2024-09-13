@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             const suggestion = document.createElement('div');
                             suggestion.classList.add('suggestion-item');
                             // show client details
-                            suggestion.textContent = `${client.name} (phone:${client.phone}, email:${client.email})`;
+                            suggestion.textContent = `${client.name} (phone: ${client.phone}, email: ${client.email})`;
 
                             // Add event listener for hover effect
                             suggestion.addEventListener('mouseenter', function () {

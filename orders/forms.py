@@ -1,6 +1,6 @@
 from django import forms
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Row, Column, HTML
+from crispy_forms.layout import Layout, Row, Column, HTML, Div
 from .models import OrderItem
 
 
@@ -50,6 +50,10 @@ class OrderForm(forms.Form):
                 Column('client_name', css_class='form-group col-md-4 mb-0'),
                 Column('client_phone', css_class='form-group col-md-4 mb-0'),
                 Column('client_email', css_class='form-group col-md-4 mb-0'),
+                # Add a custom HTML div element that will be used by the
+                # search_client.js to show suggestions
+                Div(css_id="client-suggestions", css_class="dropdown-menu"),
+                css_class='client-form-container'
             ),
             # Exclude 'deposit' and 'order_value' from automatic layout and
             # manually define position in template at the bottom

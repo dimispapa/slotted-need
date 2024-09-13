@@ -1,4 +1,7 @@
-/* CREATE ORDERS PAGE */
+/*************** CREATE ORDERS PAGE **************************/
+
+/******* CLIENT SEARCH FEATURE */
+
 /* CSS for the suggestion items */
 .suggestion-item {
     padding: 10px;
@@ -10,3 +13,27 @@
 .suggestion-item:hover, .suggestion-item.active {
     background-color: #f0f0f0;
 }
+
+/* Set up Flexbox and media queries for dynamic positioning
+of the suggestions div depending on viewport size */
+
+/* Default styles for mobile (small devices) */
+.client-form-container {
+    display: flex;
+    flex-direction: column; /* Position suggestions below client_name */
+  }
+  
+  #client-suggestions {
+    order: 2; /* Placed after client_name */
+  }
+  
+  /* When viewport is 768px or wider (tablets and desktops) */
+  @media (min-width: 768px) {
+    .client-form-container {
+      flex-direction: row; /* Position suggestions below client_email */
+    }
+  
+    #client-suggestions {
+      order: 4; /* Placed after client_email */
+    }
+  }
