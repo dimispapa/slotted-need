@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // Only show the dropdown if there are client results
                     if (data.clients.length > 0) {
-
+                        suggestions.classList.add('show');
                         // loop through the clients filtered/found
                         data.clients.forEach(client => {
                             // create suggestion item div

@@ -22,9 +22,13 @@
     <!-- Render the Order form for client information -->
     {% crispy order_form %}
 
+    <!-- Add a custom HTML div element that will be used by the -->
+    <!-- search_client.js to show suggestions -->
+    <div id="client-suggestions" class="dropdown-menu"></div>
+
     <div id="order-items">
-      <!-- Render the OrderItem forms for products and options -->
       <h3>Order Items</h3>
+      <!-- Render the OrderItem forms for products and options -->
       {% for order_item in order_item_formset %}
       <div class="card order-item-form" data-form-index="{{ forloop.counter0 }}">
         <div class="card-body container-fluid bg-secondary text-white rounded">

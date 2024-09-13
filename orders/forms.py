@@ -48,11 +48,6 @@ class OrderForm(forms.Form):
         self.helper.layout = Layout(
             Row(
                 Column('client_name', css_class='form-group col-md-4 mb-0'),
-                # Add a custom HTML div element that will be used by the
-                # search_client.js to show suggestions
-                HTML("""
-                    <div id="client-suggestions" class="dropdown-menu"></div>
-                    """),
                 Column('client_phone', css_class='form-group col-md-4 mb-0'),
                 Column('client_email', css_class='form-group col-md-4 mb-0'),
             ),
