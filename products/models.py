@@ -33,7 +33,8 @@ class ComponentPart(models.Model):
     slug = models.SlugField(max_length=50, unique=True)
     description = models.TextField(blank=True, null=True)
     unit_cost = models.DecimalField(max_digits=7, decimal_places=2,
-                                    validators=[MinValueValidator(0.00)])
+                                    validators=[MinValueValidator(0.00)],
+                                    blank=True, null=True)
     component = models.ForeignKey('Component', related_name='parts',
                                   on_delete=models.CASCADE)
     # How many parts make up a complete component
@@ -53,8 +54,9 @@ class Component(models.Model):
     slug = models.SlugField(max_length=50, unique=True)
     description = models.TextField(blank=True, null=True)
     unit_cost = models.DecimalField(max_digits=7, decimal_places=2,
-                                    validators=[MinValueValidator(0.00)])
-    supplier_details = models.TextField()
+                                    validators=[MinValueValidator(0.00)],
+                                    blank=True, null=True)
+    supplier_details = models.TextField(blank=True, null=True)
     finishes = models.ManyToManyField(Finish, blank=True,
                                       related_name='components')
 
@@ -65,30 +67,38 @@ class Component(models.Model):
         # Get the component parts if they exist
         parts = self.parts.all()
         if parts.exists():
-            # Create a string representation of the parts
             parts_str = ', '.join(
                 [f"{part.name} (x{part.quantity})" for part in parts]
             )
             return f"{self.name} @ €{self.unit_cost} | Parts: {parts_str}"
-        else:
-            return f"{self.name} @ €{self.unit_cost}"
+        return f"{self.name} @ €{self.unit_cost}"
 
     def calculate_unit_cost(self):
         """
         If the component has parts, calculate the total unit cost as the sum
         of the unit costs of its parts multiplied by the quantity of each part.
-        Otherwise, keep the current unit cost.
         """
         parts = self.parts.all()
         if parts.exists():
-            total_cost = sum(part.unit_cost * part.quantity for part in parts)
-            self.unit_cost = total_cost
+            total_cost = 0
+            for part in parts:
+                if part.unit_cost is not None:
+                    total_cost += part.unit_cost * part.quantity
+            self.unit_cost = total_cost if total_cost > 0 else None
         return self.unit_cost
 
     def save(self, *args, **kwargs):
-        # Calculate the unit cost based on the component parts
-        # (if any) before saving
+        """
+        Ensures unit cost is calculated and updated after related
+        ComponentPart objects are saved.
+        """
+        # Save the Component first to ensure it has a primary key
+        super().save(*args, **kwargs)
+
+        # Calculate the unit cost after saving the related parts
         self.calculate_unit_cost()
+
+        # Save again after calculating unit cost
         super().save(*args, **kwargs)
 
 

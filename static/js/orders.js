@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         data.options.forEach(option => {
                             // create columns for options
                             let optionCol = document.createElement('div');
-                            optionCol.classList.add('col-12', 'col-sm-6', 'col-md-4', 'col-lg-3', 'shadow', 'border', 'mb-1', 'mb-md-2');
+                            optionCol.classList.add('col-12', 'col-sm-6', 'col-md-4', 'col-lg-3', 'shadow', 'border', 'mb-1', 'mb-md-2', 'rounded');
 
                             let optionDiv = document.createElement('div');
                             optionDiv.classList.add('row');

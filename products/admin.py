@@ -19,8 +19,6 @@ class ProductAdmin(nested_admin.NestedModelAdmin):
     class ProductComponentInline(nested_admin.NestedStackedInline):
         model = ProductComponent
         extra = 0
-        verbose_name = "Component"
-        verbose_name_plural = "Components"
 
     list_display = ('name', 'slug', 'description', 'base_price',)
     inlines = [OptionInline, ProductComponentInline, ]
@@ -40,13 +38,25 @@ class ComponentAdmin(nested_admin.NestedModelAdmin):
         extra = 0
         prepopulated_fields = {'slug': ('name',)}
 
-    list_display = ('name', 'slug', 'description', 'supplier_details', )
+    list_display = ('name', 'description', 'unit_cost', 'supplier_details', )
     inlines = [ComponentPartInLine, ]
     # Allows for the selection of multiple finishes
     filter_horizontal = ['finishes',]
     search_fields = ['name', 'description', 'supplier_details']
     list_filter = ('supplier_details', )
     prepopulated_fields = {'slug': ('name',)}
+
+    def save_model(self, request, obj, form, change):
+        # Save the Component object first
+        super().save_model(request, obj, form, change)
+
+    def save_related(self, request, form, formsets, change):
+        # Save the related ComponentParts after saving the Component
+        super().save_related(request, form, formsets, change)
+        # Recalculate unit cost for the component
+        obj = form.instance  # Get the Component instance
+        obj.calculate_unit_cost()
+        obj.save()
 
 
 @admin.register(Finish)
