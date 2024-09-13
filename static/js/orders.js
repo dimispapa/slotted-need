@@ -55,48 +55,17 @@ document.addEventListener('DOMContentLoaded', function () {
                         itemValueField.value = (basePrice - discount).toFixed(2);
                         // Clear old options
                         optionsContainer.innerHTML = '';
-                        // Populate options dynamically
-                        data.options.forEach(option => {
-                            // create columns for options
-                            let optionCol = document.createElement('div');
-                            optionCol.classList.add('col-12', 'col-sm-6', 'col-md-4', 'col-lg-3', 'shadow', 'border', 'mb-1', 'mb-md-2', 'rounded');
 
-                            let optionDiv = document.createElement('div');
-                            optionDiv.classList.add('row');
-                            let optionDivHTML = `
-                                <div class="col-12 form-group mb-1 mb-md-2">
-                                    <label for="option-${option.id}-${formIndex}" class="form-label requiredField">${option.name}*</label>
-                                    <select class="form-select options-dropdown" name="option_${option.id}_${formIndex}"
-                                    id="option-${option.id}-${formIndex}" required aria-required="true">
-                                        <option value="">------------</option>
-                                </div>
-                        `;
-                            option.option_values.forEach(optionValue => {
-                                optionDivHTML += `<option value="${optionValue.id}">${optionValue.value}</option>`;
-                            });
-                            optionDivHTML += '</select>';
-                            optionDiv.innerHTML = optionDivHTML;
-                            optionCol.appendChild(optionDiv);
+                        // Populate product-level finishes dynamically
+                        updateProductFinishes(data, formIndex, optionsContainer);
 
-                            // Create a finish row
-                            let finishRow = document.createElement('div');
-                            finishRow.classList.add('row');
-                            finishRow.id = `finish-${option.id}-${formIndex}`;
-                            optionCol.appendChild(finishRow);
+                        // Populate options (and add listener to populate the selection's associated finishes) dynamically
+                        populateProductOptions(data, productId, formIndex, optionsContainer);
 
-                            // append the column to the container
-                            optionsContainer.appendChild(optionCol);
-
-                            // Fetch finishes dynamically when the option value changes
-                            document.getElementById(`option-${option.id}-${formIndex}`).addEventListener('change', function () {
-                                updateFinishes(formIndex, productId, option.id, this.value);
-                            });
-
-                            if (optionsContainer.childElementCount > 0) {
-                                // Show the options container
-                                optionsContainer.classList.remove('d-none');
-                            };
-                        });
+                        if (optionsContainer.childElementCount > 0) {
+                            // Show the options container
+                            optionsContainer.classList.remove('d-none');
+                        };
 
                         // Once the product details have been updated, resolve the promise
                         resolve();
@@ -120,6 +89,81 @@ document.addEventListener('DOMContentLoaded', function () {
             return Promise.resolve();
         }
     };
+
+    // Define function to populate product options
+    function populateProductOptions(data, productId, formIndex, optionsContainer) {
+        // Populate options dynamically
+        if (data.options && data.options.length > 0) {
+            data.options.forEach(option => {
+                // create columns for options
+                let optionCol = document.createElement('div');
+                optionCol.classList.add('col-12', 'col-sm-6', 'col-md-4', 'col-lg-3', 'shadow', 'border', 'mb-1', 'mb-md-2', 'rounded');
+
+                let optionDiv = document.createElement('div');
+                optionDiv.classList.add('row');
+                let optionDivHTML = `
+                                <div class="col-12 form-group mb-1 mb-md-2">
+                                    <label for="option-${option.id}-${formIndex}" class="form-label requiredField">${option.name}<span class="asteriskField">*</span></label>
+                                    <select class="form-select options-dropdown" name="option_${option.id}_${formIndex}"
+                                    id="option-${option.id}-${formIndex}" required aria-required="true">
+                                        <option value="">------------</option>
+                                </div>
+                        `;
+                option.option_values.forEach(optionValue => {
+                    optionDivHTML += `<option value="${optionValue.id}">${optionValue.value}</option>`;
+                });
+                optionDivHTML += '</select>';
+                optionDiv.innerHTML = optionDivHTML;
+                optionCol.appendChild(optionDiv);
+
+                // Create a finish row
+                let finishRow = document.createElement('div');
+                finishRow.classList.add('row');
+                finishRow.id = `finish-${option.id}-${formIndex}`;
+                optionCol.appendChild(finishRow);
+
+                // append the column to the container
+                optionsContainer.appendChild(optionCol);
+
+                // Fetch finishes dynamically when the option value changes
+                document.getElementById(`option-${option.id}-${formIndex}`).addEventListener('change', function () {
+                    updateFinishes(formIndex, productId, option.id, this.value);
+                });
+            });
+        }
+    }
+
+    // Define function to update product finishes
+    function updateProductFinishes(data, formIndex, optionsContainer) {
+        if (data.finishes && data.finishes.length > 0) {
+            // create a column for product finishes
+            let finishCol = document.createElement('div');
+            finishCol.classList.add('col-12', 'col-sm-6', 'col-md-4', 'col-lg-3', 'shadow', 'border', 'mb-1', 'mb-md-2', 'rounded');
+            // Populate product-level finishes dynamically
+            data.finishes.forEach(finish => {
+
+                let finishDiv = document.createElement('div');
+                finishDiv.classList.add('row');
+                let finishDivHTML = `
+                            <div class="col-12 form-group mb-1 mb-md-2">
+                                <label for="finish-${finish.id}-${productId}-${formIndex}" class="form-label requiredField">${finish.name}<span class="asteriskField">*</span></label>
+                                <select class="form-select options-dropdown" name="finish-${finish.id}-${productId}-${formIndex}"
+                                id="finish-${finish.id}-${productId}-${formIndex}" required aria-required="true">
+                                    <option value="">------------</option>
+                            </div>
+                    `;
+                finish.options.forEach(finishOption => {
+                    finishDivHTML += `<option value="${finishOption.id}">${finishOption.value}</option>`;
+                });
+                finishDivHTML += '</select>';
+                finishDiv.innerHTML = finishDivHTML;
+                finishCol.appendChild(finishDiv);
+            });
+
+            // append the column to the container
+            optionsContainer.appendChild(finishCol);
+        }
+    }
 
     // Define function to update finishes based on selected option
     function updateFinishes(formIndex, productId, optionId, optionValueId) {
