@@ -75,6 +75,15 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Hide the dropdown and clear suggestions when the user clicks away from the name field
+    clientNameInput.addEventListener('blur', function () {
+        // Use a slight timeout to allow a click on a suggestion before hiding
+        setTimeout(function () {
+            suggestions.innerHTML = ''; // Clear suggestions
+            suggestions.classList.remove('show'); // Hide the dropdown
+        }, 300);
+    });
+
     // Handle arrow key navigation and Enter key selection
     clientNameInput.addEventListener('keydown', function (e) {
         const suggestionItems = document.querySelectorAll('.suggestion-item');
@@ -101,11 +110,6 @@ document.addEventListener('DOMContentLoaded', function () {
             suggestionItems[currentIndex].classList.add('active');
         }
     }
-
-    // Hide dropdown on mouseleave
-    suggestions.addEventListener('mouseleave', function () {
-        suggestions.classList.remove('show');
-    });
 
     // Clear previously active suggestion
     function clearActiveSuggestion() {
