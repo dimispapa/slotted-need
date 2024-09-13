@@ -123,7 +123,7 @@ class OrderItemForm(forms.ModelForm):
                     HTML("""
                 <label for="id_form-{{ forloop.counter0 }}-discount"
                 class="form-label requiredField">
-                    Discount<span class="asteriskField">*</span>
+                    Discount
                 </label>
                 <div class="input-group">
                     <div class="input-group-prepend">
