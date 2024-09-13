@@ -10,7 +10,8 @@
 }
 
 /* Highlight the suggestion item when hovering */
-.suggestion-item:hover, .suggestion-item.active {
+.suggestion-item:hover,
+.suggestion-item.active {
     background-color: #f0f0f0;
 }
 
@@ -20,20 +21,34 @@ of the suggestions div depending on viewport size */
 /* Default styles for mobile (small devices) */
 .client-form-container {
     display: flex;
-    flex-direction: column; /* Position suggestions below client_name */
+    /* Position suggestions below client_name */
+    flex-direction: column;
+    /* Ensure dropdown is positioned relative to this container */
+    position: relative;
+}
+
+#client-suggestions {
+    position: absolute;
+    top: 100%; /* Place the dropdown right below the input */
+    left: 0;
+    width: 100%; /* Make sure it takes the full width of the input field */
+    z-index: 1000; /* Ensure it's on top of other elements */
+    background-color: #fff; /* Keep background color white for readability */
+    border: 1px solid #ddd; /* Add a border to differentiate it */
+    max-height: 200px; /* Optional: limit the height of the dropdown */
+    overflow-y: auto; /* Add scrolling if there are too many options */
   }
   
-  #client-suggestions {
-    order: 2; /* Placed after client_name */
-  }
-  
-  /* When viewport is 768px or wider (tablets and desktops) */
+  /* For larger devices */
   @media (min-width: 768px) {
     .client-form-container {
-      flex-direction: row; /* Position suggestions below client_email */
+      flex-direction: row;
     }
   
     #client-suggestions {
-      order: 4; /* Placed after client_email */
+      position: absolute; /* Keep absolute positioning for larger screens */
+      top: 100%;
+      left: 0;
+      width: 100%; /* Align below the client email or other fields */
     }
   }

@@ -52,7 +52,8 @@ class OrderForm(forms.Form):
                 Column('client_email', css_class='form-group col-md-4 mb-0'),
                 # Add a custom HTML div element that will be used by the
                 # search_client.js to show suggestions
-                Div(css_id="client-suggestions", css_class="dropdown-menu"),
+                Div(css_id="client-suggestions",
+                    css_class="dropdown-menu"),
                 css_class='client-form-container'
             ),
             # Exclude 'deposit' and 'order_value' from automatic layout and
