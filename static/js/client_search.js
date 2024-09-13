@@ -26,37 +26,48 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 // handle response data
                 .then(data => {
-                    // show the div
-                    suggestions.classList.add('show');
+
                     // clear the div first
                     suggestions.innerHTML = '';
                     currentIndex = -1;
 
-                    // loop through the clients filtered/found
-                    data.clients.forEach(client => {
-                        // create suggestion item div
-                        const suggestion = document.createElement('div');
-                        suggestion.classList.add('suggestion-item');
-                        // show client details
-                        suggestion.textContent = `${client.name} (phone:${client.phone}, email:${client.email})`;
+                    // Only show the dropdown if there are client results
+                    if (data.clients.length > 0) {
 
-                        // Add event listener for hover effect
-                        suggestion.addEventListener('mouseenter', function () {
-                            clearActiveSuggestion(); // Clear any previously highlighted suggestion
-                            suggestion.classList.add('active'); // Highlight current suggestion
-                        });
+                        // loop through the clients filtered/found
+                        data.clients.forEach(client => {
+                            // create suggestion item div
+                            const suggestion = document.createElement('div');
+                            suggestion.classList.add('suggestion-item');
+                            // show client details
+                            suggestion.textContent = `${client.name} (phone:${client.phone}, email:${client.email})`;
 
-                        // handle click event for the suggestion
-                        suggestion.addEventListener('click', function () {
-                            clientNameInput.value = client.name;
-                            clientPhoneInput.value = client.phone;
-                            clientEmailInput.value = client.email;
-                            suggestions.innerHTML = ''; // Clear suggestions
-                            suggestions.classList.remove('show'); // Hide the dropdown
+                            // Add event listener for hover effect
+                            suggestion.addEventListener('mouseenter', function () {
+                                clearActiveSuggestion(); // Clear any previously highlighted suggestion
+                                suggestion.classList.add('active'); // Highlight current suggestion
+                            });
+
+                            // handle click event for the suggestion
+                            suggestion.addEventListener('click', function () {
+                                clientNameInput.value = client.name;
+                                clientPhoneInput.value = client.phone;
+                                clientEmailInput.value = client.email;
+                                suggestions.innerHTML = ''; // Clear suggestions
+                                suggestions.classList.remove('show'); // Hide the dropdown
+                            });
+                            // append the suggestion item in the suggestions parent div and move to next
+                            suggestions.appendChild(suggestion);
+
                         });
-                        // append the suggestion item in the suggestions parent div and move to next
-                        suggestions.appendChild(suggestion);
-                    });
+                    } else {
+                        suggestions.classList.remove('show'); // Hide dropdown if no clients
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching client data:', error);
+                    suggestions.innerHTML = '';
+                    suggestions.classList.remove('show'); // Hide dropdown on error
                 });
         } else {
             suggestions.innerHTML = '';
