@@ -96,10 +96,13 @@ document.addEventListener('DOMContentLoaded', function () {
             // Move up the list
             currentIndex = (currentIndex - 1 + suggestionItems.length) % suggestionItems.length;
             setActiveSuggestion(suggestionItems);
-        } else if (e.key === 'Enter' && currentIndex >= 0) {
-            // Select the current item
-            suggestionItems[currentIndex].click();
-            e.preventDefault(); // Prevent form submission on Enter
+        } else if (e.key === 'Enter') {
+            if (currentIndex >= 0 && suggestionItems.length > 0) {
+                // Select the current item if suggestions are active
+                suggestionItems[currentIndex].click();
+                e.preventDefault(); // Prevent form submission when selecting a suggestion
+            } 
+            // Otherwise, allow the form to be submitted if no suggestion is being selected
         }
     });
 
