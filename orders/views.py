@@ -1,4 +1,5 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
 from django.contrib import messages
 from django.http import JsonResponse
 from django.db.models import Count, Q
@@ -18,6 +19,9 @@ def create_order(request):
         order_form = OrderForm(data=request.POST)
         order_item_formset = OrderItemFormSet(data=request.POST)
 
+        # Check if the user has confirmed using the existing client
+        use_existing_client = request.POST.get('use_existing_client') == 'true'
+
         # validation of forms and formset fields ensuring no errors
         if order_form.is_valid() and order_item_formset.is_valid():
             # handle client creation or selection
@@ -25,31 +29,51 @@ def create_order(request):
             client_phone = order_form.cleaned_data['client_phone']
             client_email = order_form.cleaned_data['client_email']
 
-            # Attempt to find an existing client with a case-insensitive
-            # partial match (match name and phone or email to avoid duplicates)
-            existing_client = Client.objects.filter(
-                Q(client_name=client_name) &
-                (Q(client_phone__iexact=client_phone) |
-                 Q(client_email__iexact=client_email))
-            ).first()
+            # Initialize the variable to avoid UnboundLocalError
+            existing_client = None
 
-            if existing_client:
-                # Return JSON response for the modal
-                return JsonResponse({
-                    'exists': True,
-                    'client': {
-                        'name': existing_client.client_name,
-                        'phone': existing_client.client_phone,
-                        'email': existing_client.client_email,
-                    }
-                })                
+            if not use_existing_client:
+                # Attempt to find an existing client with a case-insensitive
+                # partial match (match name and phone or email to avoid
+                # duplicates)
+                # Check for an exact case-insensitive match across all fields
+                exact_match_client = Client.objects.filter(
+                    client_name__iexact=client_name,
+                    client_phone__iexact=client_phone,
+                    client_email__iexact=client_email
+                ).first()
 
-            # Proceed to create a new client and save the order if no conflict
-            client, created = Client.objects.get_or_create(
-                client_name=client_name,
-                client_phone=client_phone,
-                client_email=client_email,
-            )
+                # If an exact match is found, skip the modal
+                if exact_match_client:
+                    client = exact_match_client
+
+                else:
+                    # If no exact match, attempt partial match
+                    # (name and one of phone or email matches)
+                    existing_client = Client.objects.filter(
+                        Q(client_name__iexact=client_name) &
+                        (Q(client_phone__iexact=client_phone) |
+                         Q(client_email__iexact=client_email))
+                    ).first()
+
+                    if existing_client:
+                        # Trigger modal asking user to confirm their choice and
+                        # Pass the existing client data to the template
+                        return render(request, 'orders/create_order.html', {
+                            'order_form': order_form,
+                            'order_item_formset': order_item_formset,
+                            'existing_client': existing_client,
+                            'show_client_modal': True  # Flag to show modal
+                        })
+
+            # If no modal is needed, proceed with saving the client and order
+            client = (existing_client
+                      if existing_client
+                      else Client.objects.create(
+                          client_name=client_name,
+                          client_phone=client_phone,
+                          client_email=client_email
+                      ))
 
             # create order object
             order = Order.objects.create(client=client)
@@ -66,22 +90,26 @@ def create_order(request):
                 form_item.save_m2m()
 
             # notify user with success message
-            messages.success(
-                'Order created successfully!'
-            )
+            messages.add_message(request, messages.SUCCESS,
+                                 'Order created successfully!'
+                                 )
 
-            # Reset the form and formset by creating new instances
-            order_form = OrderForm()
-            order_item_formset = OrderItemFormSet(
-                queryset=OrderItem.objects.none())
+            # Redirect to the same page to avoid form resubmission
+            return redirect(reverse('create_order'))
 
         else:
             # If the forms are not valid, display an error message
-            messages.error(
-                'There was an error with your submission. Please try again.'
-            )
+            messages.add_message(request, messages.ERROR,
+                                 'There was an error with your submission. '
+                                 'Please try again.'
+                                 )
+            # render the page again but retaining the details
+            return render(request, 'orders/create_order.html', {
+                'order_form': order_form,
+                'order_item_formset': order_item_formset,
+            })
 
-    # if a GET request simply starting a new form
+    # if a GET request simply start a new form
     else:
         order_form = OrderForm()
         order_item_formset = OrderItemFormSet(
