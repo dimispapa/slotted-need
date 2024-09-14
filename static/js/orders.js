@@ -1,6 +1,7 @@
 // Global constants definition for common Bootstrap style classes used accross
 const OPTION_COL_STYLES = ['col-12', 'col-sm-6', 'col-md-4', 'col-lg-3', 'shadow', 'border',
-    'mb-2', 'mb-md-3', 'pt-1', 'pt-md-2', 'rounded'];
+    'mb-2', 'mb-md-3', 'pt-1', 'pt-md-2', 'rounded'
+];
 
 const OPTION_GROUP_STYLES = "col-12 form-group mb-2 mb-md-3";
 
@@ -154,9 +155,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 finishDiv.classList.add('row');
                 let finishDivHTML = `
                             <div class="${OPTION_GROUP_STYLES}">
-                                <label for="finish-${finish.id}-${productId}-${finish.component_id}-${formIndex}" class="form-label requiredField">${finish.component_name} ${finish.name}<span class="asteriskField">*</span></label>
-                                <select class="form-select comp-finish-dropdown-${formIndex}" name="finish-${finish.id}-${productId}-${finish.component_id}-${formIndex}"
-                                id="finish-${finish.id}-${productId}-${finish.component_id}-${formIndex}" required aria-required="true">
+                                <label for="finish-${finish.id}-${productId}-${finish.component_id}-${formIndex}" class="form-label">${finish.component_name} ${finish.name}</label>
+                                <select class="form-select comp-finish-dropdown-${formIndex}" name="comp-finish-${finish.id}-${productId}-${finish.component_id}-${formIndex}"
+                                id="finish-${finish.id}-${productId}-${finish.component_id}-${formIndex}">
                                     <option value="">------------</option>
                             </div>
                     `;
@@ -214,11 +215,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         finishHTML += '</select>';
                         finishRow.innerHTML += finishHTML;
                     });
-
-                    // if (finishRow.childElementCount > 0) {
-                    //     // show the component-finishes-container
-                    //     finishRow.classList.remove('d-none');
-                    // };
 
                     // Add event listeners to each finish dropdown to handle the deselection of others
                     let targetClass = `.finish-dropdown-${formIndex}`;
@@ -402,5 +398,45 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // execute the updateOrderValue function
         updateOrderValue(event.target)
+    });
+
+    // Handler for Client existing and asking for user input before submitting
+    if (document.getElementById('clientConflictModal')) {
+        // Show the modal if it's supposed to be shown i.e. if it was rendered by the template condition when passed into context
+        let clientModal = new bootstrap.Modal(document.getElementById('clientConflictModal'));
+        clientModal.show();
+
+        let useExistingClientButton = document.getElementById('use-existing-client');
+        let proceedNewClientButton = document.getElementById('proceed-new-client');
+        let cancelSubmissionButton = document.getElementById('cancel-submission');
+        let existingClientInput = document.getElementById('use_existing_client');
+        let orderForm = document.getElementById('order-form');
+
+        // Handle "Use Existing Client"
+        useExistingClientButton.addEventListener('click', function () {
+            // set the hidden input to true
+            existingClientInput.value = 'true';
+            // Submit the form using the existing client
+            orderForm.submit();
+        });
+
+        // Handle "Proceed with New Client"
+        proceedNewClientButton.addEventListener('click', function () {
+            // set the hidden input to false
+            existingClientInput.value = 'false';
+            // Submit the form as usual with the new client details
+            orderForm.submit();
+        });
+
+        // Handle "Cancel and Edit"
+        cancelSubmissionButton.addEventListener('click', function () {
+            // ensure the hidden input is set to false
+            existingClientInput.value = 'false';
+            // Do nothing and allow the user to edit the form or go and change the client details in admin first
+        });
+    }
+
+    document.querySelector('form').addEventListener('submit', function (e) {
+        console.log('Form is submitting...');
     });
 });
