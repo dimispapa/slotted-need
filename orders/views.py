@@ -24,6 +24,10 @@ def create_order(request):
 
         # validation of forms and formset fields ensuring no errors
         if order_form.is_valid() and order_item_formset.is_valid():
+            # Capture calculated totals from the form
+            order_value = order_form.cleaned_data['order_value']
+            deposit = order_form.cleaned_data['deposit']
+
             # handle client creation or selection
             client_name = order_form.cleaned_data['client_name']
             client_phone = order_form.cleaned_data['client_phone']
@@ -76,7 +80,11 @@ def create_order(request):
                       ))
 
             # create order object
-            order = Order.objects.create(client=client)
+            order = Order.objects.create(
+                client=client,
+                order_value=order_value,
+                deposit=deposit
+                )
 
             # process each form in the formset to save the order items
             for form_item in order_item_formset:
@@ -98,11 +106,16 @@ def create_order(request):
             return redirect(reverse('create_order'))
 
         else:
+            # If the forms are not valid, log errors for debugging
+            print("Order form errors: ", order_form.errors)
+            print("Order item formset errors: ", order_item_formset.errors)
+
             # If the forms are not valid, display an error message
             messages.add_message(request, messages.ERROR,
                                  'There was an error with your submission. '
                                  'Please try again.'
                                  )
+
             # render the page again but retaining the details
             return render(request, 'orders/create_order.html', {
                 'order_form': order_form,
