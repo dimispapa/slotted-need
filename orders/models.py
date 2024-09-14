@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.db import models
 from django.core.validators import MinValueValidator
 from products.models import Product, OptionValue, FinishOption
@@ -18,11 +19,11 @@ class Order(models.Model):
                                on_delete=models.SET_NULL,
                                blank=True, null=True)
     discount = models.DecimalField(
-        max_digits=10, decimal_places=2, default=0, editable=False)
+        max_digits=10, decimal_places=2, default=0)
     deposit = models.DecimalField(
-        max_digits=10, decimal_places=2, default=0, editable=False)
+        max_digits=10, decimal_places=2, default=0)
     order_value = models.DecimalField(
-        max_digits=10, decimal_places=2, default=0, editable=False)
+        max_digits=10, decimal_places=2, default=0)
     # create a status mapping to use as choices for order_status
     STATUS = {1: 'Not Started',
               2: 'In Progress',
@@ -36,15 +37,21 @@ class Order(models.Model):
     updated_on = models.DateTimeField(auto_now=True)
 
     def calculate_totals(self):
-        # Sum the discount and order_value from all OrderItems
+        """Calculate the total discount and order value based
+        on order items."""
+        # Ensure there are items before trying to calculate totals
         items = self.items.all()
-        self.discount = sum(item.discount * item.quantity for item in items)
-        self.order_value = sum(item.item_value for item in items)
-        self.save()
+        if items.exists():  # Only calculate if there are items
+            self.discount = sum(
+                item.discount * item.quantity for item in items
+            )
+            self.order_value = sum(item.item_value for item in items)
 
     def save(self, *args, **kwargs):
-        # Call the method to calculate totals before saving
-        self.calculate_totals()
+        # Only calculate totals after the object has been saved
+        # and has a primary key
+        if self.pk:
+            self.calculate_totals()
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -65,12 +72,18 @@ class OrderItem(models.Model):
     item_value = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.PositiveIntegerField(default=1)
     option_values = models.ManyToManyField(OptionValue,
-                                           related_name='order_items')
+                                           related_name='order_items',
+                                           blank=True)
     finish_options = models.ManyToManyField(FinishOption, blank=True)
 
     def save(self, *args, **kwargs):
+        # Ensure base_price and discount are not None
+        base_price = (self.base_price if self.base_price is not None
+                      else Decimal('0.00'))
+        discount = (self.discount if self.discount is not None
+                    else Decimal('0.00'))
         # Automatically calculate item_value before saving
-        self.item_value = (self.base_price - self.discount) * self.quantity
+        self.item_value = (base_price - discount) * self.quantity
         super().save(*args, **kwargs)
 
     def __str__(self):
