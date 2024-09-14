@@ -2,26 +2,16 @@
 {% load static %}
 {% load crispy_forms_tags %}
 {% block content %}
-<div class="container mt-3 mt-md-5">
+<div class="container mt-2 mt-md-4">
   <h1>Create an Order</h1>
-  <br />
-
-  <!-- Display messages (success, error, etc.) -->
-  {% if messages %}
-  <div class="alert-messages">
-    {% for message in messages %}
-    <div class="alert {{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-  </div>
-  {% endif %}
 
   <!-- Form start -->
-  <form method="post">
+  <form method="post" id="order-form" action="{% url 'create_order' %}">
     {% csrf_token %}
-
     <!-- Render the Order form for client information -->
     {% crispy order_form %}
 
+    <!-- Order Items -->
     <div id="order-items">
       <h3>Order Items</h3>
       <!-- Render the OrderItem forms for products and options -->
@@ -91,9 +81,54 @@
     <!-- Formset management fields to handle the formset dynamically -->
     {{ order_item_formset.management_form }}
 
+
     <!-- Order submit button -->
-    <button type="submit" class="btn btn-lg btn-primary mb-2 mt-2">Submit Order</button>
+    <input type="submit" name="submit-btn" value="Submit Order" class="btn btn-primary btn btn-lg btn-primary mb-2 mt-2"
+      id="submit-id-submit">
   </form>
+
+  {% if show_client_modal %}
+  <!-- Client conflict Bootstrap modal -->
+  <div class="modal fade" id="clientConflictModal" tabindex="-1" aria-labelledby="clientConflictModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="clientConflictModalLabel">Client Conflict Detected</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>A client with similar details already exists:</p>
+          <ul>
+            <li>Name: {{ existing_client.client_name }}</li>
+            <li>Phone: {{ existing_client.client_phone }}</li>
+            <li>Email: {{ existing_client.client_email }}</li>
+          </ul>
+          <p>Would you like to:</p>
+          <ul>
+            <li>Use the existing client</li>
+            <li>Proceed with the new client details</li>
+            <li>Edit the client details before submitting</li>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <!-- Hidden input to track whether "Use Existing Client" was clicked -->
+          <input type="hidden" id="use_existing_client" name="use_existing_client" value="false">
+          <!-- Option to use existing client -->
+          <button type="button" class="btn btn-primary" id="use-existing-client" data-bs-dismiss="modal">Use Existing
+            Client</button>
+          <!-- Option to proceed with the new client -->
+          <button type="button" class="btn btn-secondary" id="proceed-new-client" data-bs-dismiss="modal">Proceed with
+            New Client</button>
+          <!-- Option to cancel and edit -->
+          <button type="button" class="btn btn-danger" id="cancel-submission" data-bs-dismiss="modal">Cancel and
+            Edit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
 </div>
 {% endblock %}
 

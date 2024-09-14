@@ -5,6 +5,7 @@ from .models import OrderItem
 
 
 class OrderForm(forms.Form):
+    # define client form fields
     client_name = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control',
         'autocomplete': 'off',  # Disable browser autocomplete
@@ -44,6 +45,9 @@ class OrderForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
+        # setting the form tag to false is key so that we can control
+        # where the form tag element is placed - solves issue with submitting
+        self.helper.form_tag = False
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
             Row(
@@ -88,6 +92,9 @@ class OrderItemForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
+        # setting the form tag to false is key so that we can control
+        # where the form tag element is placed - solves issue with submitting
+        self.helper.form_tag = False
         self.helper.layout = Layout(
             Row(
                 Column(
@@ -161,6 +168,24 @@ class OrderItemForm(forms.ModelForm):
                 css_class="row bg-secondary text-white mb-1"
             ),
         )
+
+
+# add custom server-side validation for option-values when a product has
+# options as this is set to blank=True in the model so there is no
+# validation in the backend
+def clean(self):
+    cleaned_data = super().clean()
+    option_values = cleaned_data.get('option_values')
+
+    # Check if product has options and ensure they are required if present
+    if (self.instance.product and
+        self.instance.product.options.exists() and
+            not option_values):
+        self.add_error('option_values',
+                       'This product requires an option to be selected.')
+
+    # Allow finishes to be optional
+    return cleaned_data
 
 
 # Create the formset
