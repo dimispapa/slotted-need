@@ -8,7 +8,7 @@ urlpatterns = [
     # renders create_order.html template
     path('create-order/', views.create_order, name="create_order"),
     # renders orders.html template
-    path('orders/', views.orders, name="orders"),
+    path('orders/', views.OrderListView.as_view(), name="orders"),
     # ***** API section ***********
     # get_products API
     path('api/get_products/', views.get_products, name='get_products'),

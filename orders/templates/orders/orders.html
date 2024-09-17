@@ -1,8 +1,45 @@
 {% extends 'base.html' %}
 {% block content %}
-  <div class="container">
-    <div class="row">
-      <p>This is the "orders.html" content</p>
-    </div>
-  </div>
+<div class="container">
+  <!-- Orders table -->
+  <table class="table">
+    <!-- table headers -->
+    <thead>
+      <tr>
+        <th scope="col">Order #</th>
+        <th scope="col">Client</th>
+        <th scope="col">Order Value</th>
+        <th scope="col">Order Status</th>
+        <th scope="col">Created On</th>
+        <th scope="col">Updated On</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- loop through orders objects -->
+      {% for order in orders %}
+      <tr>
+        <!-- Populate order row values -->
+        <th scope="row">{{ order.pk }}</th>
+        <td>{{ order.client.client_name }}</td>
+        <td>{{ order.order_value }}</td>
+        <td>{{ order.get_order_status_display }}</td>
+        <td>{{ order.created_on }}</td>
+        <td>{{ order.updated_on }}</td>
+        <td>
+          <!-- Delete button triggers a POST request -->
+          <form method="post" style="display: inline;">
+            {% csrf_token %}
+            <input type="hidden" name="order_id" value="{{ order.pk }}">
+            <button type="submit" class="btn btn-danger"
+              onclick="return confirm('Are you sure you want to delete this order?');">
+              Delete
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}

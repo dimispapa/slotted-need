@@ -1,3 +1,4 @@
+from django.views import View
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.contrib import messages
@@ -148,8 +149,12 @@ def create_order(request):
 
 
 # View that handles the orders list template rendering
-def orders(request):
-    return render(request, 'orders/orders.html')
+class OrderListView(View):
+    template_name = 'orders/orders.html'
+
+    def get(self, request, *args, **kwargs):
+        orders = Order.objects.all()
+        return render(request, self.template_name, {'orders': orders})
 
 
 # API view to get the products on initial load of order form
