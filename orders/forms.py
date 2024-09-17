@@ -132,7 +132,7 @@ class OrderItemForm(forms.ModelForm):
                 Column(
                     HTML("""
                 <label for="id_form-{{ forloop.counter0 }}-discount"
-                class="form-label requiredField">
+                class="form-label">
                     Discount
                 </label>
                 <div class="input-group">
@@ -160,7 +160,8 @@ class OrderItemForm(forms.ModelForm):
                     <input type="number"
                     name="form-{{ forloop.counter0 }}-item_value"
                     class="form-control" step="0.01"
-                    id="id_form-{{ forloop.counter0 }}-item_value">
+                    id="id_form-{{ forloop.counter0 }}-item_value"
+                    readonly="readonly">
                 </div>
                 """),
                     css_class='col-12'
