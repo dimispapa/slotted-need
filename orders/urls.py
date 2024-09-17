@@ -13,6 +13,8 @@ urlpatterns = [
     # get_finishes API, with option_value_id as a path parameter
     path('api/get_finishes/<int:product_id>/<int:option_value_id>/',
          views.get_finishes, name='get_finishes'),
+    # check_client API (uses a post request to pass client form data)
+    path('api/check_client/', views.check_client, name='check_client'),
     # search_clients API, with client_name as a query parameter set in the view
     path('api/search_clients/', views.search_clients, name='search_clients')
 ]
