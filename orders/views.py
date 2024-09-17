@@ -7,7 +7,7 @@ from django.db.models import Count, Q
 from .models import Client, Order, OrderItem
 from products.models import (Product, Option, OptionValue, FinishOption,
                              ProductComponent, Component)
-from .forms import OrderForm, OrderItemFormSet
+from .forms import OrderForm, OrderItemFormSet, OrderViewForm
 
 
 # View that renders the home template
@@ -150,11 +150,47 @@ def create_order(request):
 
 # View that handles the orders list template rendering
 class OrderListView(View):
+    model = Order
     template_name = 'orders/orders.html'
 
     def get(self, request, *args, **kwargs):
+        # fetch orders
         orders = Order.objects.all()
-        return render(request, self.template_name, {'orders': orders})
+
+        # Create a form for each order to edit order_status
+        order_forms = []
+        for order in orders:
+            form = OrderViewForm(instance=order)
+            order_forms.append((order, form))
+
+        # render template with orders and forms
+        return render(request, self.template_name,
+                      {'order_forms': order_forms})
+
+    def post(self, request, *args, **kwargs):
+        # Fetch orders to update them in bulk
+        orders = Order.objects.all()
+
+        # Track if any form was updated
+        updated = False
+
+        for order in orders:
+            # Create a form instance with the POST data for each order
+            form = OrderViewForm(request.POST, instance=order)
+
+            # Validate and save if the form is valid
+            if form.is_valid():
+                form.save()
+                updated = True
+
+        # If updates were made, add a success message and redirect
+        if updated:
+            messages.success(request, "Order statuses updated successfully.")
+        else:
+            messages.warning(request, "No changes were made.")
+
+        # Redirect back to the order list page after the bulk update
+        return redirect('order_list_view')
 
 
 # API view to get the products on initial load of order form

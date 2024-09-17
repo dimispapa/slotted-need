@@ -1,7 +1,7 @@
 from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, HTML, Div
-from .models import OrderItem
+from .models import OrderItem, Order
 
 
 class OrderForm(forms.Form):
@@ -170,23 +170,22 @@ class OrderItemForm(forms.ModelForm):
             ),
         )
 
+    # add custom server-side validation for option-values when a product has
+    # options as this is set to blank=True in the model so there is no
+    # validation in the backend
+    def clean(self):
+        cleaned_data = super().clean()
+        option_values = cleaned_data.get('option_values')
 
-# add custom server-side validation for option-values when a product has
-# options as this is set to blank=True in the model so there is no
-# validation in the backend
-def clean(self):
-    cleaned_data = super().clean()
-    option_values = cleaned_data.get('option_values')
+        # Check if product has options and ensure they are required if present
+        if (self.instance.product and
+            self.instance.product.options.exists() and
+                not option_values):
+            self.add_error('option_values',
+                           'This product requires an option to be selected.')
 
-    # Check if product has options and ensure they are required if present
-    if (self.instance.product and
-        self.instance.product.options.exists() and
-            not option_values):
-        self.add_error('option_values',
-                       'This product requires an option to be selected.')
-
-    # Allow finishes to be optional
-    return cleaned_data
+        # Allow finishes to be optional
+        return cleaned_data
 
 
 # Create the formset
@@ -196,3 +195,13 @@ OrderItemFormSet = forms.modelformset_factory(
     extra=1,  # Start with 1 empty form
     can_delete=True,  # Allow deletion of forms
 )
+
+
+class OrderViewForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = ['order_status']  # Only include the order_status field
+
+        widgets = {
+            'order_status': forms.Select(attrs={'class': 'form-control'})
+        }
