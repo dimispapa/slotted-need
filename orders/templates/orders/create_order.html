@@ -78,16 +78,19 @@
       </div>
     </div>
 
-    <!-- Formset management fields to handle the formset dynamically -->
-    {{ order_item_formset.management_form }}
-
-
     <!-- Order submit button -->
     <input type="submit" name="submit-btn" value="Submit Order" class="btn btn-primary btn btn-lg btn-primary mb-2 mt-2"
       id="submit-id-submit">
+
+    <!-- Formset management fields to handle the formset dynamically -->
+    {{ order_item_formset.management_form }}
+
+    <!-- Hidden fields for client handling -->
+    <input type="hidden" id="client-action" name="client_action" value="">
+    <input type="hidden" id="client-id-input" name="client_id" value="">
+
   </form>
 
-  {% if show_client_modal %}
   <!-- Client conflict Bootstrap modal -->
   <div class="modal fade" id="clientConflictModal" tabindex="-1" aria-labelledby="clientConflictModalLabel"
     aria-hidden="true">
@@ -100,39 +103,42 @@
         <div class="modal-body">
           <p>A client with similar details already exists:</p>
           <ul>
-            <li>Name: {{ existing_client.client_name }}</li>
-            <li>Phone: {{ existing_client.client_phone }}</li>
-            <li>Email: {{ existing_client.client_email }}</li>
+            <li>Name: <span id="modal-client-name"></span></li>
+            <li>Phone: <span id="modal-client-phone"></span></li>
+            <li>Email: <span id="modal-client-email"></span></li>
           </ul>
           <p>Would you like to:</p>
           <ul>
             <li>Use the existing client</li>
-            <li>Proceed with the new client details</li>
-            <li>Edit the client details before submitting</li>
+            <li>Update the client details to:
+              <ul>
+                <li>Name: <span id="modal-new-client-name"></span></li>
+                <li>Phone: <span id="modal-new-client-phone"></span></li>
+                <li>Email: <span id="modal-new-client-email"></span></li>
+              </ul>
+            </li>
           </ul>
         </div>
         <div class="modal-footer">
-          <!-- Hidden input to track whether "Use Existing Client" was clicked -->
-          <input type="hidden" id="use_existing_client" name="use_existing_client" value="false">
           <!-- Option to use existing client -->
-          <button type="button" class="btn btn-primary" id="use-existing-client" data-bs-dismiss="modal">Use Existing
+          <button type="button" class="btn btn-primary" id="use-existing-client-btn" data-bs-dismiss="modal">Use
+            Existing
             Client</button>
-          <!-- Option to proceed with the new client -->
-          <button type="button" class="btn btn-secondary" id="proceed-new-client" data-bs-dismiss="modal">Proceed with
-            New Client</button>
-          <!-- Option to cancel and edit -->
-          <button type="button" class="btn btn-danger" id="cancel-submission" data-bs-dismiss="modal">Cancel and
-            Edit</button>
+          <!-- Option to update client details -->
+          <button type="button" class="btn btn-secondary" id="update-client-details-btn" data-bs-dismiss="modal">Update
+            Client Details</button>
+          <!-- Option to cancel -->
+          <button type="button" class="btn btn-danger" id="cancel-btn" data-bs-dismiss="modal">Cancel</button>
         </div>
       </div>
     </div>
   </div>
-  {% endif %}
 
 </div>
 {% endblock %}
 
 {% block extras %}
-<script src="{% static 'js/client_search.js' %}"></script>
-<script src="{% static 'js/orders.js' %}"></script>
+<!-- External JS logic -->
+<script type="text/javascript" src="{% static 'js/client_search.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/orders.js' %}"></script>
 {% endblock %}

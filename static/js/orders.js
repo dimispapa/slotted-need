@@ -400,43 +400,71 @@ document.addEventListener('DOMContentLoaded', function () {
         updateOrderValue(event.target)
     });
 
-    // Handler for Client existing and asking for user input before submitting
-    if (document.getElementById('clientConflictModal')) {
-        // Show the modal if it's supposed to be shown i.e. if it was rendered by the template condition when passed into context
+
+    // Handle the submission of the form depending on client details and user choice (if modal is triggered)
+    document.getElementById('order-form').addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const formData = new FormData(this); // Capture form data
+
+        // Send a POST request to the API endpoint to check client details
+        fetch('/api/check_client/', {
+                method: 'POST',
+                body: formData, // Send form data in request body
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken') // Include CSRF token for security
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // if exact client match found, set input values and submit
+                if (data.exact_match) {
+                    document.getElementById('client-id-input').value = data.exact_match.id;
+                    document.getElementById('client-action').value = 'use_existing';
+                    this.submit();
+                // if partial client match found show modal with partial match details
+                } else if (data.partial_match) {
+                    showModalWithClientDetails(data.partial_match);
+                // if no match found
+                } else {
+                    // clear inputs then submit
+                    document.getElementById('client-id-input').value = '';
+                    document.getElementById('client-action').value = '';
+                    this.submit();
+                }
+            });
+    });
+
+    // Define handler function for Client existing and asking for user input before submitting
+    function showModalWithClientDetails(client) {
+
+        // Fill in the modal with the partial match client details
+        document.getElementById('modal-client-name').innerText = client.name;
+        document.getElementById('modal-client-phone').innerText = client.phone;
+        document.getElementById('modal-client-email').innerText = client.email;
+
+        // Fill the modal with the new client details
+        document.getElementById('modal-new-client-name').innerText = document.getElementById('client_name').value;
+        document.getElementById('modal-new-client-phone').innerText = document.getElementById('client_phone').value;
+        document.getElementById('modal-new-client-email').innerText = document.getElementById('client_email').value;
+
+        // Handle "Use Existing Client"
+        document.getElementById('use-existing-client-btn').addEventListener('click', function () {
+            document.getElementById('client-id-input').value = client.id; // Set existing client ID
+            document.getElementById('client-action').value = 'use_existing'; // Action to use existing client
+            document.getElementById('order-form').submit(); // Now submit the form with the existing client
+        });
+
+        // Handle "Update Client Details"
+        document.getElementById('update-client-details-btn').addEventListener('click', function () {
+            document.getElementById('client-id-input').value = client.id; // Set existing client ID
+            document.getElementById('client-action').value = 'update_client'; // Action to update client
+            document.getElementById('order-form').submit(); // Submit the form as is (with updated client details)
+        });
+
+        // Show the modal
         let clientModal = new bootstrap.Modal(document.getElementById('clientConflictModal'));
         clientModal.show();
 
-        let useExistingClientButton = document.getElementById('use-existing-client');
-        let proceedNewClientButton = document.getElementById('proceed-new-client');
-        let cancelSubmissionButton = document.getElementById('cancel-submission');
-        let existingClientInput = document.getElementById('use_existing_client');
-        let orderForm = document.getElementById('order-form');
-
-        // Handle "Use Existing Client"
-        useExistingClientButton.addEventListener('click', function () {
-            // set the hidden input to true
-            existingClientInput.value = 'true';
-            // Submit the form using the existing client
-            orderForm.submit();
-        });
-
-        // Handle "Proceed with New Client"
-        proceedNewClientButton.addEventListener('click', function () {
-            // set the hidden input to false
-            existingClientInput.value = 'false';
-            // Submit the form as usual with the new client details
-            orderForm.submit();
-        });
-
-        // Handle "Cancel and Edit"
-        cancelSubmissionButton.addEventListener('click', function () {
-            // ensure the hidden input is set to false
-            existingClientInput.value = 'false';
-            // Do nothing and allow the user to edit the form or go and change the client details in admin first
-        });
     }
-
-    document.querySelector('form').addEventListener('submit', function (e) {
-        console.log('Form is submitting...');
-    });
 });
