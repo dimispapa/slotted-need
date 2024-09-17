@@ -174,19 +174,23 @@ class OrderItemForm(forms.ModelForm):
     # add custom server-side validation for option-values when a product has
     # options as this is set to blank=True in the model so there is no
     # validation in the backend
-    def clean(self):
-        cleaned_data = super().clean()
-        option_values = cleaned_data.get('option_values')
+    # def clean(self):
+    #     cleaned_data = super().clean()
+    #     product = cleaned_data.get('product')
+    #     option_values = cleaned_data.get('option_values')
+    #     print(product, option_values)
+    #     # Ensure product exists in cleaned_data before proceeding with validation
+    #     if product:
+    #         # Check if the product has options
+    #         if product.options.exists():
+    #             # If the product has options but no option values are selected, add an error
+    #             if not option_values:
+    #                 self.add_error('option_values', 'This product requires an option to be selected.')
+    #         else:
+    #             # If product has no options, ensure option_values is not required
+    #             cleaned_data['option_values'] = None
 
-        # Check if product has options and ensure they are required if present
-        if (self.instance.product and
-            self.instance.product.options.exists() and
-                not option_values):
-            self.add_error('option_values',
-                           'This product requires an option to be selected.')
-
-        # Allow finishes to be optional
-        return cleaned_data
+    #     return cleaned_data
 
 
 # Create the order items formset
