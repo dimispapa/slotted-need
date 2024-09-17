@@ -2,9 +2,14 @@ from . import views
 from django.urls import path
 
 urlpatterns = [
+    # ****** URL template section ***********
+    # render the home.html template dashboard
     path('', views.home, name='home'),
     # renders create_order.html template
     path('create-order/', views.create_order, name="create_order"),
+    # renders orders.html template
+    path('orders/', views.orders, name="orders"),
+    # ***** API section ***********
     # get_products API
     path('api/get_products/', views.get_products, name='get_products'),
     # get_product_options API, with product_id as a path parameter
