@@ -45,9 +45,12 @@ class Order(models.Model):
         items = self.items.all()
         if items.exists():  # Only calculate if there are items
             self.discount = sum(
-                item.discount * item.quantity for item in items
+                (item.discount or 0) * (item.quantity or 0) for item in items
             )
             self.order_value = sum(item.item_value for item in items)
+
+    class Meta:
+        ordering = ["id"]
 
     def save(self, *args, **kwargs):
         # Only calculate totals after the object has been saved

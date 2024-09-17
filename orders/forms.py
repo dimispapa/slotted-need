@@ -34,6 +34,7 @@ class OrderForm(forms.Form):
     deposit = forms.DecimalField(
         max_digits=10,
         decimal_places=2,
+        initial=0,
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
             'id': 'order_deposit'
@@ -80,10 +81,10 @@ class OrderItemForm(forms.ModelForm):
                        'min': 1, 'value': 1}),
             'base_price': forms.NumberInput(
                 attrs={'class': 'form-control base-price-field',
-                       'readonly': False}),
+                       'min': 0, 'readonly': False}),
             'discount': forms.NumberInput(
                 attrs={'class': 'form-control discount-field',
-                       'min': 0}),
+                       'min': 0, 'readonly': False}),
             'item_value': forms.NumberInput(
                 attrs={'class': 'form-control',
                        'readonly': True}),
@@ -188,7 +189,7 @@ class OrderItemForm(forms.ModelForm):
         return cleaned_data
 
 
-# Create the formset
+# Create the order items formset
 OrderItemFormSet = forms.modelformset_factory(
     OrderItem,
     form=OrderItemForm,
@@ -197,11 +198,18 @@ OrderItemFormSet = forms.modelformset_factory(
 )
 
 
+# define form for the Orders view
 class OrderViewForm(forms.ModelForm):
     class Meta:
         model = Order
-        fields = ['order_status']  # Only include the order_status field
-
+        fields = ['order_status']
         widgets = {
-            'order_status': forms.Select(attrs={'class': 'form-control'})
+            'order_status': forms.Select(
+                attrs={'class': 'form-select'})
         }
+
+
+# Create the order view formset
+OrderViewFormSet = forms.modelformset_factory(Order,
+                                              form=OrderViewForm,
+                                              extra=0)

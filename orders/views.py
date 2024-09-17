@@ -153,6 +153,7 @@ class OrderListView(View):
     model = Order
     template_name = 'orders/orders.html'
 
+    # GET request
     def get(self, request, *args, **kwargs):
         # fetch orders
         orders = Order.objects.all()
@@ -160,37 +161,38 @@ class OrderListView(View):
         # Create a form for each order to edit order_status
         order_forms = []
         for order in orders:
-            form = OrderViewForm(instance=order)
+            form = OrderViewForm(instance=order, prefix=f'order-{order.id}')
             order_forms.append((order, form))
 
         # render template with orders and forms
-        return render(request, self.template_name,
-                      {'order_forms': order_forms})
+        return render(request, self.template_name, {
+            'order_forms': order_forms,
+        })
 
+    # POST request
     def post(self, request, *args, **kwargs):
-        # Fetch orders to update them in bulk
+        print("POST data:", request.POST)  # Debugging line
         orders = Order.objects.all()
-
-        # Track if any form was updated
         updated = False
 
+        # Iterate through orders and bind the POST data to each form
         for order in orders:
-            # Create a form instance with the POST data for each order
-            form = OrderViewForm(request.POST, instance=order)
+            form = OrderViewForm(request.POST, instance=order,
+                                 prefix=f'order-{order.id}')
 
-            # Validate and save if the form is valid
             if form.is_valid():
-                form.save()
-                updated = True
+                if form.has_changed():  # Only save if something has changed
+                    form.save()
+                    updated = True
+                else:
+                    print(f"No changes detected for order {order.id}")
 
-        # If updates were made, add a success message and redirect
         if updated:
-            messages.success(request, "Order statuses updated successfully.")
+            messages.success(request, "Orders updated successfully.")
         else:
             messages.warning(request, "No changes were made.")
 
-        # Redirect back to the order list page after the bulk update
-        return redirect('order_list_view')
+        return redirect('orders')
 
 
 # API view to get the products on initial load of order form
