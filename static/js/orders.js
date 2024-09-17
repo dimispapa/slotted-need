@@ -148,11 +148,11 @@ document.addEventListener('DOMContentLoaded', function () {
             let finishCol = document.createElement('div');
             // add column styles from list constant
             finishCol.classList.add(...OPTION_COL_STYLES);
+            // Create a finish div row
+            let finishDiv = document.createElement('div');
+            finishDiv.classList.add('row');
             // Populate component-level finishes (not driven by config options) dynamically
             data.component_finishes.forEach(finish => {
-
-                let finishDiv = document.createElement('div');
-                finishDiv.classList.add('row');
                 let finishDivHTML = `
                             <div class="${OPTION_GROUP_STYLES}">
                                 <label for="finish-${finish.id}-${productId}-${finish.component_id}-${formIndex}" class="form-label">${finish.component_name} ${finish.name}</label>
@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     finishDivHTML += `<option value="${finishOption.id}">${finishOption.name}</option>`;
                 });
                 finishDivHTML += '</select>';
-                finishDiv.innerHTML = finishDivHTML;
+                finishDiv.innerHTML += finishDivHTML;
                 finishCol.appendChild(finishDiv);
             });
 
@@ -238,8 +238,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Define function to deselect other finishes in the same option container
     function deselectOtherFinishes(selectedDropdown, targetClass) {
+        // get the grandparent div container
+        let grandParentDiv = selectedDropdown.parentElement.parentElement;
         // Loop through all finish dropdowns within the same finishRow
-        document.querySelectorAll(targetClass).forEach(dropdown => {
+        grandParentDiv.querySelectorAll(targetClass).forEach(dropdown => {
             // If it's not the dropdown that was selected, reset its value
             if (dropdown !== selectedDropdown) {
                 dropdown.value = '';
