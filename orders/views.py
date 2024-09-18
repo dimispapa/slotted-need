@@ -1,3 +1,4 @@
+import re
 from django.views import View
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
@@ -99,35 +100,32 @@ def create_order(request):
             )
 
             # process each form in the formset to save the order items
-            for form_item in order_item_formset:
+            for form in order_item_formset:
                 # create associated OrderItem instance without commiting
-                order_item = form_item.save(commit=False)
+                order_item = form.save(commit=False)
                 # pass the Order instance created above to link it with
                 order_item.order = order
                 # save and commit OrderItem to db
                 order_item.save()
                 # save the many-to-many data for option_values and finishes
-                form_item.save_m2m()
+                form.save_m2m()
+
+                # Get the form index
+                form_index = form.prefix.split('-')[1]
+
+                # Process option values
+                process_option_values(request, form_index, order_item)
 
             # notify user with success message
-            messages.add_message(request, messages.SUCCESS,
-                                 'Order created successfully!'
-                                 )
+            messages.success(request, 'Order created successfully!')
 
             # Redirect to the same page to avoid form resubmission
             return redirect(reverse('create_order'))
 
         # If the forms are not valid
         else:
-            # log errors for debugging
-            print("Order form errors: ", order_form.errors)
-            print("Order item formset errors: ", order_item_formset.errors)
-
             # display an error message
-            messages.add_message(request, messages.ERROR,
-                                 'There was an error with your submission. '
-                                 'Please try again.'
-                                 )
+            messages.error(request, 'Please correct the errors below.')
 
             # render the page again but retaining the details
             return render(request, 'orders/create_order.html', {
@@ -146,6 +144,39 @@ def create_order(request):
             'order_form': order_form,
             'order_item_formset': order_item_formset,
         })
+
+
+# *** HELPER FUNCTIONS ***
+def process_option_values(request, form_index, order_item):
+    # Define field naming pattern
+    option_field_pattern = re.compile(
+        rf'^form-{form_index}-option_\d+$')
+
+    # Get option field names
+    option_field_names = [
+        key for key in request.POST
+        if option_field_pattern.match(key)]
+
+    # Initialise emtpy list of option values
+    selected_option_value_ids = []
+
+    # Loop through field names
+    for field_name in option_field_names:
+        # Extract the option_id
+        option_id = field_name.split('-option_')[1]
+        # Get the selected values for this option
+        selected_values = request.POST.getlist(field_name)
+        # Validate and collect the selected OptionValue IDs
+        for value_id in selected_values:
+            # Validate that the OptionValue exists and
+            # is associated with the Option
+            if not OptionValue.objects.filter(id=value_id,
+                                              option_id=option_id).exists():
+                raise ValueError(f"Invalid option value selected: {value_id}")
+            selected_option_value_ids.append(value_id)
+
+    # Associate option values with the order item
+    order_item.option_values.set(selected_option_value_ids)
 
 
 # View that handles the orders list template rendering
