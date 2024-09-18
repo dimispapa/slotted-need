@@ -1,8 +1,9 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Div, Field
 from crispy_forms.bootstrap import PrependedText
-from .models import OrderItem, Order
+from .models import OrderItem, Order, Product, OptionValue
 
 
 class OrderForm(forms.Form):
@@ -72,10 +73,43 @@ class OrderItemForm(forms.ModelForm):
     class Meta:
         model = OrderItem
         fields = ['product', 'base_price', 'discount', 'item_value',
-                  'quantity']
+                  'quantity', 'option_values']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        # ***** FIELD LEVEL VALIDATION *********
+        # Dynamically set the queryset for option_values based on the
+        # selected product and handle errors to data
+
+        # Handle when a product is in the new form data
+        if 'product' in self.data:
+
+            try:
+                product_id = int(self.data.get('product'))
+                product = Product.objects.get(id=product_id)
+                self.fields['option_values'
+                            ].queryset = OptionValue.objects.filter(
+                    option__product=product)
+
+            # Handle cases when product does not exist or
+            # ID cannot be converted to int
+            except (ValueError, TypeError, Product.DoesNotExist):
+                self.fields['option_values'
+                            ].queryset = OptionValue.objects.none()
+
+        # Handle an existing order item instance
+        elif self.instance.pk and self.instance.product:
+            product = self.instance.product
+            self.fields['option_values'].queryset = OptionValue.objects.filter(
+                option__product=product)
+
+        # Handle when a product is not selected
+        else:
+            self.fields['option_values'].queryset = OptionValue.objects.none()
+
+        # *** FORM LAYOUT DESIGN WITH CRISPY-DJANGO FORM-HELPER ***
+        # Initialise the form helper to design the layout of the form
         self.helper = FormHelper()
         # setting the form tag to false is key so that we can control
         # where the form tag element is placed - solves issue with submitting
@@ -130,23 +164,42 @@ class OrderItemForm(forms.ModelForm):
             ),
         )
 
-    # add custom server-side validation for option-values when a product has
-    # options as this is set to blank=True in the model so there is no
-    # validation in the backend
+    # add custom server-side validation for option-values to ensure
+    # data integrity if client-side validation is bypassed
     # def clean(self):
     #     cleaned_data = super().clean()
     #     product = cleaned_data.get('product')
-    #     product_obj = get_object_or_404(Product, product=product)
     #     option_values = cleaned_data.get('option_values')
-    #     print(product, option_values)
-    #     # if product has options
-    #     if product and product.options.exists():
-    #         # If the product has options but no option values are selected,
-    #         # raise a Validation error
-    #         if not option_values:
-    #             self.add_error('options',
-    #                            'This product requires an option to be selected.'
-    #                            )
+
+    #     if product:
+    #         # Get all options associated with the product
+    #         product_options = product.options.all()
+
+    #         # If the product has options,
+    #         # ensure that option_values are selected
+    #         if product_options.exists():
+    #             if not option_values:
+    #                 raise ValidationError(
+    #                     'You must select an option value for this '
+    #                     'product.')
+
+    #             # Validate that the selected option_values are associated
+    #             # with  the product's options
+    #             for option_value in option_values:
+    #                 if option_value.option not in product_options:
+    #                     raise ValidationError(
+    #                         f"The option value '{option_value}' is not valid"
+    #                         " for the selected product."
+    #                     )
+    #         else:
+    #             # If the product has no options,
+    #             # ensure no option_values are selected
+    #             if option_values.exists():
+    #                 raise ValidationError(
+    #                     'This product does not have options; '
+    #                     'please deselect option values.')
+
+    #     return cleaned_data
 
 
 # Create the order items formset
