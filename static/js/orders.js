@@ -33,8 +33,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateProductDetails(target) {
 
         let productId = target.value;
-        let formIndex = target.closest('.order-item-form').getAttribute('data-form-index');
-        let optionsContainer = document.getElementById(`options-form-${formIndex}-container`);
+        let orderItem = target.closest('.order-item-form');
+        let formIndex = orderItem.getAttribute('data-form-index');
+        let optionsContainer = orderItem.querySelector('.options-form-container')
         // let finishesContainer = document.getElementById(`finishes-container-${formIndex}`);
         let basePriceField = document.getElementById(`id_form-${formIndex}-base_price`);
         let discountField = document.getElementById(`id_form-${formIndex}-discount`);
