@@ -116,11 +116,17 @@ def create_order(request):
                 # Process option values
                 process_option_values(request, form_index, order_item)
 
+                # Process component finishes
+                process_component_finishes(request, form_index, order_item)
+
+                # Process option finishes
+                process_option_finishes(request, form_index, order_item)
+
             # notify user with success message
             messages.success(request, 'Order created successfully!')
 
             # Redirect to the same page to avoid form resubmission
-            return redirect(reverse('create_order'))
+            return redirect('create_order')
 
         # If the forms are not valid
         else:
@@ -177,6 +183,71 @@ def process_option_values(request, form_index, order_item):
 
     # Associate option values with the order item
     order_item.option_values.set(selected_option_value_ids)
+
+
+def process_component_finishes(request, form_index, order_item):
+    # Define field naming pattern
+    comp_finish_field_pattern = re.compile(
+        rf'^form-{form_index}-component_finish-\d+$')
+    # Get component finish fields
+    comp_finish_field_names = [key for key in request.POST
+                               if comp_finish_field_pattern.match(key)]
+
+    for field_name in comp_finish_field_names:
+        # Extract the component_id
+        component_id = field_name.split('-component_finish-')[1]
+        finish_option_id = request.POST.get(field_name)
+
+        # Validate the Component
+        if not Component.objects.filter(id=component_id).exists():
+            raise ValueError(f"Invalid component selected: {component_id}")
+
+        # Validate the FinishOption
+        if not FinishOption.objects.filter(id=finish_option_id).exists():
+            raise ValueError(f"Invalid finish option selected: "
+                             f"{finish_option_id}")
+
+        component = Component.objects.get(id=component_id)
+        finish_option = FinishOption.objects.get(id=finish_option_id)
+
+        # Associate the finish option with the component and order item
+        order_item.item_component_finishes.create(
+            component=component,
+            finish_option=finish_option
+        )
+
+
+def process_option_finishes(request, form_index, order_item):
+    # Define field naming pattern
+    opt_finish_field_pattern = re.compile(
+        rf'^form-{form_index}-option_finish-\d+$')
+    # Get option finish fields
+    opt_finish_field_names = [key for key in request.POST
+                              if opt_finish_field_pattern.match(key)]
+
+    for field_name in opt_finish_field_names:
+        # Extract the option_value_id
+        option_value_id = field_name.split('-option_finish-')[1]
+        finish_option_id = request.POST.get(field_name)
+
+        # Validate the OptionValue
+        if not OptionValue.objects.filter(id=option_value_id).exists():
+            raise ValueError(f"Invalid option value selected: "
+                             f"{option_value_id}")
+
+        # Validate the FinishOption
+        if not FinishOption.objects.filter(id=finish_option_id).exists():
+            raise ValueError(f"Invalid finish option selected: "
+                             f"{finish_option_id}")
+
+        option_value = OptionValue.objects.get(id=option_value_id)
+        finish_option = FinishOption.objects.get(id=finish_option_id)
+
+        # Associate the finish option with the option value and order item
+        order_item.item_option_finishes.create(
+            option_value=option_value,
+            finish_option=finish_option
+        )
 
 
 # View that handles the orders list template rendering

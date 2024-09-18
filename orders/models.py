@@ -104,6 +104,10 @@ class ComponentFinish(models.Model):
     component = models.ForeignKey(Component, on_delete=models.CASCADE)
     finish_option = models.ForeignKey(FinishOption, on_delete=models.CASCADE)
 
+    class Meta:
+        # Define the plural correctly
+        verbose_name_plural = 'Component Finishes'
+
     def __str__(self):
         return (f"{self.order_item} - {self.component.name} - "
                 f"{self.finish_option.name}")
@@ -115,6 +119,10 @@ class OptionFinish(models.Model):
                                    on_delete=models.CASCADE)
     option_value = models.ForeignKey(OptionValue, on_delete=models.CASCADE)
     finish_option = models.ForeignKey(FinishOption, on_delete=models.CASCADE)
+
+    class Meta:
+        # Define the plural correctly
+        verbose_name_plural = 'Option Finishes'
 
     def __str__(self):
         return (f"{self.order_item} - {self.option_value.value} - "

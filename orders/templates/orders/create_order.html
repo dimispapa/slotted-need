@@ -37,24 +37,6 @@
     <!-- Button to Add New Order Item -->
     <button type="button" id="add-order-item" class="btn btn-secondary mb-3 mt-2">Add Order Item</button>
 
-    <!-- Hidden template for cloning -->
-    <div id="empty-form-template" class="d-none">
-      <div class="card order-item-form" data-form-index="__prefix__">
-        <div class="card-body container-fluid bg-secondary text-white rounded">
-          <h4>Order Item # __itemnum__</h4>
-          {% crispy order_item_formset.empty_form %}
-          <!-- Delete order item button -->
-          {% if order_item_formset.can_delete %}
-          <div class="form-group d-grid d-flex justify-content-end">
-            <button type="button" class="btn btn-danger delete-order-item">
-              Delete Order Item
-            </button>
-          </div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-
     <div class="row bg-primary text-white p-1 p-md-2 pb-3 pb-md-4 m-0 rounded">
       <!-- Deposit fields -->
       <div class="col-12 col-md-6">
@@ -90,6 +72,24 @@
     <input type="hidden" id="client-id-input" name="client_id" value="">
 
   </form>
+
+  <!-- Hidden template for cloning -->
+  <div id="empty-form-template" class="d-none">
+    <div class="card order-item-form" data-form-index="__prefix__">
+      <div class="card-body container-fluid bg-secondary text-white rounded">
+        <h4>Order Item # __itemnum__</h4>
+        {% crispy order_item_formset.empty_form %}
+        <!-- Delete order item button -->
+        {% if order_item_formset.can_delete %}
+        <div class="form-group d-grid d-flex justify-content-end">
+          <button type="button" class="btn btn-danger delete-order-item">
+            Delete Order Item
+          </button>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 
   <!-- Client conflict Bootstrap modal -->
   <div class="modal fade" id="clientConflictModal" tabindex="-1" aria-labelledby="clientConflictModalLabel"
