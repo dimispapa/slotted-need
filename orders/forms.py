@@ -1,6 +1,7 @@
 from django import forms
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Row, Column, HTML, Div
+from crispy_forms.layout import Layout, Row, Column, Div, Field
+from crispy_forms.bootstrap import PrependedText
 from .models import OrderItem, Order
 
 
@@ -34,7 +35,6 @@ class OrderForm(forms.Form):
     deposit = forms.DecimalField(
         max_digits=10,
         decimal_places=2,
-        initial=0,
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
             'id': 'order_deposit'
@@ -73,22 +73,6 @@ class OrderItemForm(forms.ModelForm):
         model = OrderItem
         fields = ['product', 'base_price', 'discount', 'item_value',
                   'quantity']
-        widgets = {
-            'product': forms.Select(
-                attrs={'class': 'form-control product-dropdown'}),
-            'quantity': forms.NumberInput(
-                attrs={'class': 'form-control quantity-field',
-                       'min': 1, 'value': 1}),
-            'base_price': forms.NumberInput(
-                attrs={'class': 'form-control base-price-field',
-                       'min': 0, 'readonly': False}),
-            'discount': forms.NumberInput(
-                attrs={'class': 'form-control discount-field',
-                       'min': 0, 'readonly': False}),
-            'item_value': forms.NumberInput(
-                attrs={'class': 'form-control',
-                       'readonly': True}),
-        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -99,73 +83,48 @@ class OrderItemForm(forms.ModelForm):
         self.helper.layout = Layout(
             Row(
                 Column(
-                    'product',
-                    css_class='form-group col-md-9 mb-1 mb-md-2'),
+                    # Product field
+                    Field(
+                        'product',
+                        css_class='product-dropdown'
+                    ),
+                    css_class='form-group col-md-9 mb-1 mb-md-2'
+                ),
                 Column(
-                    'quantity',
-                    css_class='form-group col-md-3 mb-2 mb-md-3'),
+                    # Quantity field
+                    Field(
+                        'quantity',
+                        css_class='quantity-field',
+                        min=1,
+                        value=1,
+                    ),
+                    css_class='form-group col-md-3 mb-2 mb-md-3'
+                ),
             ),
-            HTML("""
-                <div id="options-form-{{ forloop.counter0 }}-container"
-                class="row p-1 p-md-2 bg-light text-dark mb-2 mb-md-3 d-none
-                rounded">
-                </div>
-                """),
+            # Options container/row div
+            Row(
+                css_class=("options-form-container p-1 p-md-2 bg-light "
+                           "text-dark mb-2 mb-md-3 d-none rounded")
+            ),
             Row(
                 Column(
-                    HTML("""
-                <label for="id_form-{{ forloop.counter0 }}-base_price"
-                class="form-label requiredField">
-                    Base price<span class="asteriskField">*</span>
-                </label>
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">€</span>
-                    </div>
-                    <input type="number"
-                    name="form-{{ forloop.counter0 }}-base_price"
-                    class="form-control base-price-field" step="0.01"
-                    id="id_form-{{ forloop.counter0 }}-base_price">
-                </div>
-                """),
-                    css_class='col-sm-6 col-md-12 mb-1 mb-md-2'
+                    # Base price field
+                    PrependedText('base_price', '€', active=True,
+                                  css_class='base-price-field'),
+                    css_class='form-group col-sm-6 col-md-12 mb-1 mb-md-2'
                 ),
                 Column(
-                    HTML("""
-                <label for="id_form-{{ forloop.counter0 }}-discount"
-                class="form-label">
-                    Discount
-                </label>
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">€</span>
-                    </div>
-                    <input type="number"
-                    name="form-{{ forloop.counter0 }}-discount"
-                    class="form-control discount-field" step="0.01"
-                    id="id_form-{{ forloop.counter0 }}-discount">
-                </div>
-                """),
-                    css_class='col-sm-6 col-md-12 mb-1 mb-md-2'
+                    # Discount field
+                    PrependedText('discount', '€', active=True,
+                                  css_class='discount-field', min=0),
+                    css_class='form-group col-sm-6 col-md-12 mb-1 mb-md-2'
                 ),
                 Column(
-                    HTML("""
-                <label for="id_form-{{ forloop.counter0 }}-item_value"
-                class="form-label requiredField">
-                    Item value<span class="asteriskField">*</span>
-                </label>
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">€</span>
-                    </div>
-                    <input type="number"
-                    name="form-{{ forloop.counter0 }}-item_value"
-                    class="form-control" step="0.01"
-                    id="id_form-{{ forloop.counter0 }}-item_value"
-                    readonly="readonly">
-                </div>
-                """),
-                    css_class='col-12'
+                    # Item value field
+                    PrependedText('item_value', '€', active=True,
+                                  css_class='item-value-field',
+                                  readonly=True),
+                    css_class='form-group col-12'
                 ),
                 css_class="row bg-secondary text-white mb-1"
             ),
@@ -177,20 +136,17 @@ class OrderItemForm(forms.ModelForm):
     # def clean(self):
     #     cleaned_data = super().clean()
     #     product = cleaned_data.get('product')
+    #     product_obj = get_object_or_404(Product, product=product)
     #     option_values = cleaned_data.get('option_values')
     #     print(product, option_values)
-    #     # Ensure product exists in cleaned_data before proceeding with validation
-    #     if product:
-    #         # Check if the product has options
-    #         if product.options.exists():
-    #             # If the product has options but no option values are selected, add an error
-    #             if not option_values:
-    #                 self.add_error('option_values', 'This product requires an option to be selected.')
-    #         else:
-    #             # If product has no options, ensure option_values is not required
-    #             cleaned_data['option_values'] = None
-
-    #     return cleaned_data
+    #     # if product has options
+    #     if product and product.options.exists():
+    #         # If the product has options but no option values are selected,
+    #         # raise a Validation error
+    #         if not option_values:
+    #             self.add_error('options',
+    #                            'This product requires an option to be selected.'
+    #                            )
 
 
 # Create the order items formset
