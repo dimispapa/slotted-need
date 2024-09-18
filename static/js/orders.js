@@ -112,9 +112,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 optionDiv.classList.add('row');
                 let optionDivHTML = `
                                 <div class="${OPTION_GROUP_STYLES}">
-                                    <label for="option-${option.id}-${formIndex}" class="form-label requiredField">${option.name}<span class="asteriskField">*</span></label>
-                                    <select class="form-select options-dropdown" name="option_${option.id}_${formIndex}"
-                                    id="option-${option.id}-${formIndex}" required aria-required="true">
+                                    <label for="option-${formIndex}-${option.id}" class="form-label requiredField">${option.name}<span class="asteriskField">*</span></label>
+                                    <select class="form-select options-dropdown" name="form-${formIndex}-option_${option.id}"
+                                    id="option-${formIndex}-${option.id}" required aria-required="true">
                                         <option value="">------------</option>
                                 </div>
                         `;
@@ -128,14 +128,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Create a finish row
                 let finishRow = document.createElement('div');
                 finishRow.classList.add('row');
-                finishRow.id = `finish-${option.id}-${formIndex}`;
+                finishRow.id = `finish-${formIndex}-${option.id}`;
                 optionCol.appendChild(finishRow);
 
                 // append the column to the container
                 optionsContainer.appendChild(optionCol);
 
                 // Fetch finishes dynamically when the option value changes
-                document.getElementById(`option-${option.id}-${formIndex}`).addEventListener('change', function () {
+                document.getElementById(`option-${formIndex}-${option.id}`).addEventListener('change', function () {
                     updateFinishes(formIndex, productId, option.id, this.value);
                 });
             });
@@ -156,9 +156,9 @@ document.addEventListener('DOMContentLoaded', function () {
             data.component_finishes.forEach(finish => {
                 let finishDivHTML = `
                             <div class="${OPTION_GROUP_STYLES}">
-                                <label for="finish-${finish.id}-${productId}-${finish.component_id}-${formIndex}" class="form-label">${finish.component_name} ${finish.name}</label>
-                                <select class="form-select comp-finish-dropdown-${formIndex}" name="comp-finish-${finish.id}-${productId}-${finish.component_id}-${formIndex}"
-                                id="finish-${finish.id}-${productId}-${finish.component_id}-${formIndex}">
+                                <label for="finish-${formIndex}-${finish.id}-${finish.component_id}" class="form-label">${finish.component_name} ${finish.name}</label>
+                                <select class="form-select comp-finish-dropdown-${formIndex}" name="form-${formIndex}-component_finish-${finish.component_id}"
+                                id="finish-${formIndex}-${finish.id}-${finish.component_id}">
                                     <option value="">------------</option>
                             </div>
                     `;
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Define function to update finishes based on selected option
     function updateFinishes(formIndex, productId, optionId, optionValueId) {
 
-        let finishRow = document.getElementById(`finish-${optionId}-${formIndex}`);
+        let finishRow = document.getElementById(`finish-${formIndex}-${optionId}`);
 
         // Check if an actual option value was selected
         if (optionValueId) {
@@ -205,8 +205,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     data.component_finishes.forEach(finish => {
                         let finishHTML = `
                             <div class="${OPTION_GROUP_STYLES}">
-                                <label for="finish-${optionId}-${finish.id}-${formIndex}" class="form-label text-dark">${finish.name}</label>
-                                <select class="form-select finish-dropdown-${formIndex}" id="finish-${optionId}-${finish.id}-${formIndex}" name="finish_${optionId}_${finish.id}_${formIndex}">
+                                <label for="finish-${formIndex}-${optionValueId}-${finish.id}" class="form-label text-dark">${finish.name}</label>
+                                <select class="form-select finish-dropdown-${formIndex}" id="finish-${formIndex}-${optionValueId}-${finish.id}" name="form-${formIndex}-option_finish-${optionValueId}">
                                     <option value="">------------</option>
                             </div>
                         `;
