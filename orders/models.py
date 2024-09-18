@@ -1,7 +1,7 @@
 from decimal import Decimal
 from django.db import models
 from django.core.validators import MinValueValidator
-from products.models import Product, OptionValue, FinishOption
+from products.models import Product, OptionValue, FinishOption, Component
 
 
 class Client(models.Model):
@@ -50,7 +50,7 @@ class Order(models.Model):
             self.order_value = sum(item.item_value for item in items)
 
     class Meta:
-        ordering = ["id"]
+        ordering = ["-created_on"]
 
     def save(self, *args, **kwargs):
         # Only calculate totals after the object has been saved
@@ -78,18 +78,44 @@ class OrderItem(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     option_values = models.ManyToManyField(OptionValue,
                                            related_name='order_items',
-                                           blank=True)
-    finish_options = models.ManyToManyField(FinishOption, blank=True)
+                                           blank=True
+                                           )
+    product_finish = models.ForeignKey(FinishOption, on_delete=models.SET_NULL,
+                                       blank=True, null=True,
+                                       related_name='order_items'
+                                       )
 
     def save(self, *args, **kwargs):
-        # Ensure base_price and discount are not None
-        base_price = (self.base_price if self.base_price is not None
-                      else Decimal('0.00'))
-        discount = (self.discount if self.discount is not None
-                    else Decimal('0.00'))
+        # Ensure base_price and discount are converted from None
+        base_price = self.base_price or Decimal('0.00')
+        discount = self.discount or Decimal('0.00')
         # Automatically calculate item_value before saving
         self.item_value = (base_price - discount) * self.quantity
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.quantity}x {self.product.name}: €{self.item_value}"
+
+
+class ComponentFinish(models.Model):
+    order_item = models.ForeignKey(OrderItem,
+                                   related_name='item_component_finishes',
+                                   on_delete=models.CASCADE)
+    component = models.ForeignKey(Component, on_delete=models.CASCADE)
+    finish_option = models.ForeignKey(FinishOption, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return (f"{self.order_item} - {self.component.name} - "
+                f"{self.finish_option.name}")
+
+
+class OptionFinish(models.Model):
+    order_item = models.ForeignKey(OrderItem,
+                                   related_name='item_option_finishes',
+                                   on_delete=models.CASCADE)
+    option_value = models.ForeignKey(OptionValue, on_delete=models.CASCADE)
+    finish_option = models.ForeignKey(FinishOption, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return (f"{self.order_item} - {self.option_value.value} - "
+                f"{self.finish_option.name}")
