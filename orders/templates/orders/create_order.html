@@ -24,7 +24,7 @@
           <!-- Delete order item button -->
           {% if order_item_formset.can_delete %}
           <div class="form-group d-grid d-flex justify-content-end">
-            <button type="button" class="btn btn-danger delete-order-item mt-2">
+            <button type="button" class="btn btn-lg btn-danger delete-order-item mt-2">
               <i class="fa-solid fa-trash"></i>
             </button>
           </div>
@@ -35,7 +35,7 @@
     </div>
 
     <!-- Button to Add New Order Item -->
-    <button type="button" id="add-order-item" class="btn btn-secondary mb-3 mt-2"><i class="fa-solid fa-plus"></i></button>
+    <button type="button" id="add-order-item" class="btn btn-lg btn-secondary mb-3 mt-2"><i class="fa-solid fa-plus"></i></button>
 
     <div class="row bg-primary text-white p-1 p-md-2 pb-3 pb-md-4 m-0 rounded">
       <!-- Deposit fields -->
@@ -82,8 +82,8 @@
         <!-- Delete order item button -->
         {% if order_item_formset.can_delete %}
         <div class="form-group d-grid d-flex justify-content-end">
-          <button type="button" class="btn btn-danger delete-order-item">
-            Delete Order Item
+          <button type="button" class="btn btn-lg btn-danger delete-order-item">
+            <i class="fa-solid fa-trash"></i>
           </button>
         </div>
         {% endif %}
