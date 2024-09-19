@@ -94,5 +94,12 @@ of the suggestions div depending on viewport size */
 
 /* Paid checkbox */
 input[type="checkbox"] {
-  transform: scale(2);
+  transform: scale(1.5);
+}
+
+/* For larger devices, increase scale to 2 */
+@media (min-width: 768px) {
+  input[type="checkbox"] {
+    transform: scale(2);
+  }
 }
