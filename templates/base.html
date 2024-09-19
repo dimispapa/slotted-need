@@ -1,4 +1,8 @@
 {% load static %}
+{% url 'home' as home_url %}
+{% url 'create_order' as add_order_url %}
+{% url 'orders' as orders_url %}
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -22,39 +26,32 @@
 <header>
   <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">Slotted Need</a>
+      <a class="navbar-brand" href="#"><img src="../static/favicon/apple-touch-icon-tns.png" width="30" height="24"
+          alt="TNS logo" class="align-text-top"> Slotted Need</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
         aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation"><span
           class="navbar-toggler-icon"></span></button>
       <div class="collapse navbar-collapse" id="navbarNavDropdown">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Home</a>
+            <a class="nav-link {% if request.path == home_url %}active"
+            aria-current="page{% endif %}" href="#">Home</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
           </li>
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-              aria-expanded="false">Stock</a>
-            <ul class="dropdown-menu">
-              <li>
-                <a class="dropdown-item" href="#">Add new stock</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="#">Current stock</a>
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+            <a class="nav-link dropdown-toggle {% if request.path == add_order_url or request.path == orders_url %}active"
+            aria-current="page{% endif %}" href="#" role="button" data-bs-toggle="dropdown"
               aria-expanded="false">Orders</a>
             <ul class="dropdown-menu">
               <li>
-                <a class="dropdown-item" href="{% url 'create_order' %}">Add new order</a>
+                <a class="dropdown-item {% if request.path == add_order_url %}active"
+                aria-current="page{% endif %}" href="{% url 'create_order' %}">Add new order</a>
               </li>
               <li>
-                <a class="dropdown-item" href="{% url 'orders' %}">Current orders</a>
+                <a class="dropdown-item {% if request.path == orders_url %}active"
+                aria-current="page{% endif %}" href="{% url 'orders' %}">Current orders</a>
               </li>
             </ul>
           </li>
