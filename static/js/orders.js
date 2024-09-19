@@ -206,7 +206,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         let finishHTML = `
                             <div class="${OPTION_GROUP_STYLES}">
                                 <label for="finish-${formIndex}-${optionValueId}-${finish.id}" class="form-label text-dark">${finish.name}</label>
-                                <select class="form-select finish-dropdown-${formIndex}" id="finish-${formIndex}-${optionValueId}-${finish.id}" name="form-${formIndex}-option_finish-${optionValueId}">
+                                <select class="form-select finish-dropdown-${formIndex}" id="finish-${formIndex}-${optionValueId}-${finish.id}"
+                                name="form-${formIndex}-option_finish_component-${finish.component_id}">
                                     <option value="">------------</option>
                             </div>
                         `;

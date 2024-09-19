@@ -1,7 +1,6 @@
 import re
 from django.views import View
 from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse
 from django.contrib import messages
 from django.http import JsonResponse
 from django.db.models import Count, Q
@@ -218,36 +217,41 @@ def process_component_finishes(request, form_index, order_item):
 
 
 def process_option_finishes(request, form_index, order_item):
-    # Define field naming pattern
-    opt_finish_field_pattern = re.compile(
-        rf'^form-{form_index}-option_finish-\d+$')
-    # Get option finish fields
-    opt_finish_field_names = [key for key in request.POST
-                              if opt_finish_field_pattern.match(key)]
-
-    for field_name in opt_finish_field_names:
-        # Extract the option_value_id
-        option_value_id = field_name.split('-option_finish-')[1]
-        finish_option_id = request.POST.get(field_name)
-
-        # Validate the OptionValue
-        if not OptionValue.objects.filter(id=option_value_id).exists():
-            raise ValueError(f"Invalid option value selected: "
-                             f"{option_value_id}")
-
-        # Validate the FinishOption
-        if not FinishOption.objects.filter(id=finish_option_id).exists():
-            raise ValueError(f"Invalid finish option selected: "
-                             f"{finish_option_id}")
-
-        option_value = OptionValue.objects.get(id=option_value_id)
-        finish_option = FinishOption.objects.get(id=finish_option_id)
-
-        # Associate the finish option with the option value and order item
-        order_item.item_option_finishes.create(
-            option_value=option_value,
-            finish_option=finish_option
+    # get selected OptionValue ids
+    selected_option_value_ids = order_item.option_values.values_list(
+        'id', flat=True)
+    # loop through OptionValue ids
+    for option_value_id in selected_option_value_ids:
+        # Find ProductComponents associated with this OptionValue
+        product_components = ProductComponent.objects.filter(
+            product=order_item.product,
+            option_value_id=option_value_id
         )
+
+        # loop through relevant product components
+        for pc in product_components:
+            component = pc.component
+            # Build field name
+            field_name = (f'form-{form_index}-option_finish_'
+                          f'component-{component.id}')
+            finish_option_id = request.POST.get(field_name)
+
+            # Skip if no finish option is selected
+            if not finish_option_id:
+                continue
+
+            # Validate the FinishOption
+            if not FinishOption.objects.filter(id=finish_option_id).exists():
+                raise ValueError(f"Invalid finish option selected: "
+                                 f"{finish_option_id}")
+
+            finish_option = FinishOption.objects.get(id=finish_option_id)
+
+            # Associate the finish option with the component and order item
+            order_item.item_component_finishes.create(
+                component=component,
+                finish_option=finish_option
+            )
 
 
 # View that handles the orders list template rendering
@@ -427,8 +431,7 @@ def get_finishes(request, product_id, option_value_id):
                                        for fo in finish_options]
 
                 component_finishes.append({
-                    'component_name': component.name,
-                    'component_slug': component.slug,
+                    'component_id': component.id,
                     'id': finish.id,
                     'name': finish.name,
                     'finish_options': finish_options_data
