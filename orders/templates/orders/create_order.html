@@ -24,7 +24,7 @@
           <!-- Delete order item button -->
           {% if order_item_formset.can_delete %}
           <div class="form-group d-grid d-flex justify-content-end">
-            <button type="button" class="btn btn-lg btn-danger delete-order-item mt-2">
+            <button type="button" id="delete-item-btn-{{ forloop.counter0 }}" class="btn btn-lg btn-danger delete-order-item mt-2">
               <i class="fa-solid fa-trash"></i>
             </button>
           </div>
@@ -82,7 +82,7 @@
         <!-- Delete order item button -->
         {% if order_item_formset.can_delete %}
         <div class="form-group d-grid d-flex justify-content-end">
-          <button type="button" class="btn btn-lg btn-danger delete-order-item">
+          <button type="button" id="delete-item-btn-__prefix__" class="btn btn-lg btn-danger delete-order-item">
             <i class="fa-solid fa-trash"></i>
           </button>
         </div>
@@ -93,7 +93,7 @@
 
   <!-- Client conflict Bootstrap modal -->
   <div class="modal fade" id="clientConflictModal" tabindex="-1" aria-labelledby="clientConflictModalLabel"
-    aria-hidden="true">
+    aria-hidden="true" data-target="">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -133,6 +133,25 @@
       </div>
     </div>
   </div>
+
+<!-- Delete confirmation modal -->
+<div class="modal fade" id="DeleteConfirmationModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="DeleteConfirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="DeleteConfirmationModalLabel">Confirm Delete</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this item? This action cannot be undone!</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+        <button type="button" class="btn btn-danger" id="confirm-delete-btn" data-bs-dismiss="modal">Yes Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 </div>
 {% endblock %}

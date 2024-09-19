@@ -2,8 +2,15 @@
 const OPTION_COL_STYLES = ['col-12', 'col-sm-6', 'col-md-4', 'col-lg-3', 'shadow', 'border',
     'mb-2', 'mb-md-3', 'pt-1', 'pt-md-2', 'rounded'
 ];
-
 const OPTION_GROUP_STYLES = "col-12 form-group mb-2 mb-md-3";
+const clientModal = new bootstrap.Modal(document.getElementById('clientConflictModal'));
+const deleteModalElement = document.getElementById('DeleteConfirmationModal');
+const deleteModal = new bootstrap.Modal(document.getElementById('DeleteConfirmationModal'));
+const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
+const totalFormsInput = document.getElementById('id_form-TOTAL_FORMS');
+const orderItemsContainer = document.getElementById('order-items');
+const orderFormOrderValueField = document.getElementById('order_value');
+
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -254,8 +261,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Define function to create a new order item form dynamically (with only product and quantity fields)
     function addNewOrderItemForm() {
 
-        const totalFormsInput = document.getElementById('id_form-TOTAL_FORMS');
-        const orderItemsContainer = document.getElementById('order-items');
         // Get the current form count which will also be the index of the new form (as we use zero index for IDs of form elements)
         let newFormIndex = formCount = parseInt(totalFormsInput.value);
         let itemNum = newFormIndex + 1; // increment the item number showing on the heading
@@ -272,9 +277,7 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     // Define function that deletes an order item and remaining items index
-    function deleteOrderItem(target) {
-        const orderItemsContainer = document.getElementById('order-items');
-        let orderItemForm = target.closest('.order-item-form');
+    function deleteOrderItem(orderItemForm) {
 
         if (orderItemForm) {
             // formset management update
@@ -336,7 +339,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Define function that updates order total based on order item values
     function updateOrderTotals() {
-        const orderFormOrderValueField = document.getElementById('order_value');
         let totalOrderValue = 0;
 
         // Select all elements with class .order-item-form but exclude those inside #empty-form-template
@@ -361,22 +363,38 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Add Click event listener to handle adding new order item forms
-    const addOrderItemButton = document.getElementById('add-order-item');
-    addOrderItemButton.addEventListener('click', function () {
+    document.addEventListener('click', function (event) {
 
-        // Create a new empty form
-        addNewOrderItemForm();
+        // get add item button as reference point. Allow clicking on icon inside
+        let addItemBtn = event.target.closest('#add-order-item')
+        if (addItemBtn) {
+            // Create a new empty form
+            addNewOrderItemForm();
+        }
     });
 
-    // Add Click event listener to handle dynamic deletion of order items
+    // Add Click event listeners to handle dynamic deletion of order items
     document.addEventListener('click', function (event) {
-        if (event.target.classList.contains('delete-order-item')) {
-            if (confirm("Are you sure you want to delete the item?")) {
-                deleteOrderItem(event.target);
-                // update the running total
-                updateOrderTotals();
-            };
-        };
+        
+            // get delete button as reference point. Allow clicking on icon inside
+            let deleteBtn = event.target.closest('.delete-order-item')
+            if (deleteBtn) {
+                // Set order item delete button as attribute for the modal
+                deleteModalElement.setAttribute('data-target', deleteBtn.id);
+                // Show confirmation modal
+                deleteModal.show();
+            }
+    });
+
+    confirmDeleteBtn.addEventListener('click', function (event) {
+
+        // Get order item element to target for delete
+        deleteBtnId = deleteModalElement.getAttribute('data-target');
+        targetOrderItem = document.getElementById(deleteBtnId).closest('.order-item-form');
+        // Delete item
+        deleteOrderItem(targetOrderItem);
+        // update the running total
+        updateOrderTotals();
     });
 
     // Add Change event listener for changes to the form
@@ -467,7 +485,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         // Show the modal
-        let clientModal = new bootstrap.Modal(document.getElementById('clientConflictModal'));
         clientModal.show();
 
     }
