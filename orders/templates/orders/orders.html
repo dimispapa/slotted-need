@@ -47,7 +47,7 @@
             <td>{{ order.created_on }}</td>
             <td>{{ order.updated_on }}</td>
             <td>{{ order.get_order_status_display }}</td>
-            <td class="paid-check">{{ form.paid }}</td>
+            <td class="p-md-3 p-2">{{ form.paid }}</td>
             <td>
               <!-- Delete Button -->
               <button type="submit" name="delete_order" class="btn btn-danger" value="{{ order.id }}"
