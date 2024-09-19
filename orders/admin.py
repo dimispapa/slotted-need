@@ -1,6 +1,6 @@
 import nested_admin
 from django.contrib import admin
-from .models import Client, Order, OrderItem, ComponentFinish, OptionFinish
+from .models import Client, Order, OrderItem, ComponentFinish
 
 
 @admin.register(Client)
@@ -17,14 +17,10 @@ class OrderAdmin(nested_admin.NestedModelAdmin):
             model = ComponentFinish
             extra = 0
 
-        class OptionFinishInLine(nested_admin.NestedTabularInline):
-            model = OptionFinish
-            extra = 0
-
         filter_horizontal = ['option_values']
         model = OrderItem
         extra = 0
-        inlines = [ComponentFinishInLine, OptionFinishInLine]
+        inlines = [ComponentFinishInLine]
 
     list_display = ('order_number', 'client', 'order_value',
                     'order_status', 'created_on',

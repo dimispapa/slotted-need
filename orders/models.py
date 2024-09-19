@@ -111,19 +111,3 @@ class ComponentFinish(models.Model):
     def __str__(self):
         return (f"{self.order_item} - {self.component.name} - "
                 f"{self.finish_option.name}")
-
-
-class OptionFinish(models.Model):
-    order_item = models.ForeignKey(OrderItem,
-                                   related_name='item_option_finishes',
-                                   on_delete=models.CASCADE)
-    option_value = models.ForeignKey(OptionValue, on_delete=models.CASCADE)
-    finish_option = models.ForeignKey(FinishOption, on_delete=models.CASCADE)
-
-    class Meta:
-        # Define the plural correctly
-        verbose_name_plural = 'Option Finishes'
-
-    def __str__(self):
-        return (f"{self.order_item} - {self.option_value.value} - "
-                f"{self.finish_option.name}")
