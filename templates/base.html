@@ -48,11 +48,11 @@
               aria-expanded="false">Orders</a>
             <ul class="dropdown-menu">
               <li>
-                <a class="dropdown-item {% if request.path == add_order_url %}active"
+                <a class="dropdown-item {% if request.path == add_order_url %}active-dropdown-item"
                 aria-current="true{% endif %}" href="{% url 'create_order' %}">Add new order</a>
               </li>
               <li>
-                <a class="dropdown-item {% if request.path == orders_url %}active"
+                <a class="dropdown-item {% if request.path == orders_url %}active-dropdown-item"
                 aria-current="true{% endif %}" href="{% url 'orders' %}">Current orders</a>
               </li>
             </ul>

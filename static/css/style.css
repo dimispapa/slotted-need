@@ -1,3 +1,11 @@
+/*************** BASE TEMPLATE **************************/
+/* NAVBAR */
+/* Nav dropdown active highlight */
+.active-dropdown-item {
+  background-color: ghostwhite;
+  color: #0d6efd;
+}
+
 /*************** CREATE ORDERS PAGE **************************/
 
 /******* CLIENT SEARCH FEATURE */
