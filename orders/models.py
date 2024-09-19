@@ -35,6 +35,7 @@ class Order(models.Model):
         choices=STATUS,
         default=1
     )
+    paid = models.BooleanField(default=False)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
@@ -84,6 +85,15 @@ class OrderItem(models.Model):
                                        blank=True, null=True,
                                        related_name='order_items'
                                        )
+    # create a status mapping to use as choices for order_status
+    STATUS = {1: 'Not Started',
+              2: 'In Progress',
+              3: 'Made',
+              4: 'Delivered'}
+    item_status = models.IntegerField(
+        choices=STATUS,
+        default=1
+    )
 
     def save(self, *args, **kwargs):
         # Ensure base_price and discount are converted from None

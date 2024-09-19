@@ -22,18 +22,20 @@
             <th scope="col">Created On</th>
             <th scope="col">Updated On</th>
             <th scope="col">Order Status</th>
+            <th scope="col">Paid</th>
             <th scope="col">Actions</th>
           </tr>
         </thead>
         <tbody>
           <!-- loop through order and form objects -->
           {% for order, form in order_forms %}
-          <tr data-bs-toggle="collapse" data-bs-target="#order-items-{{ order.id }}" aria-expanded="false"
-            aria-controls="order-items-{{ order.id }}">
+          <tr>
             <!-- Populate order row values -->
             <td>
               <!-- Toggle Button -->
-              <button type="button" class="btn btn-sm btn-info toggle-items-btn" data-order-id="{{ order.id }}">
+              <button type="button" class="btn btn-sm btn-info toggle-items-btn" data-bs-toggle="collapse"
+                data-bs-target="#order-items-{{ order.id }}" aria-expanded="false"
+                aria-controls="order-items-{{ order.id }}">
                 <i class="fa-solid fa-chevron-down"></i>
               </button>
             </td>
@@ -44,7 +46,8 @@
             <td>{{ order.order_value }}</td>
             <td>{{ order.created_on }}</td>
             <td>{{ order.updated_on }}</td>
-            <td>{{ form.order_status }}</td>
+            <td>{{ order.order_status }}</td>
+            <td>{{ form.paid }}</td>
             <td>
               <!-- Delete Button -->
               <button type="submit" name="delete_order" class="btn btn-danger" value="{{ order.id }}"
@@ -55,9 +58,9 @@
           </tr>
           <!-- Hidden Row for Order Items -->
           <tr>
-            <td colspan="10" class="p-0">
+            <td colspan="11" class="p-0">
               <div id="order-items-{{ order.id }}" class="collapse">
-                <table class="table table-bordered m-0">
+                <table class="table table-hover table-bordered border-primary m-0">
                   <thead>
                     <tr>
                       <th>Product</th>
@@ -106,7 +109,7 @@
           </tr>
           {% empty %}
           <tr>
-            <td colspan="6">No orders found.</td>
+            <td colspan="11">No orders found.</td>
           </tr>
           {% endfor %}
         </tbody>

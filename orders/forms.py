@@ -215,10 +215,10 @@ OrderItemFormSet = forms.modelformset_factory(
 class OrderViewForm(forms.ModelForm):
     class Meta:
         model = Order
-        fields = ['order_status']
+        fields = ['paid']
         widgets = {
-            'order_status': forms.Select(
-                attrs={'class': 'form-select'})
+            'paid': forms.CheckboxInput(
+                attrs={'class': 'form-check form-check-inline'})
         }
 
 

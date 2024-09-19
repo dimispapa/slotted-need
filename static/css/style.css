@@ -91,3 +91,8 @@ of the suggestions div depending on viewport size */
   background-color: #0d6efd;
   color: white;
 }
+
+/* Paid checkbox */
+input[type="checkbox"] {
+  transform: scale(2);
+}
