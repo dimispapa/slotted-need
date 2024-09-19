@@ -218,7 +218,8 @@ class OrderViewForm(forms.ModelForm):
         fields = ['paid']
         widgets = {
             'paid': forms.CheckboxInput(
-                attrs={'class': 'form-check form-check-inline'})
+                attrs={'class':
+                       'form-check'})
         }
 
 
