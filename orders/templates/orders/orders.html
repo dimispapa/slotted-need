@@ -23,7 +23,7 @@
             <th scope="col">Updated On</th>
             <th scope="col">Order Status</th>
             <th scope="col">Fully Paid</th>
-            <th scope="col">Actions</th>
+            <th scope="col"></th>
           </tr>
         </thead>
         <tbody>
@@ -50,7 +50,7 @@
             <td class="p-md-3 p-2">{{ form.paid }}</td>
             <td>
               <!-- Delete Button -->
-              <button type="submit" name="delete_order" class="btn btn-danger" value="{{ order.id }}"
+              <button type="submit" name="delete_order" class="btn btn-sm btn-danger" value="{{ order.id }}"
                 onclick="return confirm('Are you sure you want to delete this order?');">
                 <i class="fa-solid fa-trash"></i>
               </button>
