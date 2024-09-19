@@ -84,3 +84,10 @@ of the suggestions div depending on viewport size */
     /* Align below the client name */
   }
 }
+
+/**** ORDERS PAGE ****/
+/* toggle items btn */
+.toggle-items-btn {
+  background-color: #0d6efd;
+  color: white;
+}

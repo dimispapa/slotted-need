@@ -13,6 +13,7 @@
         <!-- table headers -->
         <thead>
           <tr>
+            <th scope="col"></th>
             <th scope="col">Order #</th>
             <th scope="col">Client</th>
             <th scope="col">Discount (€)</th>
@@ -29,6 +30,12 @@
           {% for order, form in order_forms %}
           <tr>
             <!-- Populate order row values -->
+            <td>
+              <!-- Toggle Button -->
+              <button type="button" class="btn btn-sm btn-info toggle-items-btn" data-order-id="{{ order.id }}">
+                <i class="fa-solid fa-caret-down"></i>
+              </button>
+            </td>
             <th scope="row">{{ order.id }}</th>
             <td>{{ order.client.client_name }}</td>
             <td>{{ order.discount|default_if_none:"0.00" }}</td>
@@ -38,9 +45,11 @@
             <td>{{ order.updated_on }}</td>
             <td>{{ form.order_status }}</td>
             <td>
+
+              <!-- Delete Button -->
               <button type="submit" name="delete_order" class="btn btn-danger" value="{{ order.id }}"
                 onclick="return confirm('Are you sure you want to delete this order?');">
-                Delete
+                <i class="fa-solid fa-trash"></i>
               </button>
             </td>
           </tr>
