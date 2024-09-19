@@ -28,12 +28,13 @@
         <tbody>
           <!-- loop through order and form objects -->
           {% for order, form in order_forms %}
-          <tr>
+          <tr data-bs-toggle="collapse" data-bs-target="#order-items-{{ order.id }}" aria-expanded="false"
+            aria-controls="order-items-{{ order.id }}">
             <!-- Populate order row values -->
             <td>
               <!-- Toggle Button -->
               <button type="button" class="btn btn-sm btn-info toggle-items-btn" data-order-id="{{ order.id }}">
-                <i class="fa-solid fa-caret-down"></i>
+                <i class="fa-solid fa-chevron-down"></i>
               </button>
             </td>
             <th scope="row">{{ order.id }}</th>
@@ -45,13 +46,67 @@
             <td>{{ order.updated_on }}</td>
             <td>{{ form.order_status }}</td>
             <td>
-
               <!-- Delete Button -->
               <button type="submit" name="delete_order" class="btn btn-danger" value="{{ order.id }}"
                 onclick="return confirm('Are you sure you want to delete this order?');">
                 <i class="fa-solid fa-trash"></i>
               </button>
             </td>
+          </tr>
+          <!-- Hidden Row for Order Items -->
+          <tr>
+            <td colspan="6" class="p-0">
+              <div id="order-items-{{ order.id }}" class="collapse">
+                <table class="table table-bordered m-0">
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th>Quantity</th>
+                      <th>Item Value</th>
+                      <th>Product Finish</th>
+                      <th>Design Options</th>
+                      <th>Component Finishes</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for item in order.items.all %}
+                    <tr>
+                      <td>{{ item.product.name }}</td>
+                      <td>{{ item.quantity }}</td>
+                      <td>€{{ item.item_value }}</td>
+                      <td>{{ item.product_finish|default_if_none:"No selection" }}</td>
+                      <td>
+                        <ul>
+                          {% if item.option_values.all %}
+                          {% for option_value in item.option_values.all %}
+                          <li>{{ option_value.option.name }} - {{ option_value.value }}</li>
+                          {% endfor %}
+                          {% else %}
+                          No selection
+                          {% endif %}
+                        </ul>
+                      </td>
+                      <td>
+                        <ul>
+                          {% if item.item_component_finishes.all %}
+                          {% for finish in item.item_component_finishes.all %}
+                          <li>{{ finish.component.name }} - {{ finish.finish_option.name }}</li>
+                          {% endfor %}
+                          {% else %}
+                          No selection
+                          {% endif %}
+                        </ul>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6">No orders found.</td>
           </tr>
           {% endfor %}
         </tbody>
