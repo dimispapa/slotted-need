@@ -64,13 +64,6 @@ class Component(models.Model):
         ordering = ["name"]
 
     def __str__(self):
-        # Get the component parts if they exist
-        parts = self.parts.all()
-        if parts.exists():
-            parts_str = ', '.join(
-                [f"{part.name} (x{part.quantity})" for part in parts]
-            )
-            return f"{self.name} @ €{self.unit_cost} | Parts: {parts_str}"
         return f"{self.name} @ €{self.unit_cost}"
 
     def calculate_unit_cost(self):
