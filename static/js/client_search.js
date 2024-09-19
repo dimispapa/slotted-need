@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const query = clientNameInput.value.trim(); // Make sure there's no extra space
 
         // fetch data from API endpoint by passing the query client name input
-        if (query.length > 2) {
+        if (query.length > 0) {
             const fetchUrl = `/api/search_clients/?q=${encodeURIComponent(query)}`; // Safely encode query
             fetch(fetchUrl)
                 .then(response => {
