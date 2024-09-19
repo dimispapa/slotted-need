@@ -42,7 +42,7 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
           </li>
-          <li class="nav-item dropdown" data-bs-theme="light">
+          <li class="nav-item dropdown col-6" data-bs-theme="light">
             <a class="nav-link dropdown-toggle {% if request.path == add_order_url or request.path == orders_url %}active"
             aria-current="page{% endif %}" href="#" role="button" data-bs-toggle="dropdown"
               aria-expanded="false">Orders</a>
