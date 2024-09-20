@@ -26,16 +26,22 @@ class Order(models.Model):
         blank=True, null=True)
     order_value = models.DecimalField(
         max_digits=10, decimal_places=2, default=0)
-    # create a status mapping to use as choices for order_status
-    STATUS = {1: 'Not Started',
-              2: 'In Progress',
-              3: 'Made',
-              4: 'Delivered'}
+    # create a PROGRESS status mapping to use as choices for order_status
+    PROGRESS_STATUS = {1: 'Not Started',
+                       2: 'In Progress',
+                       3: 'Made',
+                       4: 'Delivered'}
     order_status = models.IntegerField(
-        choices=STATUS,
+        choices=PROGRESS_STATUS,
         default=1
     )
-    paid = models.BooleanField(default=False)
+    # create a PAID status mapping to use as choices for order_status
+    PAID_STATUS = {1: 'Not Fully Paid',
+                   2: 'Fully Paid'}
+    paid = models.IntegerField(
+        choices=PAID_STATUS,
+        default=1
+    )
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
@@ -104,7 +110,7 @@ class OrderItem(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.quantity}x {self.product.name}: €{self.item_value}"
+        return f"Order Item #{self.id} - {self.product.name}: €{self.item_value}"
 
 
 class ComponentFinish(models.Model):
