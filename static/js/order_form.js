@@ -10,7 +10,6 @@ const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
 const totalFormsInput = document.getElementById('id_form-TOTAL_FORMS');
 const orderItemsContainer = document.getElementById('order-items');
 const orderFormOrderValueField = document.getElementById('order_value');
-const itemStatusSelects = document.getElementsByClassName('item-status-select');
 
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -356,39 +355,7 @@ document.addEventListener('DOMContentLoaded', function () {
         orderFormOrderValueField.value = totalOrderValue.toFixed(2);
     };
 
-    // Define function that updates the item_status dropdown bg colour 
-    function updateSelectStyle(selects) {
-        // loop through dropdowns
-        selects.forEach( (select) => {
-            // remove existing style classes
-            select.classList.remove('bg-primary' ,'bg-pending', 'bg-success', 'bg-secondary');
-            // Not Started
-            if (select.value == 1) {
-              select.classList.add('bg-primary');
-            // In Progress
-            } else if (select.value == 2) {
-                select.classList.add('bg-pending');
-            // Made
-            } else if (select.value == 3) {
-              select.classList.add('bg-success');
-            // Delivered
-            } else if (select.value == 4) {
-              select.classList.add('bg-secondary');
-            }
-
-            // Add listener to update styling on change
-            select.addEventListener('change', updateSelectStyle);
-        });
-      };
-
     // ************** SECTION B: EVENT LISTENERS & HANDLERS *****************************************************************
-
-    //   Handle item_status dropdown colouring dynamically
-    if (itemStatusSelects) {
-        debugger;
-        // Initial styling on page load
-        updateSelectStyle(itemStatusSelects);
-    };
 
     // Populate product dropdowns for existing forms on page load
     document.querySelectorAll('.product-dropdown').forEach(selectElement => {
