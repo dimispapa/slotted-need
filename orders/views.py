@@ -268,7 +268,6 @@ class OrderListView(View):
 
         # Create a form for each order to edit paid checkbox on the view
         for order in orders:
-            print('Order:', order, '\nOrder Items:', order.items.all())
             order_form = OrderViewForm(instance=order,
                                        prefix=f'order-{order.id}')
             formset = OrderViewFormSet(instance=order,
@@ -280,8 +279,6 @@ class OrderListView(View):
                 'order_form': order_form,
                 'item_formset': formset,
             })
-            for item in order.items.all():
-                print('Items:', item)
 
         # render template with orders and forms
         return render(request, self.template_name, {
