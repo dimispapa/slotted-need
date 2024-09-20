@@ -6,51 +6,51 @@
   <form method="post" id="order-list-form" action="{% url 'orders' %}">
     {% csrf_token %}
     <!-- Orders table -->
-    <div class="table-responsive">
+    <div class="table-responsive order">
       <table class="table table-striped table-hover">
-        <!-- Formset management hidden fields -->
-        {{ formset.management_form }}
         <!-- table headers -->
         <thead>
           <tr>
             <th scope="col"></th>
             <th scope="col">Order #</th>
             <th scope="col">Client</th>
-            <th scope="col">Discount (€)</th>
-            <th scope="col">Deposit (€)</th>
-            <th scope="col">Order Value (€)</th>
+            <th scope="col">Discount</th>
+            <th scope="col">Deposit</th>
+            <th scope="col">Order Value</th>
             <th scope="col">Created On</th>
             <th scope="col">Updated On</th>
             <th scope="col">Order Status</th>
-            <th scope="col">Fully Paid</th>
+            <th scope="col">Payment Status</th>
             <th scope="col"></th>
           </tr>
         </thead>
         <tbody>
           <!-- loop through order and form objects -->
-          {% for order, form in order_forms %}
+          {% for order_set in order_data %}
           <tr>
             <!-- Populate order row values -->
             <td>
               <!-- Toggle Button -->
               <button type="button" class="btn btn-sm btn-info toggle-items-btn" data-bs-toggle="collapse"
-                data-bs-target="#order-items-{{ order.id }}" aria-expanded="false"
-                aria-controls="order-items-{{ order.id }}">
+                data-bs-target="#order-items-{{ order_set.order.id  }}" aria-expanded="false"
+                aria-controls="order-items-{{ order_set.order.id  }}">
                 <i class="fa-solid fa-chevron-down"></i>
               </button>
             </td>
-            <th scope="row">{{ order.id }}</th>
-            <td>{{ order.client.client_name }}</td>
-            <td>{{ order.discount|default_if_none:"0.00" }}</td>
-            <td>{{ order.deposit|default_if_none:"0.00" }}</td>
-            <td>{{ order.order_value }}</td>
-            <td>{{ order.created_on }}</td>
-            <td>{{ order.updated_on }}</td>
-            <td>{{ order.get_order_status_display }}</td>
-            <td class="p-md-3 p-2">{{ form.paid }}</td>
+            <th scope="row">{{ order_set.order.id }}</th>
+            <td>{{ order_set.order.client.client_name }}</td>
+            <td>
+              €{{ order_set.order.discount|default_if_none:"0.00" }}
+            </td>
+            <td>€{{ order_set.order.deposit|default_if_none:"0.00" }}</td>
+            <td>€{{ order_set.order.order_value }}</td>
+            <td>{{ order_set.order.created_on }}</td>
+            <td>{{ order_set.order.updated_on }}</td>
+            <td>{{ order_set.order.get_order_status_display }}</td>
+            <td class="ps-md-3 ps-2 pt-md-2.5 pt-1.5">{{ order_set.order_form.paid }}</td>
             <td>
               <!-- Delete Button -->
-              <button type="submit" name="delete_order" class="btn btn-sm btn-danger" value="{{ order.id }}"
+              <button type="submit" name="delete_order" class="btn btn-sm btn-danger" value="{{ order_set.order.id  }}"
                 onclick="return confirm('Are you sure you want to delete this order?');">
                 <i class="fa-solid fa-trash"></i>
               </button>
@@ -59,40 +59,51 @@
           <!-- Hidden Row for Order Items -->
           <tr>
             <td colspan="11" class="p-0">
-              <div id="order-items-{{ order.id }}" class="collapse">
+              <div id="order-items-{{ order_set.order.id  }}" class="collapse">
                 <table class="table table-hover table-bordered border-primary m-0">
                   <thead>
                     <tr>
-                      <th>Product</th>
-                      <th>Quantity</th>
-                      <th>Item Value</th>
-                      <th>Product Finish</th>
-                      <th>Design Options</th>
-                      <th>Component Finishes</th>
+                      <th scope="col">Order Item #</th>
+                      <th scope="col">Product</th>
+                      <th scope="col">Quantity</th>
+                      <th scope="col">Item Value</th>
+                      <th scope="col">Product Finish</th>
+                      <th scope="col">Design Options</th>
+                      <th scope="col">Component Finishes</th>
+                      <th scope="col">Item Status</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {% for item in order.items.all %}
+                    <!-- Include the management form for the item formset -->
+                    {{ order_set.item_formset.management_form }}
+                    <!-- Render each order item and form in the item formset -->
+                    {% for form_item in order_set.item_formset %}
                     <tr>
-                      <td>{{ item.product.name }}</td>
-                      <td>{{ item.quantity }}</td>
-                      <td>€{{ item.item_value }}</td>
-                      <td>{{ item.product_finish|default_if_none:"No selection" }}</td>
+                      <!-- Include hidden fields -->
+                      {% for hidden_field in form_item.hidden_fields %}
+                      {{ hidden_field }}
+                      {% endfor %}
+                      <!-- Render order item data -->
+                      <th scope="row">{{ form_item.instance.id }}</th>
+                      <td>{{ form_item.instance.product.name }}</td>
+                      <td>{{ form_item.instance.quantity }}</td>
+                      <td>€{{ form_item.instance.item_value }}</td>
+                      <td>{{ form_item.instance.product_finish|default_if_none:"No selection" }}</td>
                       <td>
+                        <!-- Render option values -->
                         <ul>
-                          {% if item.option_values.all %}
-                          {% for option_value in item.option_values.all %}
+                          {% for option_value in form_item.instance.option_values.all %}
                           <li>{{ option_value.option.name }} - {{ option_value.value }}</li>
-                          {% endfor %}
-                          {% else %}
+                          {% empty %}
                           No selection
-                          {% endif %}
+                          {% endfor %}
                         </ul>
                       </td>
                       <td>
+                        <!-- Render finishes -->
                         <ul>
-                          {% if item.item_component_finishes.all %}
-                          {% for finish in item.item_component_finishes.all %}
+                          {% if form_item.instance.item_component_finishes.all %}
+                          {% for finish in form_item.instance.item_component_finishes.all %}
                           <li>{{ finish.component.name }} - {{ finish.finish_option.name }}</li>
                           {% endfor %}
                           {% else %}
@@ -100,6 +111,8 @@
                           {% endif %}
                         </ul>
                       </td>
+                      <!-- Render item status form field -->
+                      <td>{{ form_item.item_status }}</td>
                     </tr>
                     {% endfor %}
                   </tbody>

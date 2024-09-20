@@ -7,7 +7,7 @@ from django.db.models import Count, Q
 from .models import Client, Order, OrderItem
 from products.models import (Product, Option, OptionValue, FinishOption,
                              ProductComponent, Component)
-from .forms import OrderForm, OrderItemFormSet, OrderViewForm
+from .forms import OrderForm, OrderItemFormSet, OrderViewForm, OrderViewFormSet
 
 
 # View that renders the home template
@@ -261,37 +261,81 @@ class OrderListView(View):
 
     # GET request
     def get(self, request, *args, **kwargs):
-        # fetch orders
-        orders = Order.objects.all()
+        # fetch orders and prefetch items (optimised query)
+        orders = Order.objects.all().prefetch_related('items')
+        # Intialise empty order data list
+        order_data = []
 
-        # Create a form for each order to edit order_status
-        order_forms = []
+        # Create a form for each order to edit paid checkbox on the view
         for order in orders:
-            form = OrderViewForm(instance=order, prefix=f'order-{order.id}')
-            order_forms.append((order, form))
+            print('Order:', order, '\nOrder Items:', order.items.all())
+            order_form = OrderViewForm(instance=order,
+                                       prefix=f'order-{order.id}')
+            formset = OrderViewFormSet(instance=order,
+                                       prefix=f'items-{order.id}')
+
+            # Append data and forms to order data list
+            order_data.append({
+                'order': order,
+                'order_form': order_form,
+                'item_formset': formset,
+            })
+            for item in order.items.all():
+                print('Items:', item)
 
         # render template with orders and forms
         return render(request, self.template_name, {
-            'order_forms': order_forms,
+            'order_data': order_data,
         })
 
     # POST request
     def post(self, request, *args, **kwargs):
-        print("POST data:", request.POST)  # Debugging line
         orders = Order.objects.all()
+        order_data = []
         updated = False
+        has_errors = False
 
         # Iterate through orders and bind the POST data to each form
         for order in orders:
-            form = OrderViewForm(request.POST, instance=order,
-                                 prefix=f'order-{order.id}')
+            order_form = OrderViewForm(request.POST,
+                                       instance=order,
+                                       prefix=f'order-{order.id}')
+            formset = OrderViewFormSet(
+                request.POST,
+                instance=order,
+                prefix=f'items-{order.id}'
+            )
 
-            if form.is_valid():
-                if form.has_changed():  # Only save if something has changed
-                    form.save()
+            # Check if any form errors
+            if order_form.is_valid() and formset.is_valid():
+                # Only save if something has changed
+                if order_form.has_changed():
+                    order_form.save()
                     updated = True
-                else:
-                    print(f"No changes detected for order {order.id}")
+                if formset.has_changed():
+                    formset.save()
+                    updated = True
+            else:
+                has_errors = True
+                print(f"Order {order.id} form errors: {order_form.errors}")
+                print(f"Order {order.id} formset errors: {formset.errors}")
+
+            # Re-fetch the order from the database to ensure it's up-to-date
+            order.refresh_from_db()
+            order_data.append({
+                'order': order,
+                'order_form': order_form,
+                'item_formset': formset,
+            })
+
+        # Handle form errors and maintain form data
+        if has_errors:
+            messages.error(
+                request,
+                "There were errors in the forms. Please correct them.")
+            return render(request,
+                          self.template_name,
+                          {'order_data': order_data})
 
         if updated:
             messages.success(request, "Orders updated successfully.")

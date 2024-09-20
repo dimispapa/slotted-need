@@ -217,13 +217,30 @@ class OrderViewForm(forms.ModelForm):
         model = Order
         fields = ['paid']
         widgets = {
-            'paid': forms.CheckboxInput(
+            'paid': forms.Select(
                 attrs={'class':
-                       'form-check'})
+                       'form-select form-select-sm'})
+        }
+
+
+# define form for the OrdersItem view
+class OrderItemViewForm(forms.ModelForm):
+    class Meta:
+        model = OrderItem
+        fields = ['item_status']
+        widgets = {
+            'item_status': forms.Select(
+                attrs={'class':
+                       'form-select form-select-sm'})
         }
 
 
 # Create the order view formset
-OrderViewFormSet = forms.modelformset_factory(Order,
-                                              form=OrderViewForm,
-                                              extra=0)
+OrderViewFormSet = forms.inlineformset_factory(
+    parent_model=Order,
+    model=OrderItem,
+    form=OrderItemViewForm,
+    fields=('item_status',),  # Include fields you want to edit
+    extra=0,
+    can_delete=True  # Set to True if you want to allow deleting items
+)
