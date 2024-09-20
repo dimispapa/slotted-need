@@ -1,5 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
 
+    // Constant definitions
+    const deleteModalElement = document.getElementById('DeleteOrderConfirmationModal');
+    const deleteModal = new bootstrap.Modal(document.getElementById('DeleteOrderConfirmationModal'));
+    const confirmDeleteBtn = document.getElementById("confirm-delete-order-btn");
+
     // ************** SECTION A: FUNCTION DEFINITIONS ********************************************************************
 
     // Define function that updates the item_status dropdown bg colour 
@@ -47,6 +52,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     };
 
+    // Define function that deletes an order item and remaining items index
+    function deleteOrder(order) {
+        debugger;
+        if (order) {
+            // delete row from table
+            document.getElementById('orders-table').deleteRow(order.rowIndex);
+        }
+    };
+
     // ************** SECTION B: EVENT LISTENERS & HANDLERS *****************************************************************
 
     //   Handle item_status dropdown colouring dynamically
@@ -55,5 +69,27 @@ document.addEventListener('DOMContentLoaded', function () {
         // Initial styling on page load
         updateSelectStyle();
     };
+
+    // Add Click event listeners to handle dynamic deletion of order items
+    document.addEventListener('click', function (event) {
+
+        // get delete button as reference point. Allow clicking on icon inside
+        let deleteBtn = event.target.closest('.delete-order-btn')
+        if (deleteBtn) {
+            // Set order item delete button as attribute for the modal
+            deleteModalElement.setAttribute('data-target', deleteBtn.value);
+            // Show confirmation modal
+            deleteModal.show();
+        }
+    });
+
+    confirmDeleteBtn.addEventListener('click', function (event) {
+
+        // Get order item element to target for delete
+        deleteBtnValue = deleteModalElement.getAttribute('data-target');
+        targetOrder = document.getElementById(`order-${deleteBtnValue}`);
+        // Delete item
+        deleteOrder(targetOrder);
+    });
 
 });
