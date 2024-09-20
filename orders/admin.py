@@ -22,6 +22,7 @@ class OrderAdmin(nested_admin.NestedModelAdmin):
         extra = 0
         inlines = [ComponentFinishInLine]
 
+    readonly_fields = ['order_status']
     list_display = ('order_number', 'client', 'order_value',
                     'order_status', 'created_on',
                     'updated_on')
