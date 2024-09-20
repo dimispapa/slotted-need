@@ -27,13 +27,14 @@ class Order(models.Model):
     order_value = models.DecimalField(
         max_digits=10, decimal_places=2, default=0)
     # create a PROGRESS status mapping to use as choices for order_status
-    PROGRESS_STATUS = {1: 'Not Started',
+    ORDER_STATUS = {1: 'Not Started',
                        2: 'In Progress',
                        3: 'Made',
                        4: 'Delivered'}
     order_status = models.IntegerField(
-        choices=PROGRESS_STATUS,
-        default=1
+        choices=ORDER_STATUS,
+        default=1,
+        editable=False,  # Prevents editing in forms and admin
     )
     # create a PAID status mapping to use as choices for order_status
     PAID_STATUS = {1: 'Not Fully Paid',
@@ -56,14 +57,39 @@ class Order(models.Model):
             )
             self.order_value = sum(item.item_value for item in items)
 
+    def update_order_status(self):
+        """Automatically derive the order status based on conditions
+        set on the child items' item_status fields."""
+        # Get all item statuses
+        item_statuses = self.items.values_list('item_status', flat=True)
+
+        # Check for 'Not Started'
+        if all(status == 1 for status in item_statuses):
+            self.order_status = 1
+        # Check for 'Delivered'
+        elif all(status == 4 for status in item_statuses):
+            self.order_status = 4
+        # Check for 'Made'
+        elif all(status == 3 for status in item_statuses):
+            self.order_status = 3
+        # Check for 'In Progress'
+        elif any(status == 2 for status in item_statuses):
+            self.order_status = 2
+        else:
+            # Default to 'In Progress' if any other combination
+            self.order_status = 2
+
+        self.save(update_fields=['order_status'])
+
     class Meta:
         ordering = ["-created_on"]
 
     def save(self, *args, **kwargs):
-        # Only calculate totals after the object has been saved
+        # Only execute custom methods after the object has been saved
         # and has a primary key
         if self.pk:
             self.calculate_totals()
+            self.update_order_status()
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -107,10 +133,19 @@ class OrderItem(models.Model):
         discount = self.discount or Decimal('0.00')
         # Automatically calculate item_value before saving
         self.item_value = (base_price - discount) * self.quantity
+        # Update the order's status after saving the item
+        self.order.update_order_status()
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Order Item #{self.id} - {self.product.name}: €{self.item_value}"
+        return (f"Order Item #{self.id} - {self.product.name}: "
+                f"€{self.item_value}")
+
+    def delete(self, *args, **kwargs):
+        order = self.order  # Keep a reference to the order
+        super().delete(*args, **kwargs)
+        # Update the order's status after deleting the item
+        order.update_order_status()
 
 
 class ComponentFinish(models.Model):
