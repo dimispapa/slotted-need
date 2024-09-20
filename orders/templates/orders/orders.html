@@ -53,7 +53,7 @@
             <td>
               <span class="badge 
               {% if order_set.order.order_status == 2 %}
-                bg-pending
+                bg-warning text-dark
               {% elif order_set.order.order_status == 3 %}
                 bg-success
               {% elif order_set.order.order_status == 4 %}
