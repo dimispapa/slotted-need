@@ -312,6 +312,8 @@ class OrderListView(View):
                 if formset.has_changed():
                     formset.save()
                     updated = True
+                    # Call update_order_status after saving the formset
+                    order.update_order_status()
             else:
                 has_errors = True
                 print(f"Order {order.id} form errors: {order_form.errors}")

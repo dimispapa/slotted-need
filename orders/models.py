@@ -63,23 +63,39 @@ class Order(models.Model):
         # Get all item statuses
         item_statuses = self.items.values_list('item_status', flat=True)
 
+        print(f'Statuses of: {self.id}')
+        print([status for status in item_statuses])
+
+        # If no items exist set to not started
+        if not item_statuses:
+            new_status = 1
         # Check for 'Not Started'
-        if all(status == 1 for status in item_statuses):
-            self.order_status = 1
+        elif all(status == 1 for status in item_statuses):
+            print('All statuses are Not Started')
+            new_status = 1
         # Check for 'Delivered'
         elif all(status == 4 for status in item_statuses):
-            self.order_status = 4
+            print('All statuses are Delivered')
+            new_status = 4
         # Check for 'Made'
         elif all(status == 3 for status in item_statuses):
-            self.order_status = 3
+            print('All statuses are Made')
+            new_status = 3
         # Check for 'In Progress'
         elif any(status == 2 for status in item_statuses):
-            self.order_status = 2
+            print('At least one status is In Progress')
+            new_status = 2
         else:
             # Default to 'In Progress' if any other combination
-            self.order_status = 2
+            print('Defaulted to In Progress')
+            new_status = 2
 
-        self.save(update_fields=['order_status'])
+        # Update the order_status if it has changed
+        if self.order_status != new_status:
+            print("Current order status:", self.order_status, "New order status:", new_status)
+            self.order_status = new_status
+            # Save the order without triggering update_order_status again
+            super(Order, self).save(update_fields=['order_status'])
 
     class Meta:
         ordering = ["-created_on"]
@@ -89,7 +105,6 @@ class Order(models.Model):
         # and has a primary key
         if self.pk:
             self.calculate_totals()
-            self.update_order_status()
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -133,8 +148,6 @@ class OrderItem(models.Model):
         discount = self.discount or Decimal('0.00')
         # Automatically calculate item_value before saving
         self.item_value = (base_price - discount) * self.quantity
-        # Update the order's status after saving the item
-        self.order.update_order_status()
         super().save(*args, **kwargs)
 
     def __str__(self):
