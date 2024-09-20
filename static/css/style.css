@@ -92,6 +92,18 @@ of the suggestions div depending on viewport size */
   color: white;
 }
 
+/* custom boostrap-like classes for bg colours */
 .bg-pending {
   background-color: #fd7e14;
+}
+
+.bg-notice {
+  background-color: #e3ff2c;
+  text-decoration: none;
+  opacity: 1;
+}
+
+/* Ensure badge has consistent font size with rest of table */
+.badge {
+  font-size: inherit;
 }
