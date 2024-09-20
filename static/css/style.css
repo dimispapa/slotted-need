@@ -99,6 +99,12 @@ of the suggestions div depending on viewport size */
   opacity: 1;
 }
 
+/* ensure status dropdowns don't shrink too much */
+.item-status-select, .paid-status-select {
+  min-width: 75px;
+  width: auto;
+}
+
 /* Ensure badge has consistent font size with rest of table */
 .badge {
   font-size: inherit;
