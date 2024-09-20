@@ -205,6 +205,10 @@ def process_component_finishes(request, form_index, order_item):
         component_id = field_name.split('-component_finish-')[1]
         finish_option_id = request.POST.get(field_name)
 
+        # Skip this field if no finish option is selected
+        if not finish_option_id:
+            continue
+
         # Validate the Component
         if not Component.objects.filter(id=component_id).exists():
             raise ValueError(f"Invalid component selected: {component_id}")
