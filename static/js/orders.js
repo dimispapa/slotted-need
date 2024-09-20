@@ -12,13 +12,13 @@ document.addEventListener('DOMContentLoaded', function () {
         // loop through item status dropdowns
         itemStatusSelects.forEach(select => {
             // remove existing style classes
-            select.classList.remove('bg-primary', 'bg-pending', 'bg-success', 'bg-secondary');
+            select.classList.remove('bg-primary', 'bg-warning', 'bg-success', 'bg-secondary', 'text-dark');
             // Not Started
             if (select.value == 1) {
                 select.classList.add('bg-primary');
                 // In Progress
             } else if (select.value == 2) {
-                select.classList.add('bg-pending');
+                select.classList.add('bg-warning', 'text-dark');
                 // Made
             } else if (select.value == 3) {
                 select.classList.add('bg-success');
