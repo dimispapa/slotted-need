@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
 {% block content %}
 <div class="container mt-2 mt-md-4">
-  <h1>Orders</h1>
+  <h1>Order Status Tracker</h1>
   <!-- Form start -->
   <form method="post" id="order-list-form" action="{% url 'orders' %}">
     {% csrf_token %}
@@ -30,7 +32,7 @@
           <!-- Apply conditional classes based on order status and paid status -->
           <tr {% if order_set.order.order_status == 4 and order_set.order.paid == 1 %} class="table-warning"
             {% elif order_set.order.order_status == 4 and order_set.order.paid == 2 %}
-            class="table-secondary text-decoration-line-through" {% endif %}>
+            class="table-secondary text-decoration-line-through opacity-50" {% endif %}>
             <!-- Populate order row values -->
             <td>
               <!-- Toggle Button -->
@@ -148,4 +150,9 @@
     <!-- Save All Changes button -->
     <button type="submit" class="btn btn-primary">Save All Changes</button>
 </div>
+{% endblock %}
+
+{% block extras %}
+<!-- External JS logic -->
+<script type="text/javascript" src="{% static 'js/orders.js' %}"></script>
 {% endblock %}
