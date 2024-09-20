@@ -37,7 +37,7 @@ class Order(models.Model):
         editable=False,  # Prevents editing in forms and admin
     )
     # create a PAID status mapping to use as choices for order_status
-    PAID_STATUS = {1: 'Not Fully Paid',
+    PAID_STATUS = {1: 'Not Paid',
                    2: 'Fully Paid'}
     paid = models.IntegerField(
         choices=PAID_STATUS,
