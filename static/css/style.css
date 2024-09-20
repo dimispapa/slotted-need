@@ -92,14 +92,6 @@ of the suggestions div depending on viewport size */
   color: white;
 }
 
-/* Paid checkbox */
-input[type="checkbox"] {
-  transform: scale(1.5);
-}
-
-/* For larger devices, increase scale to 2 */
-@media (min-width: 768px) {
-  input[type="checkbox"] {
-    transform: scale(2);
-  }
+.bg-pending {
+  background-color: #fd7e14;
 }

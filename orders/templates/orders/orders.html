@@ -27,7 +27,10 @@
         <tbody>
           <!-- loop through order and form objects -->
           {% for order_set in order_data %}
-          <tr>
+          <!-- Apply conditional classes based on order status and paid status -->
+          <tr {% if order_set.order.order_status == 4 and order_set.order.paid == 1 %} class="table-warning"
+            {% elif order_set.order.order_status == 4 and order_set.order.paid == 2 %}
+            class="table-secondary text-decoration-line-through" {% endif %}>
             <!-- Populate order row values -->
             <td>
               <!-- Toggle Button -->
@@ -46,7 +49,21 @@
             <td>€{{ order_set.order.order_value }}</td>
             <td>{{ order_set.order.created_on }}</td>
             <td>{{ order_set.order.updated_on }}</td>
-            <td>{{ order_set.order.get_order_status_display }}</td>
+            <td>
+              <span class="badge 
+              {% if order_set.order.order_status == 2 %}
+                bg-pending
+              {% elif order_set.order.order_status == 3 %}
+                bg-success
+              {% elif order_set.order.order_status == 4 %}
+                bg-secondary
+              {% else %}
+                bg-primary
+              {% endif %}
+            ">
+                {{ order_set.order.get_order_status_display }}
+              </span>
+            </td>
             <td>{{ order_set.order_form.paid }}</td>
             <td>
               <!-- Delete Button -->

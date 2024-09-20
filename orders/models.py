@@ -28,9 +28,9 @@ class Order(models.Model):
         max_digits=10, decimal_places=2, default=0)
     # create a PROGRESS status mapping to use as choices for order_status
     ORDER_STATUS = {1: 'Not Started',
-                       2: 'In Progress',
-                       3: 'Made',
-                       4: 'Delivered'}
+                    2: 'In Progress',
+                    3: 'Made',
+                    4: 'Delivered'}
     order_status = models.IntegerField(
         choices=ORDER_STATUS,
         default=1,
