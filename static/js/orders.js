@@ -33,10 +33,10 @@ document.addEventListener('DOMContentLoaded', function () {
         // loop through dropdowns
         paidStatusSelects.forEach(select => {
             // remove existing style classes
-            select.classList.remove('bg-notice', 'bg-secondary', 'text-decoration-line-through', 'text-light');
+            select.classList.remove('bg-pending', 'bg-secondary', 'text-decoration-line-through', 'text-light');
             // Not Paid
             if (select.value == 1) {
-                select.classList.add('bg-notice');
+                select.classList.add('bg-pending');
                 // Fully Paid
             } else if (select.value == 2) {
                 select.classList.add('bg-secondary', 'text-decoration-line-through', 'text-light');
