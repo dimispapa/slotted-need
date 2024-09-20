@@ -103,9 +103,26 @@ of the suggestions div depending on viewport size */
 .item-status-select, .paid-status-select {
   min-width: 75px;
   width: auto;
+  font-size: inherit;
 }
 
 /* Ensure badge has consistent font size with rest of table */
 .badge {
   font-size: inherit;
+}
+
+.sticky-head {
+  position: sticky;
+  top: 0;
+}
+
+.table-container {
+  overflow: auto;
+  max-height: 80vh;
+}
+
+@media (max-width: 768px) {
+  #order-list-form {
+    font-size: 12px;
+  }
 }

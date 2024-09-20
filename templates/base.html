@@ -26,7 +26,7 @@
 </head>
 
 <header>
-  <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+  <nav class="navbar navbar-expand-lg bg-primary fixed-top" data-bs-theme="dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="#"><img src="../static/favicon/apple-touch-icon-tns.png" width="30" height="24"
           alt="TNS logo" class="align-text-top"> Slotted Need</a>
@@ -49,11 +49,11 @@
             <ul class="dropdown-menu">
               <li>
                 <a class="dropdown-item {% if request.path == add_order_url %}active-dropdown-item"
-                aria-current="true{% endif %}" href="{% url 'create_order' %}">Add new order</a>
+                aria-current="true{% endif %}" href="{% url 'create_order' %}">Add New Order</a>
               </li>
               <li>
                 <a class="dropdown-item {% if request.path == orders_url %}active-dropdown-item"
-                aria-current="true{% endif %}" href="{% url 'orders' %}">Current orders</a>
+                aria-current="true{% endif %}" href="{% url 'orders' %}">Order Tracker</a>
               </li>
             </ul>
           </li>
@@ -79,7 +79,7 @@
 
 </header>
 
-<body>
+<body class="pt-5">
   {% block content %}
   <!-- CONTENT GOES HERE -->
   {% endblock %}

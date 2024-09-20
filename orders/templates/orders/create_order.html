@@ -3,22 +3,23 @@
 {% load crispy_forms_tags %}
 {% block content %}
 <div class="container mt-2 mt-md-4 mb-2 mb-md-4">
-  <h1>Create an Order</h1>
+  <h1 class="d-none">Create an order</h1>
 
   <!-- Form start -->
   <form method="post" id="order-form" action="{% url 'create_order' %}">
     {% csrf_token %}
     <!-- Render the Order form for client information -->
+    <h2>Client Details</h2>
     {% crispy order_form %}
 
     <!-- Order Items -->
+    <h2>Order Items</h2>
     <div id="order-items">
-      <h3>Order Items</h3>
       <!-- Render the OrderItem forms for products and options -->
       {% for order_item in order_item_formset %}
       <div class="card order-item-form" data-form-index="{{ forloop.counter0 }}">
         <div class="card-body container-fluid bg-secondary text-white rounded">
-          <h4>Order Item # {{ forloop.counter }}</h4>
+          <h3>Order Item # {{ forloop.counter }}</h3>
           {% crispy order_item %}
 
           <!-- Delete order item button -->
