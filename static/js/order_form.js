@@ -18,26 +18,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ************** SECTION A: FUNCTION DEFINITIONS ********************************************************************
 
-    // Define function to fetch and populate product dropdowns
-    function populateProductDropdown(selectElement) {
-        fetch('/api/get_products/')
-            .then(response => {
-                // Check if the response is OK (status in the range 200-299)
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                selectElement.innerHTML = '<option value="">Select a product</option>'; // Reset dropdown
-                data.products.forEach(product => {
-                    let optionHTML = `<option value="${product.id}">${product.name}</option>`;
-                    selectElement.innerHTML += optionHTML;
-                });
-            })
-            .catch(error => console.error('Error fetching products:', error));
-    };
-
     // Define function to update product details based on product selection
     function updateProductDetails(target) {
         let productId = target.value;
@@ -363,11 +343,6 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     // ************** SECTION B: EVENT LISTENERS & HANDLERS *****************************************************************
-
-    // Populate product dropdowns for existing forms on page load
-    document.querySelectorAll('.product-dropdown').forEach(selectElement => {
-        populateProductDropdown(selectElement);
-    });
 
     // Add Click event listener to handle adding new order item forms
     document.addEventListener('click', function (event) {

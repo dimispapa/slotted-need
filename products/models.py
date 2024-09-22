@@ -112,7 +112,7 @@ class Product(models.Model):
         ordering = ["name"]
 
     def __str__(self):
-        return f"{self.name} | Base price at €{self.base_price}"
+        return f"{self.name}"
 
 
 # Create an Option model to define the options for a product config that can
