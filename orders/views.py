@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.db import transaction
 from django.db.models import Count, Q
-from .models import Client, Order, OrderItem
+from .models import Client, Order, OrderItem, ComponentFinish
 from products.models import (Product, Option, OptionValue, FinishOption,
                              ProductComponent, Component)
 from .forms import OrderForm, OrderItemFormSet, OrderViewForm, OrderViewFormSet
@@ -127,32 +127,36 @@ def create_order(request):
 
                     # Validate the formset again with the correct instance
                     if order_item_formset.is_valid():
-                        # Save the formset, which creates OrderItem instances
-                        # linked to the Order
-                        order_item_formset.save()
 
                         # process each form in the formset
                         # to save the order items
                         for form in order_item_formset:
-                            # Order item already saved by formset.save()
-                            order_item = form.instance
+                            # Get the quantity from the form
+                            quantity = form.cleaned_data.get('quantity', 1)
+                            # Save original OrderItem instance without commit
+                            # to process the remainder options/finishes fields
+                            order_item = form.save(commit=False)
+                            order_item.order = order
+                            order_item.save()
+                            form.save_m2m()
                             # Get the form index
                             form_index = form.prefix.split('-')[1]
-
                             # Process option values
                             process_option_values(request,
                                                   form_index,
                                                   order_item)
-
                             # Process component finishes
                             process_component_finishes(request,
                                                        form_index,
                                                        order_item)
-
                             # Process option finishes
                             process_option_finishes(request,
                                                     form_index,
                                                     order_item)
+                            # Create additional order items instances
+                            # based on quantity with same configurations
+                            for _ in range(quantity - 1):
+                                copy_order_item(order_item)
 
                         # notify user with success message
                         messages.success(request,
@@ -201,7 +205,7 @@ def create_order(request):
 def process_option_values(request, form_index, order_item):
     # Define field naming pattern
     option_field_pattern = re.compile(
-        rf'^form-{form_index}-option_\d+$')
+        rf'^items-{form_index}-option_\d+$')
 
     # Get option field names
     option_field_names = [
@@ -234,7 +238,7 @@ def process_option_values(request, form_index, order_item):
 def process_component_finishes(request, form_index, order_item):
     # Define field naming pattern
     comp_finish_field_pattern = re.compile(
-        rf'^form-{form_index}-component_finish-\d+$')
+        rf'^items-{form_index}-component_finish-\d+$')
     # Get component finish fields
     comp_finish_field_names = [key for key in request.POST
                                if comp_finish_field_pattern.match(key)]
@@ -285,7 +289,7 @@ def process_option_finishes(request, form_index, order_item):
         for pc in product_components:
             component = pc.component
             # Build field name
-            field_name = (f'form-{form_index}-option_finish_'
+            field_name = (f'items-{form_index}-option_finish_'
                           f'component-{component.id}')
             finish_option_id = request.POST.get(field_name)
 
@@ -308,6 +312,33 @@ def process_option_finishes(request, form_index, order_item):
             )
 
 
+def copy_order_item(order_item):
+    """
+    Creates an instance copy of the given OrderItem with the same
+    option_values and ComponentFinishes.
+    """
+    order_item_copy = OrderItem.objects.create(
+        order=order_item.order,
+        product=order_item.product,
+        base_price=order_item.base_price,
+        discount=order_item.discount,
+        item_value=order_item.item_value,
+    )
+    # set the same option values
+    order_item_copy.option_values.set(
+        order_item.option_values.all())
+    # Duplicate ComponentFinishes
+    for icf in order_item.item_component_finishes.\
+            all():
+        ComponentFinish.objects.create(
+            order_item=order_item_copy,
+            component=icf.component,
+            finish_option=icf.finish_option,
+        )
+    return order_item_copy
+
+
+# *** ORDER LIST VIEW ***
 # View that handles the orders list template rendering
 class OrderListView(View):
     model = Order

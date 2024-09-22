@@ -120,13 +120,11 @@
       <h4>Order Item # __itemnum__</h4>
       {% crispy order_item_formset.empty_form %}
       <!-- Delete order item button -->
-      {% if order_item_formset.can_delete %}
       <div class="form-group d-grid d-flex justify-content-end">
         <button type="button" id="delete-item-btn-__prefix__" class="btn btn-lg btn-danger delete-order-item">
           <i class="fa-solid fa-trash"></i>
         </button>
       </div>
-      {% endif %}
     </div>
   </div>
 </div>

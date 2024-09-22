@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (formCount < maxFormCount || maxFormCount === 0) { // 0 means no max
             // Clone the empty form template. Replace placeholders with appropriate index values and item heading number
             let newFormHtml = emptyFormTemplate.replace(/__prefix__/g, newFormIndex)
-            newFormHtml = newFormHtml.replace(/__itemnum__/g, itemNum).replace(/items--/g, `items-${newFormIndex}-`);
+            newFormHtml = newFormHtml.replace(/__itemnum__/g, itemNum).replace(/items--/g, `items-${newFormIndex}-`).replace(/form--/g, `form-${newFormIndex}-`);
 
             // Append the new form to the container
             orderItemsContainer.insertAdjacentHTML('beforeend', newFormHtml);
