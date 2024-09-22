@@ -1,6 +1,7 @@
 import re
 from django.views import View
 from django.shortcuts import render, get_object_or_404, redirect
+from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.http import JsonResponse
 from django.db import transaction
@@ -54,97 +55,134 @@ def check_client(request):
         return JsonResponse({'exact_match': False, 'partial_match': False})
 
 
+# Function to handle client creation
+def get_update_create_client(action, client_id, cleaned_data):
+    # If the user is updating the client details
+    if action == 'update_client' and client_id:
+        client = Client.objects.get(id=client_id)
+        # Update the client's details with the new form data
+        client.client_name = cleaned_data[
+            'client_name']
+        client.client_phone = cleaned_data[
+            'client_phone']
+        client.client_email = cleaned_data[
+            'client_email']
+        client.save()
+
+    elif action == 'use_existing' and client_id:
+        # Use existing client without updating details
+        client = Client.objects.get(id=client_id)
+
+    else:
+        # Create new client if no client ID or action is passed
+        client = Client.objects.create(
+            client_name=cleaned_data['client_name'],
+            client_phone=cleaned_data['client_phone'],
+            client_email=cleaned_data['client_email']
+        )
+
+    return client
+
+
 # View to handle the create order form
 def create_order(request):
     if request.method == 'POST':
 
-        # use transaction context manager to ensure operations to roll back in
-        # case of failure in any one operation - ensure data integrity
-        with transaction.atomic():
-            # pass the post request to the form and formset objects
-            order_form = OrderForm(data=request.POST)
-            order_item_formset = OrderItemFormSet(data=request.POST)
+        # pass the post request to the form and formset objects
+        order_form = OrderForm(data=request.POST)
+        # Initialize the formset with the Order instance (not yet saved)
+        order_item_formset = OrderItemFormSet(data=request.POST,
+                                              instance=Order())
 
-            # Check if the user has confirmed using the existing client
-            client_action = request.POST.get('client_action')
-            client_id = request.POST.get('client_id')
+        # Check if the user has confirmed using the existing client
+        client_action = request.POST.get('client_action')
+        client_id = request.POST.get('client_id')
 
-            # validation of forms and formset fields ensuring no errors
-            if order_form.is_valid() and order_item_formset.is_valid():
-                # Capture calculated totals from the form
-                order_value = order_form.cleaned_data['order_value']
-                deposit = order_form.cleaned_data['deposit']
+        # validation of forms and formset fields ensuring no errors
+        if order_form.is_valid() and order_item_formset.is_valid():
+            try:
+                # use transaction context manager to ensure operations to roll
+                # back in case of failure in any one operation
+                # - ensure data integrity
+                with transaction.atomic():
+                    # call function to get, update or create client
+                    client = get_update_create_client(client_action,
+                                                      client_id,
+                                                      order_form.cleaned_data)
 
-                # If the user is updating the client details
-                if client_action == 'update_client' and client_id:
-                    client = Client.objects.get(id=client_id)
-                    # Update the client's details with the new form data
-                    client.client_name = order_form.cleaned_data[
-                        'client_name']
-                    client.client_phone = order_form.cleaned_data[
-                        'client_phone']
-                    client.client_email = order_form.cleaned_data[
-                        'client_email']
-                    client.save()
+                    # Capture calculated totals from the form
+                    order_value = order_form.cleaned_data.get('order_value', 0)
+                    deposit = order_form.cleaned_data['deposit']
 
-                elif client_action == 'use_existing' and client_id:
-                    # Use existing client without updating details
-                    client = Client.objects.get(id=client_id)
-
-                else:
-                    # Create new client if no client ID or action is passed
-                    client = Client.objects.create(
-                        client_name=order_form.cleaned_data['client_name'],
-                        client_phone=order_form.cleaned_data['client_phone'],
-                        client_email=order_form.cleaned_data['client_email']
+                    # proceed to create order object
+                    order = Order.objects.create(
+                        client=client,
+                        order_value=order_value,
+                        deposit=deposit
                     )
 
-                # proceed to create order object
-                order = Order.objects.create(
-                    client=client,
-                    order_value=order_value,
-                    deposit=deposit
-                )
+                    # Now bind the formset to the saved Order instance
+                    order_item_formset = OrderItemFormSet(
+                        request.POST, instance=order)
 
-                # process each form in the formset to save the order items
-                for form in order_item_formset:
-                    # create associated OrderItem instance without commiting
-                    order_item = form.save(commit=False)
-                    # pass the Order instance created above to link it with
-                    order_item.order = order
-                    # save and commit OrderItem to db
-                    order_item.save()
-                    # save the many-to-many data for option_values and finishes
-                    form.save_m2m()
+                    # Validate the formset again with the correct instance
+                    if order_item_formset.is_valid():
+                        # Save the formset, which creates OrderItem instances
+                        # linked to the Order
+                        order_item_formset.save()
 
-                    # Get the form index
-                    form_index = form.prefix.split('-')[1]
+                        # process each form in the formset
+                        # to save the order items
+                        for form in order_item_formset:
+                            # Order item already saved by formset.save()
+                            order_item = form.instance
+                            # Get the form index
+                            form_index = form.prefix.split('-')[1]
 
-                    # Process option values
-                    process_option_values(request, form_index, order_item)
+                            # Process option values
+                            process_option_values(request,
+                                                  form_index,
+                                                  order_item)
 
-                    # Process component finishes
-                    process_component_finishes(request, form_index, order_item)
+                            # Process component finishes
+                            process_component_finishes(request,
+                                                       form_index,
+                                                       order_item)
 
-                    # Process option finishes
-                    process_option_finishes(request, form_index, order_item)
+                            # Process option finishes
+                            process_option_finishes(request,
+                                                    form_index,
+                                                    order_item)
 
-                # notify user with success message
-                messages.success(request, 'Order created successfully!')
+                        # notify user with success message
+                        messages.success(request,
+                                         'Order created successfully!')
 
-                # Redirect to the same page to avoid form resubmission
-                return redirect('create_order')
+                        # Redirect to the same page to avoid form resubmission
+                        return redirect('create_order')
 
-            # If the forms are not valid
-            else:
-                # display an error message
-                messages.error(request, 'Please correct the errors below.')
+                    else:
+                        # If formset is invalid after binding to the
+                        # saved Order, show errors
+                        messages.error(request,
+                                       'Please correct the errors in the order'
+                                       ' items.')
 
-                # render the page again but retaining the details
-                return render(request, 'orders/create_order.html', {
-                    'order_form': order_form,
-                    'order_item_formset': order_item_formset,
-                })
+            # catch any other errors as validation errors
+            except ValidationError as e:
+                messages.error(request,
+                               f"There was an error processing the order: {e}")
+
+        # If the forms are not valid
+        else:
+            # display an error message
+            messages.error(request, 'Please correct the errors below.')
+
+        # If the form or formset is invalid, re-render the page with errors
+        return render(request, 'orders/create_order.html', {
+            'order_form': order_form,
+            'order_item_formset': order_item_formset,
+        })
 
     # if a GET request simply start a new form
     else:
@@ -185,7 +223,8 @@ def process_option_values(request, form_index, order_item):
             # is associated with the Option
             if not OptionValue.objects.filter(id=value_id,
                                               option_id=option_id).exists():
-                raise ValueError(f"Invalid option value selected: {value_id}")
+                raise ValidationError(
+                    f"Invalid option value selected: {value_id}")
             selected_option_value_ids.append(value_id)
 
     # Associate option values with the order item
@@ -211,12 +250,14 @@ def process_component_finishes(request, form_index, order_item):
 
         # Validate the Component
         if not Component.objects.filter(id=component_id).exists():
-            raise ValueError(f"Invalid component selected: {component_id}")
+            raise ValidationError(
+                f"Invalid component selected: {component_id}")
 
         # Validate the FinishOption
         if not FinishOption.objects.filter(id=finish_option_id).exists():
-            raise ValueError(f"Invalid finish option selected: "
-                             f"{finish_option_id}")
+            raise ValidationError(
+                f"Invalid finish option selected: "
+                f"{finish_option_id}")
 
         component = Component.objects.get(id=component_id)
         finish_option = FinishOption.objects.get(id=finish_option_id)
@@ -254,8 +295,9 @@ def process_option_finishes(request, form_index, order_item):
 
             # Validate the FinishOption
             if not FinishOption.objects.filter(id=finish_option_id).exists():
-                raise ValueError(f"Invalid finish option selected: "
-                                 f"{finish_option_id}")
+                raise ValidationError(
+                    f"Invalid finish option selected: "
+                    f"{finish_option_id}")
 
             finish_option = FinishOption.objects.get(id=finish_option_id)
 

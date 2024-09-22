@@ -1,5 +1,4 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Div, Field
 from crispy_forms.bootstrap import PrependedText
@@ -12,15 +11,15 @@ class OrderForm(forms.Form):
         'class': 'form-control',
         'autocomplete': 'off',  # Disable browser autocomplete
         'id': 'client_name'
-    }))
+    }), required=True)
     client_phone = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control',
         'id': 'client_phone'
-    }))
+    }), required=True)
     client_email = forms.EmailField(widget=forms.EmailInput(attrs={
         'class': 'form-control',
         'id': 'client_email'
-    }))
+    }), required=True)
 
     # read-only deposit and order_value fields
     order_value = forms.DecimalField(
@@ -31,7 +30,7 @@ class OrderForm(forms.Form):
             'readonly': 'readonly',
             'id': 'order_value'
         }),
-        required=False,  # Optional as we populate it dynamically
+        required=True
     )
     deposit = forms.DecimalField(
         max_digits=10,
@@ -70,6 +69,36 @@ class OrderForm(forms.Form):
 
 
 class OrderItemForm(forms.ModelForm):
+
+    product = forms.ModelChoiceField(
+        queryset=Product.objects.all(),
+        required=True,
+        widget=forms.Select()
+    )
+
+    quantity = forms.IntegerField(
+        required=True,
+        min_value=1,
+        initial=1,
+        widget=forms.NumberInput()
+    )
+
+    base_price = forms.DecimalField(
+        required=True,
+        max_digits=10,
+        decimal_places=2,
+        min_value=0,
+        widget=forms.NumberInput()
+    )
+
+    item_value = forms.DecimalField(
+        required=True,
+        max_digits=10,
+        decimal_places=2,
+        min_value=0,
+        widget=forms.NumberInput()
+    )
+
     class Meta:
         model = OrderItem
         fields = ['product', 'base_price', 'discount', 'item_value',
@@ -128,9 +157,7 @@ class OrderItemForm(forms.ModelForm):
                     # Quantity field
                     Field(
                         'quantity',
-                        css_class='quantity-field',
-                        min=1,
-                        value=1,
+                        css_class='quantity-field'
                     ),
                     css_class='form-group col-md-3 mb-2 mb-md-3'
                 ),
@@ -166,46 +193,25 @@ class OrderItemForm(forms.ModelForm):
 
     # add custom server-side validation for option-values to ensure
     # data integrity if client-side validation is bypassed
-    # def clean(self):
-    #     cleaned_data = super().clean()
-    #     product = cleaned_data.get('product')
-    #     option_values = cleaned_data.get('option_values')
+    def clean(self):
+        cleaned_data = super().clean()
+        product = cleaned_data.get('product')
 
-    #     if product:
-    #         # Get all options associated with the product
-    #         product_options = product.options.all()
+        if not product:
+            # raise validation error as an order item must have a product
+            if not self.has_error('product'):
+                self.add_error('product', 'This field is required.')
 
-    #         # If the product has options,
-    #         # ensure that option_values are selected
-    #         if product_options.exists():
-    #             if not option_values:
-    #                 raise ValidationError(
-    #                     'You must select an option value for this '
-    #                     'product.')
-
-    #             # Validate that the selected option_values are associated
-    #             # with  the product's options
-    #             for option_value in option_values:
-    #                 if option_value.option not in product_options:
-    #                     raise ValidationError(
-    #                         f"The option value '{option_value}' is not valid"
-    #                         " for the selected product."
-    #                     )
-    #         else:
-    #             # If the product has no options,
-    #             # ensure no option_values are selected
-    #             if option_values.exists():
-    #                 raise ValidationError(
-    #                     'This product does not have options; '
-    #                     'please deselect option values.')
-
-    #     return cleaned_data
+        return cleaned_data
 
 
 # Create the order items formset
-OrderItemFormSet = forms.modelformset_factory(
-    OrderItem,
+OrderItemFormSet = forms.inlineformset_factory(
+    parent_model=Order,
+    model=OrderItem,
     form=OrderItemForm,
+    fields=['product', 'base_price', 'discount', 'item_value', 'quantity',
+            'option_values'],
     extra=1,  # Start with 1 empty form
     can_delete=True,  # Allow deletion of forms
 )
@@ -243,7 +249,7 @@ OrderViewFormSet = forms.inlineformset_factory(
     parent_model=Order,
     model=OrderItem,
     form=OrderItemViewForm,
-    fields=('item_status',),  # Include fields you want to edit
+    fields=('item_status',),
     extra=0,
-    can_delete=True  # Set to True if you want to allow deleting items
+    can_delete=True
 )

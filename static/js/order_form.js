@@ -7,7 +7,9 @@ const clientModal = new bootstrap.Modal(document.getElementById('clientConflictM
 const deleteModalElement = document.getElementById('DeleteConfirmationModal');
 const deleteModal = new bootstrap.Modal(document.getElementById('DeleteConfirmationModal'));
 const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
-const totalFormsInput = document.getElementById('id_form-TOTAL_FORMS');
+const emptyFormTemplate = document.getElementById('empty-form-template').innerHTML;
+const totalForms = document.getElementById('id_items-TOTAL_FORMS');
+const maxForms = document.getElementById('id_items-MAX_NUM_FORMS');
 const orderItemsContainer = document.getElementById('order-items');
 const orderFormOrderValueField = document.getElementById('order_value');
 
@@ -38,15 +40,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Define function to update product details based on product selection
     function updateProductDetails(target) {
-
         let productId = target.value;
         let orderItem = target.closest('.order-item-form');
         let formIndex = orderItem.getAttribute('data-form-index');
         let optionsContainer = orderItem.querySelector('.options-form-container')
-        // let finishesContainer = document.getElementById(`finishes-container-${formIndex}`);
-        let basePriceField = document.getElementById(`id_form-${formIndex}-base_price`);
-        let discountField = document.getElementById(`id_form-${formIndex}-discount`);
-        let itemValueField = document.getElementById(`id_form-${formIndex}-item_value`);
+        let basePriceField = document.getElementById(`id_items-${formIndex}-base_price`);
+        let discountField = document.getElementById(`id_items-${formIndex}-discount`);
+        let itemValueField = document.getElementById(`id_items-${formIndex}-item_value`);
 
         if (productId) {
             // Return a promise when a productId is present
@@ -119,9 +119,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 optionDiv.classList.add('row');
                 let optionDivHTML = `
                                 <div class="${OPTION_GROUP_STYLES}">
-                                    <label for="option-${formIndex}-${option.id}" class="form-label requiredField">${option.name}<span class="asteriskField">*</span></label>
-                                    <select class="form-select options-dropdown" name="form-${formIndex}-option_${option.id}"
-                                    id="option-${formIndex}-${option.id}" required aria-required="true">
+                                    <label for="id_items-${formIndex}-option-${option.id}" class="form-label requiredField">${option.name}<span class="asteriskField">*</span></label>
+                                    <select class="form-select options-dropdown" name="items-${formIndex}-option_${option.id}"
+                                    id="id_items-${formIndex}-option-${option.id}" required aria-required="true">
                                         <option value="">------------</option>
                                 </div>
                         `;
@@ -142,8 +142,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 optionsContainer.appendChild(optionCol);
 
                 // Fetch finishes dynamically when the option value changes
-                document.getElementById(`option-${formIndex}-${option.id}`).addEventListener('change', function () {
-                    updateFinishes(formIndex, productId, option.id, this.value);
+                document.getElementById(`id_items-${formIndex}-option-${option.id}`).addEventListener('change', function () {
+                    updateFinishes(formIndex, productId, finishRow.id, this.value);
                 });
             });
         }
@@ -163,9 +163,9 @@ document.addEventListener('DOMContentLoaded', function () {
             data.component_finishes.forEach(finish => {
                 let finishDivHTML = `
                             <div class="${OPTION_GROUP_STYLES}">
-                                <label for="finish-${formIndex}-${finish.id}-${finish.component_id}" class="form-label">${finish.component_name} ${finish.name}</label>
-                                <select class="form-select comp-finish-dropdown-${formIndex}" name="form-${formIndex}-component_finish-${finish.component_id}"
-                                id="finish-${formIndex}-${finish.id}-${finish.component_id}">
+                                <label for="id_items-${formIndex}-finish-${finish.id}-${finish.component_id}" class="form-label">${finish.component_name} ${finish.name}</label>
+                                <select class="form-select comp-finish-dropdown-${formIndex}" name="items-${formIndex}-component_finish-${finish.component_id}"
+                                id="id_items-${formIndex}-finish-${finish.id}-${finish.component_id}">
                                     <option value="">------------</option>
                             </div>
                     `;
@@ -191,9 +191,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Define function to update finishes based on selected option
-    function updateFinishes(formIndex, productId, optionId, optionValueId) {
-
-        let finishRow = document.getElementById(`finish-${formIndex}-${optionId}`);
+    function updateFinishes(formIndex, productId, finishRowId, optionValueId) {
+        let finishRow = document.getElementById(finishRowId);
 
         // Check if an actual option value was selected
         if (optionValueId) {
@@ -206,15 +205,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     return response.json();
                 })
                 .then(data => {
+                    // Unhide the component finishes containers
+                    finishRow.classList.remove('d-none');
                     // Clear old finishes
                     finishRow.innerHTML = '';
                     // Populate finishes dynamically
                     data.component_finishes.forEach(finish => {
                         let finishHTML = `
                             <div class="${OPTION_GROUP_STYLES}">
-                                <label for="finish-${formIndex}-${optionValueId}-${finish.id}" class="form-label text-dark">${finish.name}</label>
-                                <select class="form-select finish-dropdown-${formIndex}" id="finish-${formIndex}-${optionValueId}-${finish.id}"
-                                name="form-${formIndex}-option_finish_component-${finish.component_id}">
+                                <label for="id_items-${formIndex}-finish-${optionValueId}-${finish.id}" class="form-label text-dark">${finish.name}</label>
+                                <select class="form-select finish-dropdown-${formIndex}" id="id_items-${formIndex}-finish-${optionValueId}-${finish.id}"
+                                name="items-${formIndex}-option_finish_component-${finish.component_id}">
                                     <option value="">------------</option>
                             </div>
                         `;
@@ -240,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
 
         } else {
-            // Hide the component finishes containers if no product is selected
+            // Hide the component finishes containers if no product/option is selected
             finishRow.classList.add('d-none');
         };
     };
@@ -262,18 +263,24 @@ document.addEventListener('DOMContentLoaded', function () {
     function addNewOrderItemForm() {
 
         // Get the current form count which will also be the index of the new form (as we use zero index for IDs of form elements)
-        let newFormIndex = formCount = parseInt(totalFormsInput.value);
+        let formCount = parseInt(totalForms.value);
+        let newFormIndex = formCount;
+        let maxFormCount = parseInt(maxForms.value);
         let itemNum = newFormIndex + 1; // increment the item number showing on the heading
 
-        // Clone the empty form template. Replace placeholders with appropriate index values and item heading number
-        let newFormHtml = document.getElementById('empty-form-template').innerHTML.replace(/__prefix__/g, newFormIndex)
-        newFormHtml = newFormHtml.replace(/__itemnum__/g, itemNum).replace(/form--/g, `form-${newFormIndex}-`);
+        if (formCount < maxFormCount || maxFormCount === 0) { // 0 means no max
+            // Clone the empty form template. Replace placeholders with appropriate index values and item heading number
+            let newFormHtml = emptyFormTemplate.replace(/__prefix__/g, newFormIndex)
+            newFormHtml = newFormHtml.replace(/__itemnum__/g, itemNum).replace(/items--/g, `items-${newFormIndex}-`);
 
-        // Append the new form to the container
-        orderItemsContainer.insertAdjacentHTML('beforeend', newFormHtml);
+            // Append the new form to the container
+            orderItemsContainer.insertAdjacentHTML('beforeend', newFormHtml);
 
-        // Increment the total forms count
-        totalFormsInput.value = formCount + 1;
+            // Increment the total forms count
+            totalForms.value = formCount + 1;
+        } else {
+            alert('Maximum number of order items reached.');
+        }
     };
 
     // Define function that deletes an order item and remaining items index
@@ -281,8 +288,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (orderItemForm) {
             // formset management update
-            let newFormCount = document.getElementById('id_form-TOTAL_FORMS').value - 1
-            document.getElementById('id_form-TOTAL_FORMS').setAttribute('value', newFormCount)
+            let newFormCount = totalForms.value - 1
+            totalForms.setAttribute('value', newFormCount)
 
             // remove orderItemForm from container
             orderItemsContainer.removeChild(orderItemForm);
@@ -297,13 +304,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 // update select and input elements
                 form.querySelectorAll('input, select').forEach(field => {
                     // Update field names and IDs to maintain the correct formset structure
-                    field.name = field.name.replace(/form-\d+-/, `form-${index}-`);
-                    field.id = field.id.replace(/form-\d+-/, `form-${index}-`);
+                    field.name = field.name.replace(/items-\d+-/, `items-${index}-`);
+                    field.id = field.id.replace(/id_items-\d+-/, `id_items-${index}-`);
                 });
                 // update label elements
                 form.querySelectorAll('label').forEach(field => {
                     // Update for to align label to correct elements
-                    field.htmlFor = field.htmlFor.replace(/form-\d+-/, `form-${index}-`);
+                    field.htmlFor = field.htmlFor.replace(/id_items-\d+-/, `id_items-${index}-`);
                 });
                 // update relevant div containers that include this id
                 form.querySelectorAll('div[id*="form-"]').forEach(div => {
@@ -323,10 +330,10 @@ document.addEventListener('DOMContentLoaded', function () {
             target.classList.contains('base-price-field')
         ) {
             let formIndex = target.closest('.order-item-form').getAttribute('data-form-index');
-            let basePriceField = document.getElementById(`id_form-${formIndex}-base_price`);
-            let discountField = document.getElementById(`id_form-${formIndex}-discount`);
-            let quantityField = document.getElementById(`id_form-${formIndex}-quantity`);
-            let itemValueField = document.getElementById(`id_form-${formIndex}-item_value`);
+            let basePriceField = document.getElementById(`id_items-${formIndex}-base_price`);
+            let discountField = document.getElementById(`id_items-${formIndex}-discount`);
+            let quantityField = document.getElementById(`id_items-${formIndex}-quantity`);
+            let itemValueField = document.getElementById(`id_items-${formIndex}-item_value`);
             // Recalculate item value
             let discount = parseFloat(discountField.value) || 0;
             let basePrice = parseFloat(basePriceField.value) || 0;
@@ -344,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Select all elements with class .order-item-form but exclude those inside #empty-form-template
         document.querySelectorAll('.order-item-form:not(#empty-form-template .order-item-form)').forEach((_, index) => {
 
-            let itemValueField = document.getElementById(`id_form-${index}-item_value`)
+            let itemValueField = document.getElementById(`id_items-${index}-item_value`)
             let itemValue = parseFloat(itemValueField.value) || 0
 
             // Sum up item values for the order
@@ -375,15 +382,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Add Click event listeners to handle dynamic deletion of order items
     document.addEventListener('click', function (event) {
-        
-            // get delete button as reference point. Allow clicking on icon inside
-            let deleteBtn = event.target.closest('.delete-order-item')
-            if (deleteBtn) {
-                // Set order item delete button as attribute for the modal
-                deleteModalElement.setAttribute('data-target', deleteBtn.id);
-                // Show confirmation modal
-                deleteModal.show();
-            }
+
+        // get delete button as reference point. Allow clicking on icon inside
+        let deleteBtn = event.target.closest('.delete-order-item')
+        if (deleteBtn) {
+            // Set order item delete button as attribute for the modal
+            deleteModalElement.setAttribute('data-target', deleteBtn.id);
+            // Show confirmation modal
+            deleteModal.show();
+        }
     });
 
     confirmDeleteBtn.addEventListener('click', function (event) {
@@ -444,10 +451,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('client-id-input').value = data.exact_match.id;
                     document.getElementById('client-action').value = 'use_existing';
                     this.submit();
-                // if partial client match found show modal with partial match details
+                    // if partial client match found show modal with partial match details
                 } else if (data.partial_match) {
                     showModalWithClientDetails(data.partial_match);
-                // if no match found
+                    // if no match found
                 } else {
                     // clear inputs then submit
                     document.getElementById('client-id-input').value = '';
