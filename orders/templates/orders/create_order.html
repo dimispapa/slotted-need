@@ -8,12 +8,51 @@
   <!-- Form start -->
   <form method="post" id="order-form" action="{% url 'create_order' %}">
     {% csrf_token %}
+
+    <!-- Display form and formset errors -->
+    {% if order_form.errors or order_item_formset.errors %}
+    <div class="alert alert-danger">
+      <ul>
+        {% if order_form.errors %}
+        {% for field in order_form %}
+        {% for error in field.errors %}
+        <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+        {% endfor %}
+        {% endfor %}
+        {% for error in order_form.non_field_errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+        {% endif %}
+
+        {% if order_item_formset.errors %}
+        {% for form in order_item_formset %}
+        {% for field in form %}
+        {% for error in field.errors %}
+        <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+        {% endfor %}
+        {% endfor %}
+        {% for error in form.non_field_errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+        {% endfor %}
+        {% for error in order_item_formset.non_form_errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+        {% endif %}
+      </ul>
+    </div>
+    {% endif %}
+
     <!-- Render the Order form for client information -->
     <h2>Client Details</h2>
     {% crispy order_form %}
 
     <!-- Order Items -->
     <h2>Order Items</h2>
+
+    <!-- Formset management fields to handle the order item formset -->
+    {{ order_item_formset.management_form }}
+
     <div id="order-items">
       <!-- Render the OrderItem forms for products and options -->
       {% for order_item in order_item_formset %}
@@ -66,9 +105,6 @@
     <!-- Order submit button -->
     <input type="submit" name="submit-btn" value="Submit Order" class="btn btn-primary btn btn-lg btn-primary mb-2 mt-2"
       id="submit-id-submit">
-
-    <!-- Formset management fields to handle the formset dynamically -->
-    {{ order_item_formset.management_form }}
 
     <!-- Hidden fields for client handling -->
     <input type="hidden" id="client-action" name="client_action" value="">
