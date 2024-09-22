@@ -114,7 +114,6 @@ class OrderItem(models.Model):
                                    validators=[MinValueValidator(0.00)],
                                    blank=True, null=True)
     item_value = models.DecimalField(max_digits=10, decimal_places=2)
-    quantity = models.PositiveIntegerField(default=1)
     option_values = models.ManyToManyField(OptionValue,
                                            related_name='order_items',
                                            blank=True
@@ -138,7 +137,7 @@ class OrderItem(models.Model):
         base_price = self.base_price or Decimal('0.00')
         discount = self.discount or Decimal('0.00')
         # Automatically calculate item_value before saving
-        self.item_value = (base_price - discount) * self.quantity
+        self.item_value = base_price - discount
         super().save(*args, **kwargs)
 
     def __str__(self):

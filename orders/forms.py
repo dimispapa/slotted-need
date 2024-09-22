@@ -76,11 +76,12 @@ class OrderItemForm(forms.ModelForm):
         widget=forms.Select()
     )
 
+    # Define 'quantity' as a form-only field
     quantity = forms.IntegerField(
-        required=True,
         min_value=1,
         initial=1,
-        widget=forms.NumberInput()
+        widget=forms.NumberInput(attrs={'min': '1'}),
+        required=True,
     )
 
     base_price = forms.DecimalField(
@@ -102,7 +103,7 @@ class OrderItemForm(forms.ModelForm):
     class Meta:
         model = OrderItem
         fields = ['product', 'base_price', 'discount', 'item_value',
-                  'quantity', 'option_values']
+                  'option_values']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -213,7 +214,7 @@ OrderItemFormSet = forms.inlineformset_factory(
     fields=['product', 'base_price', 'discount', 'item_value', 'quantity',
             'option_values'],
     extra=1,  # Start with 1 empty form
-    can_delete=True,  # Allow deletion of forms
+    can_delete=False,  # Deletion only on the front-end
 )
 
 
