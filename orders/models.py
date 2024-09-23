@@ -52,9 +52,7 @@ class Order(models.Model):
         # Ensure there are items before trying to calculate totals
         items = self.items.all()
         if items.exists():  # Only calculate if there are items
-            self.discount = sum(
-                (item.discount or 0) * (item.quantity or 0) for item in items
-            )
+            self.discount = sum((item.discount or 0) for item in items)
             self.order_value = sum(item.item_value for item in items)
 
     def update_order_status(self):
