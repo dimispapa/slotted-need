@@ -65,6 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             })
             .then(response => {
+                console.log(response);
                 // handle bad reponse status
                 if (!response.ok) {
                     if (response.status === 403) {
@@ -78,6 +79,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 return response.json();
             })
             .then(data => {
+                console.log(data);
                 if (data.success) {
                     // get order row element to target for deletion
                     const orderRow = document.getElementById(`order-${orderId}`);

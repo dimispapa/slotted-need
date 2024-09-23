@@ -629,7 +629,8 @@ def delete_order(request, order_id):
     # Check if the user has permission to delete this order
     # Only admins can delete
     if not request.user.is_staff:
-        print('User access not allowed. User permission is:', request.user.is_staff)
+        print('User access not allowed. User permission is:',
+              request.user.is_staff)
         messages.error(request,
                        'You do not have permission to delete this order.')
         return JsonResponse(
