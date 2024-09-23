@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.error(`There was a problem with deleting order ${orderId}:`, error);
                 displayMessages([{
                     level: 40,
-                    level_tag: 'ERROR',
+                    level_tag: 'error',
                     message: `An error occurred: ${error.message}`
                 }]);
             });
@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Create a div for each message
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('alert', 'alert-dismissible', 'fade', 'show');
-
+            debugger;
             // Determine the alert class based on message level
             switch (msg.level_tag) {
                 case 'debug':

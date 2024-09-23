@@ -5,7 +5,6 @@ from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponseBadRequest, Http404
 from django.views.decorators.http import require_POST
-from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db.models import Count, Q
 from .models import Client, Order, OrderItem, ComponentFinish
@@ -607,20 +606,18 @@ def search_clients(request):
 
 
 @require_POST  # Require a 'POST' request
-@login_required  # Ensure that only authenticated users can delete orders
 def delete_order(request, order_id):
 
     # Verify that the request is AJAX
     if not request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return HttpResponseBadRequest('Invalid request type.')
-    print('AJAX verified')
+
     # Get order object or throw a 404 error
     try:
         order = get_object_or_404(Order, id=order_id)
-        print('Order fetched')
+
     except Http404:
         messages.error(request, 'Order does not exist.')
-        print('Order not found')
         return JsonResponse(
             {'success': False,
              'messages': serialize_messages(request)},
@@ -629,8 +626,6 @@ def delete_order(request, order_id):
     # Check if the user has permission to delete this order
     # Only admins can delete
     if not request.user.is_staff:
-        print('User access not allowed. User permission is:',
-              request.user.is_staff)
         messages.error(request,
                        'You do not have permission to delete this order.')
         return JsonResponse(
