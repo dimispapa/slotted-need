@@ -2,6 +2,7 @@
 {% url 'home' as home_url %}
 {% url 'create_order' as add_order_url %}
 {% url 'orders' as orders_url %}
+{% url 'order_items' as order_items_url %}
 
 
 <!DOCTYPE html>
@@ -64,7 +65,7 @@
               </li>
               <!-- Item Tracker -->
               <li>
-                <a class="dropdown-item {% if request.path == orders_url %}active-dropdown-item"
+                <a class="dropdown-item {% if request.path == order_items_url %}active-dropdown-item"
                 aria-current="true{% endif %}" href="{% url 'order_items' %}"><i class="fa-solid fa-table-list"></i> Item Tracker</a>
               </li>
             </ul>
