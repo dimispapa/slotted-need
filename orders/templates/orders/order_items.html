@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-2 mt-md-4">
+   
+    <!-- Filter Form -->
+    <form method="get" class="form-inline mb-3">
+        <input type="text" name="search" placeholder="Search by product" value="{{ search_query }}" class="form-control mr-2">
+        
+        <select name="status" class="form-control mr-2">
+            <option value="">Filter by progress status</option>
+            {% for value in statuses %}
+                <option value="{{ value }}" {% if order_status_filter|add:'' == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        
+        <select name="paid_status" class="form-control mr-2">
+            <option value="">Filter by payment status</option>
+            {% for value in paid_statuses %}
+                <option value="{{ value }}" {% if payment_status_filter|add:'' == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+    
+    <!-- Sort Options -->
+    <div class="mb-3">
+        <strong>Sort By:</strong>
+        {% for key, field in sortable_fields.items %}
+            <a href="?{% if search_query %}search={{ search_query }}&amp;{% endif %}
+                {% if order_status_filter %}order_status={{ order_status_filter }}&amp;{% endif %}
+                {% if payment_status_filter %}payment_status={{ payment_status_filter }}&amp;{% endif %}
+                sort={{ key }}&amp;order={% if current_sort == key and current_order == 'asc' %}desc{% else %}asc{% endif %}"
+                class="btn btn-link">
+                {{ field|capfirst }} {% if current_sort == key %}
+                    {% if current_order == 'asc' %}
+                        <i class="fa fa-arrow-up"></i>
+                    {% else %}
+                        <i class="fa fa-arrow-down"></i>
+                    {% endif %}
+                {% endif %}
+            </a>
+        {% endfor %}
+    </div>
+    
+    <!-- Order Items Table -->
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Order Item ID</th>
+                <th>Client Name</th>
+                <th>Product</th>
+                <th>Item Value</th>
+                <th>Progress Status</th>
+                <th>Payment Status</th>
+                <th>Date Added</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order_items %}
+                <tr>
+                    <td>{{ item.order.id }}</td>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.order.client }}</td>
+                    <td>{{ item.product }}</td>
+                    <td>€{{ item.item_value }}</td>
+                    <td>{{ item.get_item_status_display }}</td>
+                    <td>{{ item.order.get_paid_display }}</td>
+                    <td>{{ item.order.created_on }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">No order items found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- Pagination -->
+    {% if order_items.has_other_pages %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if order_items.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ order_items.previous_page_number }}&amp;{% if search_query %}search={{ search_query }}&amp;{% endif %}
+                            {% if order_status_filter %}order_status={{ order_status_filter }}&amp;{% endif %}
+                            {% if payment_status_filter %}payment_status={{ payment_status_filter }}&amp;{% endif %}
+                            sort={{ current_sort }}&amp;order={{ current_order }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">&laquo;</span>
+                    </li>
+                {% endif %}
+                
+                {% for num in order_items.paginator.page_range %}
+                    {% if order_items.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > order_items.number|add:'-3' and num < order_items.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}&amp;{% if search_query %}search={{ search_query }}&amp;{% endif %}
+                            {% if order_status_filter %}order_status={{ order_status_filter }}&amp;{% endif %}
+                            {% if payment_status_filter %}payment_status={{ payment_status_filter }}&amp;{% endif %}
+                            sort={{ current_sort }}&amp;order={{ current_order }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if order_items.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ order_items.next_page_number }}&amp;{% if search_query %}search={{ search_query }}&amp;{% endif %}
+                            {% if order_status_filter %}order_status={{ order_status_filter }}&amp;{% endif %}
+                            {% if payment_status_filter %}payment_status={{ payment_status_filter }}&amp;{% endif %}
+                            sort={{ current_sort }}&amp;order={{ current_order }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">&raquo;</span>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+</div>
+{% endblock %}

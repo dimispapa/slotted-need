@@ -37,25 +37,35 @@
           class="navbar-toggler-icon"></span></button>
       <div class="collapse navbar-collapse" id="navbarNavDropdown">
         <ul class="navbar-nav">
+          <!-- Home -->
           <li class="nav-item">
             <a class="nav-link {% if request.path == home_url %}active"
             aria-current="page{% endif %}" href="{% url 'home' %}"><i class="fa-solid fa-house"></i> Home</a>
           </li>
+          <!-- Admin -->
           <li class="nav-item">
             <a class="nav-link" href="{% url 'admin:index' %}"><i class="fa-solid fa-gears"></i> Admin</a>
           </li>
+          <!-- Order nav dropdown -->
           <li class="nav-item dropdown" data-bs-theme="light">
             <a class="nav-link dropdown-toggle {% if request.path == add_order_url or request.path == orders_url %}active"
             aria-current="page{% endif %}" href="#" role="button" data-bs-toggle="dropdown"
               aria-expanded="false"><i class="fa-regular fa-clipboard"></i> Orders</a>
             <ul class="dropdown-menu col-6">
+              <!-- Add New Order -->
               <li>
                 <a class="dropdown-item {% if request.path == add_order_url %}active-dropdown-item"
                 aria-current="true{% endif %}" href="{% url 'create_order' %}"><i class="fa-solid fa-pen-to-square"></i> Add New Order</a>
               </li>
+              <!-- Order Tracker -->
               <li>
                 <a class="dropdown-item {% if request.path == orders_url %}active-dropdown-item"
-                aria-current="true{% endif %}" href="{% url 'orders' %}"><i class="fa-solid fa-table"></i> Order Tracker</a>
+                aria-current="true{% endif %}" href="{% url 'orders' %}"><i class="fa-solid fa-list-check"></i> Order Tracker</a>
+              </li>
+              <!-- Item Tracker -->
+              <li>
+                <a class="dropdown-item {% if request.path == orders_url %}active-dropdown-item"
+                aria-current="true{% endif %}" href="{% url 'order_items' %}"><i class="fa-solid fa-table-list"></i> Item Tracker</a>
               </li>
             </ul>
           </li>
