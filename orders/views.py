@@ -1,5 +1,6 @@
 import re
 from django.views import View
+from django.views.generic import ListView
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.exceptions import ValidationError
 from django.contrib import messages
@@ -640,3 +641,75 @@ def serialize_messages(request):
         'level_tag': message.level_tag,
         'message': message.message
     } for message in storage]
+
+
+class OrderItemListView(ListView):
+    model = OrderItem
+    template_name = 'orders/order_items.html'
+    context_object_name = 'order_items'
+    paginate_by = 20
+
+    def get_queryset(self):
+        queryset = super().get_queryset().select_related('order')
+
+        # Retrieve query parameters
+        search_query = self.request.GET.get('search', '')
+        status_filter = self.request.GET.get('status', '')
+        paid_status_filter = self.request.GET.get('paid_status', '')
+        product_filter = self.request.GET.get('product', '')
+        sort_by = self.request.GET.get('sort', 'id')
+        order = self.request.GET.get('order', 'asc')
+
+        # Client search filter
+        if search_query:
+            queryset = queryset.filter(client__name__icontains=search_query)
+
+        # Item status filter
+        if status_filter:
+            queryset = queryset.filter(item_status=status_filter)
+
+        # Payment status filter
+        if paid_status_filter:
+            queryset = queryset.filter(order__paid=paid_status_filter)
+
+        # Product design filter
+        if product_filter:
+            queryset = queryset.filter(product__name=product_filter)
+
+        # Define sortable fields
+        sortable_fields = {
+            'order': 'order__id',
+            'product': 'product',
+            'item_value': 'item_value',
+            'status': 'item_status',
+            'paid_status': 'order__paid',
+            'date_added': 'order__created_on',
+        }
+
+        # Apply sorting
+        if sort_by in sortable_fields:
+            sort_field = sortable_fields[sort_by]
+            if order == 'desc':
+                sort_field = f'-{sort_field}'
+            queryset = queryset.order_by(sort_field)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['statuses'] = OrderItem.STATUS
+        context['paid_statuses'] = Order.PAID_STATUS
+        context['search_query'] = self.request.GET.get('search', '')
+        context['status_filter'] = self.request.GET.get('status', '')
+        context['paid_status_filter'] = self.request.GET.get('paid_status', '')
+        context['current_sort'] = self.request.GET.get('sort', 'date_added')
+        context['current_order'] = self.request.GET.get('order', 'asc')
+        context['sortable_fields'] = {
+            'order': 'Order ID',
+            'product': 'Product',
+            'item value': 'Item Value',
+            'status': 'Status',
+            'paid_status': 'Payment Status',
+            'date_added': 'Date Added',
+        }
+        return context
