@@ -613,12 +613,14 @@ def delete_order(request, order_id):
     # Verify that the request is AJAX
     if not request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return HttpResponseBadRequest('Invalid request type.')
-
+    print('AJAX verified')
     # Get order object or throw a 404 error
     try:
         order = get_object_or_404(Order, id=order_id)
+        print('Order fetched')
     except Http404:
         messages.error(request, 'Order does not exist.')
+        print('Order not found')
         return JsonResponse(
             {'success': False,
              'messages': serialize_messages(request)},
@@ -627,7 +629,7 @@ def delete_order(request, order_id):
     # Check if the user has permission to delete this order
     # Only admins can delete
     if not request.user.is_staff:
-        print('User permission:', request.user.is_staff)
+        print('User access not allowed. User permission is:', request.user.is_staff)
         messages.error(request,
                        'You do not have permission to delete this order.')
         return JsonResponse(
@@ -637,6 +639,7 @@ def delete_order(request, order_id):
 
     # Delete the order
     order.delete()
+    print('Order deleted')
     messages.success(request,
                      f'Order {order_id} deleted successfully.')
     return JsonResponse(
