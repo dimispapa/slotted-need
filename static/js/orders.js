@@ -78,7 +78,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 return response.json();
             })
             .then(data => {
-                debugger;
                 if (data.success) {
                     // get order row element to target for deletion
                     const orderRow = document.getElementById(`order-${orderId}`);
@@ -173,7 +172,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // get delete button as reference point. Allow clicking on icon inside
         let deleteBtn = event.target.closest('.delete-order-btn')
         if (deleteBtn) {
-            debugger;
             // get orderId from the button value
             let orderId = deleteBtn.value;
             // Set orderId as attribute for the modal to be used for front-end deletion
@@ -188,7 +186,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // Get order ID from modal attribute
         orderId = deleteModalElement.getAttribute('data-order-id');
         if (orderId) {
-            debugger;
             // Delete item
             deleteOrder(orderId);
             // Clear the data attribute
