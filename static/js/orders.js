@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (response.status === 403) {
                         throw new Error('You do not have permission to delete this order.');
                     } else if (response.status === 404) {
-                        throw new Error('Order does not exist');
+                        throw new Error('Order was not found.');
                     } else {
                         throw new Error('Network response was not ok.');
                     }
@@ -124,7 +124,6 @@ document.addEventListener('DOMContentLoaded', function () {
             // Create a div for each message
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('alert', 'alert-dismissible', 'fade', 'show');
-            debugger;
             // Determine the alert class based on message level
             switch (msg.level_tag) {
                 case 'debug':

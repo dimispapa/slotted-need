@@ -3,11 +3,12 @@ from django.views import View
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.exceptions import ValidationError
 from django.contrib import messages
-from django.http import JsonResponse, HttpResponseBadRequest, Http404
+from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.http import require_POST
 from django.db import transaction
 from django.db.models import Count, Q
 from .models import Client, Order, OrderItem, ComponentFinish
+from .decorators import ajax_login_required, ajax_admin_required
 from products.models import (Product, Option, OptionValue, FinishOption,
                              ProductComponent, Component)
 from .forms import OrderForm, OrderItemFormSet, OrderViewForm, OrderViewFormSet
@@ -605,7 +606,9 @@ def search_clients(request):
     return JsonResponse({'error': 'POST method not allowed'}, status=405)
 
 
-@require_POST  # Require a 'POST' request
+@require_POST
+@ajax_admin_required
+@ajax_login_required
 def delete_order(request, order_id):
 
     # Verify that the request is AJAX
@@ -613,25 +616,7 @@ def delete_order(request, order_id):
         return HttpResponseBadRequest('Invalid request type.')
 
     # Get order object or throw a 404 error
-    try:
-        order = get_object_or_404(Order, id=order_id)
-
-    except Http404:
-        messages.error(request, 'Order does not exist.')
-        return JsonResponse(
-            {'success': False,
-             'messages': serialize_messages(request)},
-            status=404)
-
-    # Check if the user has permission to delete this order
-    # Only admins can delete
-    if not request.user.is_staff:
-        messages.error(request,
-                       'You do not have permission to delete this order.')
-        return JsonResponse(
-            {'success': False,
-             'messages': serialize_messages(request)},
-            status=403)
+    order = get_object_or_404(Order, id=order_id)
 
     # Delete the order
     order.delete()
