@@ -1,0 +1,26 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ title }} | Slotted Need{% endblock %}
+
+{% block extrahead %}<!-- Font Awesome script -->
+<script src="https://kit.fontawesome.com/3f60c2fc78.js" crossorigin="anonymous"></script>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">{{ site_header|default:_('Slotted Need administration') }}</a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}
+    {{ block.super }}
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'home' %}">
+            <i class="fa-solid fa-house"></i> Return to App Home
+        </a>
+    </li>
+{% endblock %}
+
+{% block content_title %}
+    {{ block.super }}
+{% endblock %}
