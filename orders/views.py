@@ -3,7 +3,9 @@ from django.views import View
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.exceptions import ValidationError
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseBadRequest, Http404
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db.models import Count, Q
 from .models import Client, Order, OrderItem, ComponentFinish
@@ -17,6 +19,7 @@ def home(request):
     return render(request, 'home.html')
 
 
+@require_POST
 # API view to check for client and return matches if any
 def check_client(request):
     if request.method == 'POST':
@@ -601,3 +604,55 @@ def search_clients(request):
 
     # If not a GET request, return a method not allowed response
     return JsonResponse({'error': 'POST method not allowed'}, status=405)
+
+
+@require_POST  # Require a 'POST' request
+@login_required  # Ensure that only authenticated users can delete orders
+def delete_order(request, order_id):
+
+    # Verify that the request is AJAX
+    if not request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return HttpResponseBadRequest('Invalid request type.')
+
+    # Get order object or throw a 404 error
+    try:
+        order = get_object_or_404(Order, id=order_id)
+    except Http404:
+        messages.error(request, 'Order does not exist.')
+        return JsonResponse(
+            {'success': False,
+             'messages': serialize_messages(request)},
+            status=404)
+
+    # Check if the user has permission to delete this order
+    # Only admins can delete
+    if not request.user.is_staff:
+        print('User permission:', request.user.is_staff)
+        messages.error(request,
+                       'You do not have permission to delete this order.')
+        return JsonResponse(
+            {'success': False,
+             'messages': serialize_messages(request)},
+            status=403)
+
+    # Delete the order
+    order.delete()
+    messages.success(request,
+                     f'Order {order_id} deleted successfully.')
+    return JsonResponse(
+        {'success': True,
+         'messages': serialize_messages(request)})
+
+
+# Helper function to serialize messages
+def serialize_messages(request):
+    """
+    Serializes Django messages into a list of dictionaries.
+    Each dictionary contains the message level and the message text.
+    """
+    storage = messages.get_messages(request)
+    return [{
+        'level': message.level,
+        'level_tag': message.level_tag,
+        'message': message.message
+    } for message in storage]
