@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Define function that deletes an order item and remaining items index
     function deleteOrder(orderId) {
         // call delete_order API to handle deletion in the backend
-        fetch(`/api/delete_order/${orderId}/`, {
+        fetch(`/api/delete-order/${orderId}/`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': csrftoken,

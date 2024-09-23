@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Return a promise when a productId is present
             return new Promise((resolve, reject) => {
                 // fetch product data from the API
-                fetch(`/api/get_product_data/${productId}/`)
+                fetch(`/api/get-product-data/${productId}/`)
                     .then(response => {
                         // Check if the response is OK (status in the range 200-299)
                         if (!response.ok) {
@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Check if an actual option value was selected
         if (optionValueId) {
-            fetch(`/api/get_finishes/${productId}/${optionValueId}/`)
+            fetch(`/api/get-finishes/${productId}/${optionValueId}/`)
                 .then(response => {
                     // Check if the response is OK (status in the range 200-299)
                     if (!response.ok) {
@@ -412,7 +412,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const formData = new FormData(this); // Capture form data
 
         // Send a POST request to the API endpoint to check client details
-        fetch('/api/check_client/', {
+        fetch('/api/check-client/', {
                 method: 'POST',
                 body: formData, // Send form data in request body
                 headers: {
