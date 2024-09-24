@@ -41,12 +41,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # third party apps
     'crispy_forms',
     'crispy_bootstrap5',
     'nested_admin',
     'rest_framework',
     'django_filters',
-    'channels',
+    # project apps
     'products',
     'orders',
 ]
@@ -63,7 +64,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ],
     # enable filtering and ordering
     'DEFAULT_FILTER_BACKENDS': [
@@ -105,14 +106,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'slotted_need.wsgi.application'
-# Channels Configuration / Asynchronous Server
-ASGI_APPLICATION = 'slotted_need.asgi.application'
 
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
-    },
-}
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
