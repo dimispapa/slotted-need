@@ -39,10 +39,11 @@ class OrderItemFilter(django_filters.FilterSet):
         model = OrderItem
         fields = [
             'order',
-            'order__client'
+            'order__client',
             'product',
-            'item_value',
+            'price_min',
+            'price_max',
             'item_status',
             'priority_level',
-            'order__paid'
+            'payment_status'
         ]
