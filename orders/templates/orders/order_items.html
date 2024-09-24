@@ -3,28 +3,28 @@
 
 {% block content %}
 <div class="container mt-2 mt-md-4">
-   
+
     <!-- Filter Form -->
     <form method="get" class="form-inline mb-3">
         <input type="text" name="search" placeholder="Search by product" value="{{ search_query }}" class="form-control mr-2">
-        
+
         <select name="status" class="form-control mr-2">
             <option value="">Filter by progress status</option>
             {% for value in statuses %}
                 <option value="{{ value }}" {% if order_status_filter|add:'' == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
             {% endfor %}
         </select>
-        
+
         <select name="paid_status" class="form-control mr-2">
             <option value="">Filter by payment status</option>
             {% for value in paid_statuses %}
                 <option value="{{ value }}" {% if payment_status_filter|add:'' == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
             {% endfor %}
         </select>
-        
+
         <button type="submit" class="btn btn-primary">Filter</button>
     </form>
-    
+
     <!-- Sort Options -->
     <div class="mb-3">
         <strong>Sort By:</strong>
@@ -44,7 +44,7 @@
             </a>
         {% endfor %}
     </div>
-    
+
     <!-- Order Items Table -->
     <table class="table table-bordered">
         <thead>
@@ -78,7 +78,7 @@
             {% endfor %}
         </tbody>
     </table>
-    
+
     <!-- Pagination -->
     {% if order_items.has_other_pages %}
         <nav aria-label="Page navigation">
