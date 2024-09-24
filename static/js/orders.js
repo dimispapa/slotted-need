@@ -18,10 +18,10 @@ document.addEventListener('DOMContentLoaded', function () {
         // loop through item status dropdowns
         itemStatusSelects.forEach(select => {
             // remove existing style classes
-            select.classList.remove('bg-primary', 'bg-warning', 'bg-success', 'bg-secondary', 'text-dark');
+            select.classList.remove('bg-pending', 'bg-warning', 'bg-success', 'bg-secondary', 'text-dark');
             // Not Started
             if (select.value == 1) {
-                select.classList.add('bg-primary');
+                select.classList.add('bg-pending', 'text-dark');
                 // In Progress
             } else if (select.value == 2) {
                 select.classList.add('bg-warning', 'text-dark');
@@ -39,13 +39,13 @@ document.addEventListener('DOMContentLoaded', function () {
         // loop through dropdowns
         paidStatusSelects.forEach(select => {
             // remove existing style classes
-            select.classList.remove('bg-pending', 'bg-secondary', 'text-decoration-line-through', 'text-light');
+            select.classList.remove('bg-danger-light', 'bg-secondary', 'text-light');
             // Not Paid
             if (select.value == 1) {
-                select.classList.add('bg-pending');
+                select.classList.add('bg-danger-light');
                 // Fully Paid
             } else if (select.value == 2) {
-                select.classList.add('bg-secondary', 'text-decoration-line-through', 'text-light');
+                select.classList.add('bg-secondary', 'text-light');
             }
             // Add listener to update styling on change
             select.addEventListener('change', updateSelectStyle);

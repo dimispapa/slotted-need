@@ -15,12 +15,12 @@
           <tr>
             <th scope="col" class="sticky-head"></th>
             <th scope="col" class="sticky-head">Order ID</th>
+            <th scope="col" class="sticky-head">Created On</th>
+            <th scope="col" class="sticky-head">Updated On</th>
             <th scope="col" class="sticky-head">Client</th>
             <th scope="col" class="sticky-head">Discount</th>
             <th scope="col" class="sticky-head">Deposit</th>
             <th scope="col" class="sticky-head">Order Value</th>
-            <th scope="col" class="sticky-head">Created On</th>
-            <th scope="col" class="sticky-head">Updated On</th>
             <th scope="col" class="sticky-head">Order Status</th>
             <th scope="col" class="sticky-head">Payment Status</th>
             <th scope="col" class="sticky-head"></th>
@@ -30,9 +30,9 @@
           <!-- loop through order and form objects -->
           {% for order_set in order_data %}
           <!-- Apply conditional classes based on order status and paid status -->
-          <tr {% if order_set.order.order_status == 4 and order_set.order.paid == 1 %} class="table-warning"
+          <tr {% if order_set.order.order_status == 4 and order_set.order.paid == 1 %} class="table-danger"
             {% elif order_set.order.order_status == 4 and order_set.order.paid == 2 %}
-            class="table-secondary text-decoration-line-through opacity-50" {% endif %} id="order-{{ order_set.order.id  }}">
+            class="table-secondary opacity-50" {% endif %} id="order-{{ order_set.order.id  }}">
             <!-- Populate order row values -->
             <td>
               <!-- Toggle Button -->
@@ -42,15 +42,21 @@
                 <i class="fa-solid fa-chevron-down"></i>
               </button>
             </td>
-            <th scope="row">{{ order_set.order.id }}</th>
-            <td>{{ order_set.order.client.client_name }}</td>
-            <td>
+            <th scope="row" class="table-info {% if order_set.order.order_status == 4 and order_set.order.paid == 2 %}text-decoration-line-through{% endif %}">{{ order_set.order.id }}</th>
+            <th scope="row" class="table-info {% if order_set.order.order_status == 4 and order_set.order.paid == 2 %}text-decoration-line-through{% endif %}">{{ order_set.order.created_on|date:"d/m/y" }}</th>
+            <th scope="row" class="table-info {% if order_set.order.order_status == 4 and order_set.order.paid == 2 %}text-decoration-line-through{% endif %}">
+              {% if order_set.order.updated_on|date:"d/m/y" == order_set.order.created_on|date:"d/m/y" %}
+              -
+              {% else %}
+              {{ order_set.order.updated_on|date:"d/m/y" }}
+              {% endif %}
+            </th>
+            <td {% if order_set.order.order_status == 4 and order_set.order.paid == 2 %}class="text-decoration-line-through"{% endif %}>{{ order_set.order.client.client_name }}</td>
+            <td {% if order_set.order.order_status == 4 and order_set.order.paid == 2 %}class="text-decoration-line-through"{% endif %}>
               €{{ order_set.order.discount|default_if_none:"0.00" }}
             </td>
-            <td>€{{ order_set.order.deposit|default_if_none:"0.00" }}</td>
-            <td>€{{ order_set.order.order_value }}</td>
-            <td>{{ order_set.order.created_on }}</td>
-            <td>{{ order_set.order.updated_on }}</td>
+            <td {% if order_set.order.order_status == 4 and order_set.order.paid == 2 %}class="text-decoration-line-through"{% endif %}>€{{ order_set.order.deposit|default_if_none:"0.00" }}</td>
+            <td {% if order_set.order.order_status == 4 and order_set.order.paid == 2 %}class="text-decoration-line-through"{% endif %}>€{{ order_set.order.order_value }}</td>
             <td>
               <span class="badge 
               {% if order_set.order.order_status == 2 %}
@@ -60,7 +66,7 @@
               {% elif order_set.order.order_status == 4 %}
                 bg-secondary
               {% else %}
-                bg-primary
+                bg-pending text-dark
               {% endif %}
             ">
                 {{ order_set.order.get_order_status_display }}
@@ -84,7 +90,6 @@
                     <tr>
                       <th scope="col">Item ID</th>
                       <th scope="col">Product</th>
-                      <th scope="col">Quantity</th>
                       <th scope="col">Item Value</th>
                       <th scope="col">Product Finish</th>
                       <th scope="col">Design Options</th>
@@ -105,29 +110,26 @@
                       <!-- Render order item data -->
                       <th scope="row">{{ form_item.instance.id }}</th>
                       <td>{{ form_item.instance.product.name }}</td>
-                      <td>{{ form_item.instance.quantity }}</td>
                       <td>€{{ form_item.instance.item_value }}</td>
-                      <td>{{ form_item.instance.product_finish|default_if_none:"No selection" }}</td>
+                      <td>{{ form_item.instance.product_finish|default_if_none:"-" }}</td>
                       <td>
                         <!-- Render option values -->
                         <ul>
                           {% for option_value in form_item.instance.option_values.all %}
-                          <li>{{ option_value.option.name }} - {{ option_value.value }}</li>
+                          <li>{{ option_value.value }}</li>
                           {% empty %}
-                          No selection
+                          -
                           {% endfor %}
                         </ul>
                       </td>
                       <td>
                         <!-- Render finishes -->
                         <ul>
-                          {% if form_item.instance.item_component_finishes.all %}
                           {% for finish in form_item.instance.item_component_finishes.all %}
                           <li>{{ finish.component.name }} - {{ finish.finish_option.name }}</li>
+                          {% empty %}
+                          -
                           {% endfor %}
-                          {% else %}
-                          No selection
-                          {% endif %}
                         </ul>
                       </td>
                       <!-- Render item status form field -->
