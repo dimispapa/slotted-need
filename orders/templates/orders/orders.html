@@ -9,7 +9,7 @@
     {% csrf_token %}
     <!-- Orders table -->
     <div class="table-responsive order mb-3 table-container">
-      <table id="orders-table" class="table table-striped table-hover">
+      <table id="orders-table" class="table shadow table-hover">
         <!-- table headers -->
         <thead class="sticky-head">
           <tr>
@@ -26,7 +26,7 @@
             <th scope="col" class="sticky-head"></th>
           </tr>
         </thead>
-        <tbody class="shadow table-secondary">
+        <tbody class="table-secondary">
           <!-- loop through order and form objects -->
           {% for order_set in order_data %}
           <!-- Apply conditional classes based on order status and paid status -->
