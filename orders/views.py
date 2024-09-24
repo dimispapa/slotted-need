@@ -1,18 +1,24 @@
 import re
 from django.views import View
-from django.views.generic import ListView
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.http import require_POST
+from django.views.generic import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import Count, Q
+from rest_framework import viewsets, permissions
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 from .models import Client, Order, OrderItem, ComponentFinish
 from .decorators import ajax_login_required, ajax_admin_required
 from products.models import (Product, Option, OptionValue, FinishOption,
                              ProductComponent, Component)
 from .forms import OrderForm, OrderItemFormSet, OrderViewForm, OrderViewFormSet
+from .filters import OrderItemFilter
+from .serializers import OrderItemSerializer
 
 
 # View that renders the home template
@@ -643,73 +649,48 @@ def serialize_messages(request):
     } for message in storage]
 
 
-class OrderItemListView(ListView):
-    model = OrderItem
-    template_name = 'orders/order_items.html'
-    context_object_name = 'order_items'
-    paginate_by = 20
+class OrderItemViewSet(viewsets.ModelViewSet):
+    """
+    A ViewSet for viewing and editing OrderItem instances.
+    """
+    queryset = OrderItem.objects.select_related(
+        'order__client', 'product').all().order_by('-id')
+    serializer_class = OrderItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filterset_class = OrderItemFilter
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    ordering_fields = [
+        'id',
+        'order__id',
+        'order__client__name',
+        'product__name',
+        'item_value',
+        'item_status',
+        'priority_level',
+        'order__paid',
+    ]
+    ordering = ['id']  # Default ordering
 
     def get_queryset(self):
-        queryset = super().get_queryset().select_related('order')
-
-        # Retrieve query parameters
-        search_query = self.request.GET.get('search', '')
-        status_filter = self.request.GET.get('status', '')
-        paid_status_filter = self.request.GET.get('paid_status', '')
-        product_filter = self.request.GET.get('product', '')
-        sort_by = self.request.GET.get('sort', 'id')
-        order = self.request.GET.get('order', 'asc')
-
-        # Client search filter
-        if search_query:
-            queryset = queryset.filter(client__name__icontains=search_query)
-
-        # Item status filter
-        if status_filter:
-            queryset = queryset.filter(item_status=status_filter)
-
-        # Payment status filter
-        if paid_status_filter:
-            queryset = queryset.filter(order__paid=paid_status_filter)
-
-        # Product design filter
-        if product_filter:
-            queryset = queryset.filter(product__name=product_filter)
-
-        # Define sortable fields
-        sortable_fields = {
-            'order': 'order__id',
-            'product': 'product',
-            'item_value': 'item_value',
-            'status': 'item_status',
-            'paid_status': 'order__paid',
-            'date_added': 'order__created_on',
-        }
-
-        # Apply sorting
-        if sort_by in sortable_fields:
-            sort_field = sortable_fields[sort_by]
-            if order == 'desc':
-                sort_field = f'-{sort_field}'
-            queryset = queryset.order_by(sort_field)
-
+        """
+        Optionally restricts the returned OrderItems to a given user,
+        by filtering against a `username` query parameter in the URL.
+        """
+        queryset = self.queryset
         return queryset
+
+
+class OrderItemListView(LoginRequiredMixin, TemplateView):
+    """
+    Renders the OrderItem management page.
+    Only accessible to authenticated users.
+    """
+    template_name = 'orders/order_items.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['statuses'] = OrderItem.STATUS
-        context['paid_statuses'] = Order.PAID_STATUS
-        context['search_query'] = self.request.GET.get('search', '')
-        context['status_filter'] = self.request.GET.get('status', '')
-        context['paid_status_filter'] = self.request.GET.get('paid_status', '')
-        context['current_sort'] = self.request.GET.get('sort', 'date_added')
-        context['current_order'] = self.request.GET.get('order', 'asc')
-        context['sortable_fields'] = {
-            'order': 'Order ID',
-            'product': 'Product',
-            'item value': 'Item Value',
-            'status': 'Status',
-            'paid_status': 'Payment Status',
-            'date_added': 'Date Added',
-        }
+        # Extract choices from the OrderItem model
+        context['item_status_choices'] = OrderItem.STATUS_CHOICES
+        context['priority_level_choices'] = OrderItem.PRIORITY_CHOICES
+        context['payment_status_choices'] = Order.PAID_CHOICES
         return context
