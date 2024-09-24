@@ -16,8 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from .apis import router
 
 urlpatterns = [
+    # Admin site
     path('admin/', admin.site.urls),
+    # API endpoints
+    path('api/', include(router.urls)),
+    # Frontend views
     path('', include('orders.urls'), name='orders-urls'),
+    # DRF login/logout views
+    path('api-auth/', include('rest_framework.urls')),
 ]
