@@ -26,12 +26,12 @@
             <th scope="col" class="sticky-head"></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="shadow table-secondary">
           <!-- loop through order and form objects -->
           {% for order_set in order_data %}
           <!-- Apply conditional classes based on order status and paid status -->
           <tr {% if order_set.order.order_status == 4 and order_set.order.paid == 1 %} class="table-danger"
-            {% elif order_set.order.order_status == 4 and order_set.order.paid == 2 %} class="table-dark opacity-75"
+            {% elif order_set.order.order_status == 4 and order_set.order.paid == 2 %} class="table-light opacity-50 shadow-none"
             {% endif %} id="order-{{ order_set.order.id  }}">
             <!-- Populate order row values -->
             <td>
@@ -42,34 +42,21 @@
                 <i class="fa-solid fa-chevron-down"></i>
               </button>
             </td>
-            <th scope="row"
-              class="table-dark text-light {% if order_set.order.order_status == 4 and order_set.order.paid == 2 %}text-decoration-line-through{% endif %}">
+            <th scope="row">
               {{ order_set.order.id }}</th>
-            <th scope="row"
-              class="table-dark text-light {% if order_set.order.order_status == 4 and order_set.order.paid == 2 %}text-decoration-line-through{% endif %}">
+            <th scope="row">
               {{ order_set.order.created_on|date:"d/m/y" }}</th>
-            <th scope="row"
-              class="table-dark text-light {% if order_set.order.order_status == 4 and order_set.order.paid == 2 %}text-decoration-line-through{% endif %}">
+            <th scope="row">
               {% if order_set.order.updated_on|date:"d/m/y" == order_set.order.created_on|date:"d/m/y" %}
               -
               {% else %}
               {{ order_set.order.updated_on|date:"d/m/y" }}
               {% endif %}
             </th>
-            <td
-              {% if order_set.order.order_status == 4 and order_set.order.paid == 2 %}class="text-decoration-line-through"
-              {% endif %}>{{ order_set.order.client.client_name }}</td>
-            <td
-              {% if order_set.order.order_status == 4 and order_set.order.paid == 2 %}class="text-decoration-line-through"
-              {% endif %}>
-              €{{ order_set.order.discount|default_if_none:"0.00" }}
-            </td>
-            <td
-              {% if order_set.order.order_status == 4 and order_set.order.paid == 2 %}class="text-decoration-line-through"
-              {% endif %}>€{{ order_set.order.deposit|default_if_none:"0.00" }}</td>
-            <td
-              {% if order_set.order.order_status == 4 and order_set.order.paid == 2 %}class="text-decoration-line-through"
-              {% endif %}>€{{ order_set.order.order_value }}</td>
+            <td>{{ order_set.order.client.client_name }}</td>
+            <td>€{{ order_set.order.discount|default_if_none:"0.00" }}</td>
+            <td>€{{ order_set.order.deposit|default_if_none:"0.00" }}</td>
+            <td>€{{ order_set.order.order_value }}</td>
             <td>
               <!-- Order Status badge -->
               <span class="badge position-relative 
