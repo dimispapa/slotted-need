@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container mt-2 mt-md-4">
   <!-- Form start -->
-  <form method="post" id="order-list-form" action="{% url 'orders' %}">
+  <form method="post" id="order-list-form" action="{% url 'order_tracker' %}">
     {% csrf_token %}
     <!-- Orders table -->
     <div class="table-responsive order mb-3 table-container">
@@ -203,5 +203,5 @@
 
 {% block extra_scripts %}
 <!-- External JS logic -->
-<script type="text/javascript" src="{% static 'js/orders.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/order_tracker.js' %}"></script>
 {% endblock %}
