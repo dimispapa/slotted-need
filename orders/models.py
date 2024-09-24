@@ -37,10 +37,10 @@ class Order(models.Model):
         editable=False,  # Prevents editing in forms and admin
     )
     # create a PAID status mapping to use as choices for order_status
-    PAID_STATUS = {1: 'Not Paid',
-                   2: 'Fully Paid'}
+    PAID_CHOICES = {1: 'Not Paid',
+                    2: 'Fully Paid'}
     paid = models.IntegerField(
-        choices=PAID_STATUS,
+        choices=PAID_CHOICES,
         default=1
     )
     created_on = models.DateTimeField(auto_now_add=True)
@@ -121,20 +121,20 @@ class OrderItem(models.Model):
                                        related_name='order_items'
                                        )
     # create a status mapping to use as choices for order_status
-    STATUS = {1: 'Not Started',
-              2: 'In Progress',
-              3: 'Made',
-              4: 'Delivered'}
+    STATUS_CHOICES = {1: 'Not Started',
+                      2: 'In Progress',
+                      3: 'Made',
+                      4: 'Delivered'}
     item_status = models.IntegerField(
-        choices=STATUS,
+        choices=STATUS_CHOICES,
         default=1
     )
     # create a priority level field and use a mapping for choices
-    PRIORITY = {1: 'Low',
-                2: 'Medium',
-                3: 'High'}
+    PRIORITY_CHOICES = {1: 'Low',
+                        2: 'Medium',
+                        3: 'High'}
     priority_level = models.IntegerField(
-        choices=PRIORITY,
+        choices=PRIORITY_CHOICES,
         default=1
     )
 
