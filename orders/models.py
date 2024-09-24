@@ -129,6 +129,14 @@ class OrderItem(models.Model):
         choices=STATUS,
         default=1
     )
+    # create a priority level field and use a mapping for choices
+    PRIORITY = {1: 'Low',
+                2: 'Medium',
+                3: 'High'}
+    priority_level = models.IntegerField(
+        choices=PRIORITY,
+        default=1
+    )
 
     def save(self, *args, **kwargs):
         # Ensure base_price and discount are converted from None
