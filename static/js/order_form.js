@@ -1,20 +1,19 @@
-// Global constants definition
-const OPTION_COL_STYLES = ['col-12', 'col-sm-6', 'col-md-4', 'col-lg-3', 'shadow', 'border',
-    'mb-2', 'mb-md-3', 'pt-1', 'pt-md-2', 'rounded'
-];
-const OPTION_GROUP_STYLES = "col-12 form-group mb-2 mb-md-3";
-const clientModal = new bootstrap.Modal(document.getElementById('clientConflictModal'));
-const deleteModalElement = document.getElementById('DeleteConfirmationModal');
-const deleteModal = new bootstrap.Modal(document.getElementById('DeleteConfirmationModal'));
-const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
-const emptyFormTemplate = document.getElementById('empty-form-template').innerHTML;
-const totalForms = document.getElementById('id_items-TOTAL_FORMS');
-const maxForms = document.getElementById('id_items-MAX_NUM_FORMS');
-const orderItemsContainer = document.getElementById('order-items');
-const orderFormOrderValueField = document.getElementById('order_value');
-
-
 document.addEventListener('DOMContentLoaded', function () {
+
+    // Global constants definition
+    const OPTION_COL_STYLES = ['col-12', 'col-sm-6', 'col-md-4', 'col-lg-3', 'shadow', 'border',
+        'mb-2', 'mb-md-3', 'pt-1', 'pt-md-2', 'rounded'
+    ];
+    const OPTION_GROUP_STYLES = "col-12 form-group mb-2 mb-md-3";
+    const clientModal = new bootstrap.Modal(document.getElementById('clientConflictModal'));
+    const deleteModalElement = document.getElementById('DeleteConfirmationModal');
+    const deleteModal = new bootstrap.Modal(document.getElementById('DeleteConfirmationModal'));
+    const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
+    const emptyFormTemplate = document.getElementById('empty-form-template').innerHTML;
+    const totalForms = document.getElementById('id_items-TOTAL_FORMS');
+    const maxForms = document.getElementById('id_items-MAX_NUM_FORMS');
+    const orderItemsContainer = document.getElementById('order-items');
+    const orderFormOrderValueField = document.getElementById('order_value');
 
     // ************** SECTION A: FUNCTION DEFINITIONS ********************************************************************
 
