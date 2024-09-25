@@ -8,7 +8,7 @@ class OrderItemFilter(django_filters.FilterSet):
         lookup_expr='exact')
 
     client = django_filters.NumberFilter(
-        field_name='order__client__name',
+        field_name='order__client__client_name',
         lookup_expr='icontains')
 
     product = django_filters.CharFilter(
@@ -39,7 +39,7 @@ class OrderItemFilter(django_filters.FilterSet):
         model = OrderItem
         fields = [
             'order',
-            'order__client',
+            'client',
             'product',
             'price_min',
             'price_max',
