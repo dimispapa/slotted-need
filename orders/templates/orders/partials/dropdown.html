@@ -1,0 +1,9 @@
+{% comment %} 
+"Usage: {% include 'orders/partials/dropdown.html' with options=variable selected=value class='additional-class' id='element-id' %}" 
+{% endcomment %}
+<select class="{{ class }}" id="{{ id }}">
+    <option value="">All</option>
+    {% for option_value, option_display in options %}
+        <option value="{{ option_value }}" {% if option_value == selected %}selected{% endif %}>{{ option_display }}</option>
+    {% endfor %}
+</select>

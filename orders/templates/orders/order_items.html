@@ -37,28 +37,13 @@
                     <input type="number" id="filter-price-max" placeholder="Max Price" />
                 </th>
                 <th>
-                    <select id="filter-item-status">
-                        <option value="">All</option>
-                        {% for status, display in item_status_choices %}
-                        <option value="{{ status }}">{{ display }}</option>
-                        {% endfor %}
-                    </select>
+                    {% include 'orders/partials/dropdown.html' with options=item_status_choices selected="" class="filter-item-status" id="filter-item-status" %}
                 </th>
                 <th>
-                    <select id="filter-priority-level">
-                        <option value="">All</option>
-                        {% for level, display in priority_level_choices %}
-                        <option value="{{ level }}">{{ display }}</option>
-                        {% endfor %}
-                    </select>
+                    {% include 'orders/partials/dropdown.html' with options=priority_level_choices selected="" class="filter-priority-level" id="filter-priority-level" %}
                 </th>
                 <th>
-                    <select id="filter-payment-status">
-                        <option value="">All</option>
-                        {% for status, display in payment_status_choices %}
-                        <option value="{{ status }}">{{ display }}</option>
-                        {% endfor %}
-                    </select>
+                    {% include 'orders/partials/dropdown.html' with options=payment_status_choices selected="" class="filter-payment-status" id="filter-payment-status" %}
                 </th>
                 <th></th> <!-- No filter for actions -->
             </tr>
@@ -119,5 +104,5 @@
 {% endblock %}
 
 {% block extra_scripts %}
-
+<script src="{% static 'js/item_tracker.js' %}"></script>
 {% endblock %}
