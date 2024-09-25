@@ -1,4 +1,5 @@
 import re
+import json
 from django.views import View
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.exceptions import ValidationError
@@ -649,12 +650,13 @@ def serialize_messages(request):
     } for message in storage]
 
 
+# define viewset that feeds the order_items API
 class OrderItemViewSet(viewsets.ModelViewSet):
     """
     A ViewSet for viewing and editing OrderItem instances.
     """
     queryset = OrderItem.objects.select_related(
-        'order__client', 'product').all().order_by('-id')
+        'order', 'product').all().order_by('-id')
     serializer_class = OrderItemSerializer
     permission_classes = [permissions.IsAuthenticated]
     filterset_class = OrderItemFilter
@@ -662,7 +664,7 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     ordering_fields = [
         'id',
         'order__id',
-        'order__client__name',
+        'order__client__client_name',
         'product__name',
         'item_value',
         'item_status',
@@ -693,4 +695,12 @@ class OrderItemListView(LoginRequiredMixin, TemplateView):
         context['item_status_choices'] = OrderItem.STATUS_CHOICES
         context['priority_level_choices'] = OrderItem.PRIORITY_CHOICES
         context['payment_status_choices'] = Order.PAID_CHOICES
+
+        # Serialize choices to JSON for JavaScript
+        context['item_status_choices_json'] = json.dumps(
+            context['item_status_choices'])
+        context['priority_level_choices_json'] = json.dumps(
+            context['priority_level_choices'])
+        context['payment_status_choices_json'] = json.dumps(
+            context['payment_status_choices'])
         return context

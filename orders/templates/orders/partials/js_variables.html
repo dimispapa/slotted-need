@@ -1,0 +1,9 @@
+{% comment %}
+"This partial renders JavaScript variables from Django context variables"
+{% endcomment %}
+<script type="text/javascript">
+    // Ensure that the variables are safely serialized to JSON
+    let itemStatusChoices = {{ item_status_choices_json|safe }};
+    let priorityLevelChoices = {{ priority_level_choices_json|safe }};
+    let paymentStatusChoices = {{ payment_status_choices_json|safe }};
+</script>
