@@ -1,8 +1,16 @@
 from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
-from .models import OrderItem, Order, Product
+from .models import OrderItem, Order, Product, Client
+
+
+class ClientSerializer(ModelSerializer):
+    class Meta:
+        model = Client
+        fields = ['id', 'client_name', 'client_phone', 'client_email']
 
 
 class OrderSerializer(ModelSerializer):
+    client = ClientSerializer(read_only=True)
+
     class Meta:
         model = Order
         fields = ['id', 'client', 'paid', 'created_on']
@@ -42,6 +50,5 @@ class OrderItemSerializer(ModelSerializer):
             'item_component_finishes',
             'item_status',
             'priority_level',
-            'paid',
         ]
         read_only_fields = ['id', 'order', 'product', 'order_id', 'product_id']
