@@ -2,6 +2,7 @@ $(document).ready(function() {
 
     // Global constants definition
     const csrftoken = document.querySelector("meta[name='csrf-token']").content;
+    const pageSize = 25;
 
     // Setup AJAX to include CSRF token
     $.ajaxSetup({
@@ -17,6 +18,9 @@ $(document).ready(function() {
     let table = $('#orderitem-table').DataTable({
         serverSide: true,  // Enable server-side processing
         processing: true,
+        scrollY: true,  // Enable vertical scrolling
+        scrollX: true,  // Enable horizontal scrolling
+        pageLength: pageSize,
         ajax: {
             url: '/api/order_items/',
             type: 'GET',
@@ -25,7 +29,7 @@ $(document).ready(function() {
 
                 // Calculate page number and page size
                 let start = parseInt(d.start) || 0;
-                let length = parseInt(d.length) || 10;
+                let length = parseInt(d.length) || pageSize;
                 let page = Math.floor(start / length) + 1;
 
                 // Assign page and page size
@@ -55,8 +59,7 @@ $(document).ready(function() {
             dataSrc: function(json) {
                 // Map API response to DataTables expected format
                 json.recordsTotal = json.count;
-                json.recordsFiltered = json.count;  // Adjust if you have separate counts
-                console.log(json.results);
+                json.recordsFiltered = json.count;
                 return json.results;
             },
         },
@@ -68,9 +71,9 @@ $(document).ready(function() {
             { data: 'item_value' },
             { data: 'item_status', name: 'item_status', render: function(data, type, row) {
                 if(type === 'display'){
-                    var select = '<select class="form-control item-status" data-id="' + row.id + '">';
+                    let select = '<select class="form-control item-status" data-id="' + row.id + '">';
                     select += '<option value="">All</option>';
-                    // Assuming itemStatusChoices is a global variable passed from the template
+                    // Use global variable passed from context into JS
                     itemStatusChoices.forEach(function(option) {
                         select += '<option value="' + option[0] + '"' + (option[0] === data ? ' selected' : '') + '>' + option[1] + '</option>';
                     });
@@ -81,8 +84,9 @@ $(document).ready(function() {
             }},
             { data: 'priority_level', name: 'priority_level', render: function(data, type, row) {
                 if(type === 'display'){
-                    var select = '<select class="form-control priority-level" data-id="' + row.id + '">';
+                    let select = '<select class="form-control priority-level" data-id="' + row.id + '">';
                     select += '<option value="">All</option>';
+                    // Use global variable passed from context into JS
                     priorityLevelChoices.forEach(function(option) {
                         select += '<option value="' + option[0] + '"' + (option[0] === data ? ' selected' : '') + '>' + option[1] + '</option>';
                     });
@@ -93,8 +97,9 @@ $(document).ready(function() {
             }},
             { data: 'order.paid', name: 'payment_status', render: function(data, type, row) {
                 if(type === 'display'){
-                    var select = '<select class="form-control payment-status" data-id="' + row.id + '">';
+                    let select = '<select class="form-control payment-status" data-id="' + row.id + '">';
                     select += '<option value="">All</option>';
+                    // Use global variable passed from context into JS
                     paymentStatusChoices.forEach(function(option) {
                         select += '<option value="' + option[0] + '"' + (option[0] === data ? ' selected' : '') + '>' + option[1] + '</option>';
                     });
@@ -109,5 +114,26 @@ $(document).ready(function() {
         ],
         order: [[0, 'asc']],  // Default ordering by ID ascending
     });
+
+    // Function to reload table with new filters
+    function applyFilters() {
+        table.ajax.reload();
+    }
+
+    // Debounce function to limit the rate of function execution
+    function debounce(func, delay) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), delay);
+        }
+    }
+
+    // Event listeners for filter inputs with debounce
+    $('#filter-id, #filter-order, #filter-client, #filter-product, #filter-quantity-min, #filter-quantity-max, #filter-price-min, '
+        + '#filter-price-max, #filter-item-status, #filter-priority-level, #filter-payment-status').on('keyup change', debounce(function() {
+        applyFilters();
+    }, 300));
+    
 
 })
