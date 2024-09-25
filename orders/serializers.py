@@ -45,9 +45,6 @@ class OrderItemSerializer(ModelSerializer):
             'order_id',
             'product_id',
             'item_value',
-            'option_values',
-            'product_finish',
-            'item_component_finishes',
             'item_status',
             'priority_level',
         ]

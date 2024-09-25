@@ -37,8 +37,9 @@ $(document).ready(function() {
                 d.length = length;
 
                 // Filtering parameters based on filters.py
-                d.order = $('#filter-order').val();
-                d.client = $('#filter-client').val();
+                d.id = $('#filter-id').val();
+                d.order_id = $('#filter-order').val();
+                d.client_name = $('#filter-client').val();
                 d.product = $('#filter-product').val();
                 d.price_min = $('#filter-price-min').val();
                 d.price_max = $('#filter-price-max').val();
@@ -47,6 +48,8 @@ $(document).ready(function() {
                 d.payment_status = $('#filter-payment-status').val();
 
                 // Ordering parameters
+                // WARNING: "order" is a reserved array name to store sorting instructions
+                // Avoid using the "order" attribute to store other data that can cause conflicts.
                 if (d.order && d.order.length > 0) {
                     let orderColumnIndex = d.order[0].column;
                     let orderDir = d.order[0].dir;
@@ -60,6 +63,7 @@ $(document).ready(function() {
                 // Map API response to DataTables expected format
                 json.recordsTotal = json.count;
                 json.recordsFiltered = json.count;
+                console.log(json.results);
                 return json.results;
             },
         },
@@ -69,9 +73,9 @@ $(document).ready(function() {
             { data: 'order.client.client_name', name: 'order__client__client_name' },
             { data: 'product.name', name: 'product__name' },
             { data: 'item_value' },
-            { data: 'item_status', name: 'item_status', render: function(data, type, row) {
+            { data: 'item_status', render: function(data, type, row) {
                 if(type === 'display'){
-                    let select = '<select class="form-control item-status" data-id="' + row.id + '">';
+                    let select = '<select class="form-select item-status" data-id="' + row.id + '">';
                     select += '<option value="">All</option>';
                     // Use global variable passed from context into JS
                     itemStatusChoices.forEach(function(option) {
@@ -82,9 +86,9 @@ $(document).ready(function() {
                 }
                 return data;
             }},
-            { data: 'priority_level', name: 'priority_level', render: function(data, type, row) {
+            { data: 'priority_level', render: function(data, type, row) {
                 if(type === 'display'){
-                    let select = '<select class="form-control priority-level" data-id="' + row.id + '">';
+                    let select = '<select class="form-select priority-level" data-id="' + row.id + '">';
                     select += '<option value="">All</option>';
                     // Use global variable passed from context into JS
                     priorityLevelChoices.forEach(function(option) {
@@ -95,9 +99,9 @@ $(document).ready(function() {
                 }
                 return data;
             }},
-            { data: 'order.paid', name: 'payment_status', render: function(data, type, row) {
+            { data: 'order.paid', name: 'order__paid', render: function(data, type, row) {
                 if(type === 'display'){
-                    let select = '<select class="form-control payment-status" data-id="' + row.id + '">';
+                    let select = '<select class="form-select payment-status" data-id="' + row.id + '">';
                     select += '<option value="">All</option>';
                     // Use global variable passed from context into JS
                     paymentStatusChoices.forEach(function(option) {
@@ -109,10 +113,10 @@ $(document).ready(function() {
                 return data;
             }},
             { data: null, orderable: false, searchable: false, render: function(data, type, row) {
-                return '<button class="btn btn-danger btn-sm delete-orderitem action-btn" data-id="' + row.id + '">Delete</button>';
+                return '<button class="btn btn-danger btn-sm delete-orderitem action-btn" data-id="' + row.id + '"><i class="fa-solid fa-trash"></i></button>';
             }},
         ],
-        order: [[0, 'asc']],  // Default ordering by ID ascending
+        id: [[0, 'asc']],  // Default ordering by ID ascending
     });
 
     // Function to reload table with new filters
@@ -130,10 +134,9 @@ $(document).ready(function() {
     }
 
     // Event listeners for filter inputs with debounce
-    $('#filter-id, #filter-order, #filter-client, #filter-product, #filter-quantity-min, #filter-quantity-max, #filter-price-min, '
+    $('#filter-id, #filter-order, #filter-client, #filter-product, #filter-price-min, '
         + '#filter-price-max, #filter-item-status, #filter-priority-level, #filter-payment-status').on('keyup change', debounce(function() {
         applyFilters();
     }, 300));
-    
 
 })

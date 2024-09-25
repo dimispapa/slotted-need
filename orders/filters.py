@@ -3,11 +3,16 @@ from .models import OrderItem, Order
 
 
 class OrderItemFilter(django_filters.FilterSet):
-    order = django_filters.NumberFilter(
+
+    id = django_filters.NumberFilter(
+        field_name='id',
+        lookup_expr='exact')
+
+    order_id = django_filters.NumberFilter(
         field_name='order__id',
         lookup_expr='exact')
 
-    client = django_filters.NumberFilter(
+    client_name = django_filters.CharFilter(
         field_name='order__client__client_name',
         lookup_expr='icontains')
 
@@ -38,8 +43,9 @@ class OrderItemFilter(django_filters.FilterSet):
     class Meta:
         model = OrderItem
         fields = [
-            'order',
-            'client',
+            'id',
+            'order_id',
+            'client_name',
             'product',
             'price_min',
             'price_max',
