@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .apis import router
+from orders.apis import router
 
 urlpatterns = [
     # Admin site
