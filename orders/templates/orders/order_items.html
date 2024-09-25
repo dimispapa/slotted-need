@@ -21,6 +21,9 @@
                 <th>Order ID</th>
                 <th>Client Name</th>
                 <th>Product</th>
+                <th>Design Options</th>
+                <th>Product Finish</th>
+                <th>Component Finishes</th>
                 <th>Value</th>
                 <th>Item Status</th>
                 <th>Priority Level</th>
@@ -28,13 +31,16 @@
                 <th>Actions</th>
             </tr>
             <tr class="filter-row">
-                <th><input type="text" id="filter-id" placeholder="Filter ID" /></th>
+                <th><input type="number" id="filter-id" placeholder="Filter ID" /></th>
                 <th><input type="number" id="filter-order" placeholder="Filter Order ID" /></th>
                 <th><input type="text" id="filter-client" placeholder="Filter Client Name" /></th>
                 <th><input type="text" id="filter-product" placeholder="Filter Product" /></th>
+                <th><input type="text" id="filter-design-options" placeholder="Filter Design Options" /></th>
+                <th><input type="text" id="filter-product-finish" placeholder="Filter Product Finish" /></th>
+                <th><input type="text" id="filter-component-finishes" placeholder="Filter Component Finishes" /></th>
                 <th>
-                    <input type="number" id="filter-price-min" placeholder="Min Price" />
-                    <input type="number" id="filter-price-max" placeholder="Max Price" />
+                    <input type="number" id="filter-price-min" placeholder="Min Value" />
+                    <input type="number" id="filter-price-max" placeholder="Max Value" />
                 </th>
                 <th>
                     {% include 'orders/partials/dropdown.html' with options=item_status_choices selected="" class="filter-item-status" id="filter-item-status" %}

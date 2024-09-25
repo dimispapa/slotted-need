@@ -655,23 +655,40 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     """
     A ViewSet for viewing and editing OrderItem instances.
     """
-    queryset = OrderItem.objects.select_related(
-        'order', 'product').all().order_by('-id')
+    # fetch queryset with optimised query for related objects
+    queryset = OrderItem.objects.\
+        select_related('order', 'product', 'product_finish').\
+        prefetch_related('option_values',
+                         'item_component_finishes__component',
+                         'item_component_finishes__finish_option'
+                         ).all().order_by('-id')
+
     serializer_class = OrderItemSerializer
     permission_classes = [permissions.IsAuthenticated]
     filterset_class = OrderItemFilter
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter,
+                       filters.SearchFilter]
     ordering_fields = [
         'id',
         'order__id',
         'order__client__client_name',
         'product__name',
+        'product_finish__name',
         'item_value',
         'item_status',
         'priority_level',
         'order__paid',
     ]
     ordering = ['id']  # Default ordering
+    search_fields = [
+        'id',
+        'order__id',
+        'order__client__client_name',
+        'product__name',
+        'option_values__value',
+        'product_finish__name',
+        'item_component_finishes__finish_option__name',
+    ]
 
     def get_queryset(self):
         """
