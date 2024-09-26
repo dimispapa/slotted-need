@@ -56,9 +56,8 @@ function updateSelectStyle() {
 
         itemStatusSelects.forEach(select => {
             // remove existing style classes
-            select.classList.remove('bg-pending', 'bg-warning', 'bg-success', 'bg-secondary', 'text-dark');
-            // Add general styles
-            select.classList.add('text-light', 'fw-bolder', 'text-wrap');
+            select.classList.remove('bg-pending', 'bg-warning', 'bg-success', 'bg-secondary', 'text-dark', 'text-light');
+
             // Not Started
             if (select.value == 1) {
                 select.classList.add('bg-pending', 'text-dark');
@@ -67,10 +66,10 @@ function updateSelectStyle() {
                 select.classList.add('bg-warning', 'text-dark');
                 // Made
             } else if (select.value == 3) {
-                select.classList.add('bg-success');
+                select.classList.add('bg-success', 'text-light');
                 // Delivered
             } else if (select.value == 4) {
-                select.classList.add('bg-secondary');
+                select.classList.add('bg-secondary', 'text-light');
             }
             // Add listener to update styling on change
             select.addEventListener('change', updateSelectStyle);
@@ -82,12 +81,11 @@ function updateSelectStyle() {
 
         paidStatusSelects.forEach(select => {
             // remove existing style classes
-            select.classList.remove('bg-danger-light', 'bg-secondary', 'text-light');
-            // add general styles
-            select.classList.add('fw-bolder', 'text-wrap');
+            select.classList.remove('bg-danger-light', 'bg-secondary', 'text-dark', 'text-light');
+
             // Not Paid
             if (select.value == 1) {
-                select.classList.add('bg-danger-light');
+                select.classList.add('bg-danger-light, text-dark');
                 // Fully Paid
             } else if (select.value == 2) {
                 select.classList.add('bg-secondary', 'text-light');
@@ -102,18 +100,17 @@ function updateSelectStyle() {
 
         priorityStatusSelects.forEach(select => {
             // remove existing style classes
-            select.classList.remove('bg-danger-light', 'bg-light', 'bg-warning');
-            // add general styles
-            select.classList.add('fw-bolder', 'text-wrap');
+            select.classList.remove('bg-danger-light', 'bg-light', 'bg-warning', 'text-dark');
+
             // Low priority
             if (select.value == 1) {
-                select.classList.add('bg-light');
+                select.classList.add('bg-light', 'text-dark');
                 // Medium priority
             } else if (select.value == 2) {
-                select.classList.add('bg-warning');
+                select.classList.add('bg-warning', 'text-dark');
                 // High priority
             } else if (select.value == 3) {
-                select.classList.add('bg-danger-light');
+                select.classList.add('bg-danger-light', 'text-dark');
             }
             // Add listener to update styling on change
             select.addEventListener('change', updateSelectStyle);

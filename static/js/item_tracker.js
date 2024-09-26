@@ -160,7 +160,7 @@ $(document).ready(function () {
                 className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        let select = '<select class="form-select-sm item-status-select" data-id="' + row.id + '">';
+                        let select = '<select class="form-select-sm item-status-select fw-bolder text-wrap" data-id="' + row.id + '">';
                         // Use global variable passed from context into JS
                         itemStatusChoices.forEach(function (option) {
                             select += '<option value="' + option[0] + '"' + (option[0] === data ? ' selected' : '') + '>' + option[1] + '</option>';
@@ -176,7 +176,7 @@ $(document).ready(function () {
                 className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        let select = '<select class="form-select-sm priority-status-select" data-id="' + row.id + '">';
+                        let select = '<select class="form-select-sm priority-status-select fw-bolder text-wrap" data-id="' + row.id + '">';
                         // Use global variable passed from context into JS
                         priorityLevelChoices.forEach(function (option) {
                             select += '<option value="' + option[0] + '"' + (option[0] === data ? ' selected' : '') + '>' + option[1] + '</option>';
@@ -193,7 +193,7 @@ $(document).ready(function () {
                 className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        let select = '<select class="form-select-sm paid-status-select" data-id="' + row.id + '">';
+                        let select = '<select class="form-select-sm paid-status-select fw-bolder text-wrap" data-id="' + row.id + '">';
                         // Use global variable passed from context into JS
                         paymentStatusChoices.forEach(function (option) {
                             select += '<option value="' + option[0] + '"' + (option[0] === data ? ' selected' : '') + '>' + option[1] + '</option>';
@@ -276,6 +276,28 @@ $(document).ready(function () {
             },
             error: function(xhr, status, error) {
                 console.error('Error updating item status:', error);
+                // Reload the table to revert changes
+                table.ajax.reload(null, false);
+            }
+        });
+    });
+
+    // Handle change for priority_level
+    $('#orderitem-table').on('change', '.priority-status-select', function() {
+        var orderitemId = $(this).data('id');
+        var newPriority = $(this).val();
+
+        $.ajax({
+            url: '/api/order_items/' + orderitemId + '/',
+            type: 'PATCH',
+            data: JSON.stringify({ 'priority_level': newPriority }),
+            contentType: 'application/json',
+            success: function(response) {
+                // Reload the table without resetting pagination
+                table.ajax.reload(null, false);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error updating priority level:', error);
                 // Reload the table to revert changes
                 table.ajax.reload(null, false);
             }
