@@ -44,7 +44,79 @@ function displayMessages(messages) {
     });
 };
 
-export {
-    displayMessages
+// Define function that updates the item_status and paid_status dropdown bg colour
+function updateSelectStyle() {
+    // Get select elements
+    let itemStatusSelects = document.querySelectorAll('.item-status-select');
+    let paidStatusSelects = document.querySelectorAll('.paid-status-select');
+    let priorityStatusSelects = document.querySelectorAll('.priority-status-select');
+
+    // loop through item status dropdowns
+    if (itemStatusSelects && itemStatusSelects.length > 0) {
+
+        itemStatusSelects.forEach(select => {
+            // remove existing style classes
+            select.classList.remove('bg-pending', 'bg-warning', 'bg-success', 'bg-secondary', 'text-dark');
+            // Not Started
+            if (select.value == 1) {
+                select.classList.add('bg-pending', 'text-dark');
+                // In Progress
+            } else if (select.value == 2) {
+                select.classList.add('bg-warning', 'text-dark');
+                // Made
+            } else if (select.value == 3) {
+                select.classList.add('bg-success');
+                // Delivered
+            } else if (select.value == 4) {
+                select.classList.add('bg-secondary');
+            }
+            // Add listener to update styling on change
+            select.addEventListener('change', updateSelectStyle);
+        });
+    }
+
+    // loop through paid status dropdowns
+    if (paidStatusSelects && paidStatusSelects.length > 0) {
+
+        paidStatusSelects.forEach(select => {
+            // remove existing style classes
+            select.classList.remove('bg-danger-light', 'bg-secondary', 'text-light');
+            // Not Paid
+            if (select.value == 1) {
+                select.classList.add('bg-danger-light');
+                // Fully Paid
+            } else if (select.value == 2) {
+                select.classList.add('bg-secondary', 'text-light');
+            }
+            // Add listener to update styling on change
+            select.addEventListener('change', updateSelectStyle);
+        });
+    }
+
+    // loop through paid status dropdowns
+    if (priorityStatusSelects && priorityStatusSelects.length > 0) {
+
+        priorityStatusSelects.forEach(select => {
+            // remove existing style classes
+            select.classList.remove('bg-danger-light', 'bg-light', 'bg-warning');
+            // Low priority
+            if (select.value == 1) {
+                select.classList.add('bg-light');
+                // Medium priority
+            } else if (select.value == 2) {
+                select.classList.add('bg-warning');
+                // High priority
+            } else if (select.value == 3) {
+                select.classList.add('bg-danger-light');
+            }
+            // Add listener to update styling on change
+            select.addEventListener('change', updateSelectStyle);
+        });
+    }
 };
 
+
+export {
+    displayMessages,
+    updateSelectStyle
+};

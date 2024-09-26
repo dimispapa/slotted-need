@@ -1,4 +1,7 @@
-import { displayMessages } from './utils.js'
+import {
+    displayMessages,
+    updateSelectStyle
+} from './utils.js'
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -9,50 +12,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const csrftoken = document.querySelector("meta[name='csrf-token']").content;
 
     // ************** SECTION A: FUNCTION DEFINITIONS ********************************************************************
-
-    // Define function that updates the item_status dropdown bg colour 
-    function updateSelectStyle() {
-        // Get select elements
-        let itemStatusSelects = document.querySelectorAll('.item-status-select');
-        let paidStatusSelects = document.querySelectorAll('.paid-status-select');
-
-        // loop through item status dropdowns
-        itemStatusSelects.forEach(select => {
-            // remove existing style classes
-            select.classList.remove('bg-pending', 'bg-warning', 'bg-success', 'bg-secondary', 'text-dark');
-            // Not Started
-            if (select.value == 1) {
-                select.classList.add('bg-pending', 'text-dark');
-                // In Progress
-            } else if (select.value == 2) {
-                select.classList.add('bg-warning', 'text-dark');
-                // Made
-            } else if (select.value == 3) {
-                select.classList.add('bg-success');
-                // Delivered
-            } else if (select.value == 4) {
-                select.classList.add('bg-secondary');
-            }
-            // Add listener to update styling on change
-            select.addEventListener('change', updateSelectStyle);
-        });
-
-        // loop through dropdowns
-        paidStatusSelects.forEach(select => {
-            // remove existing style classes
-            select.classList.remove('bg-danger-light', 'bg-secondary', 'text-light');
-            // Not Paid
-            if (select.value == 1) {
-                select.classList.add('bg-danger-light');
-                // Fully Paid
-            } else if (select.value == 2) {
-                select.classList.add('bg-secondary', 'text-light');
-            }
-            // Add listener to update styling on change
-            select.addEventListener('change', updateSelectStyle);
-        });
-
-    };
 
     // Define function that deletes an order item and remaining items index
     function deleteOrder(orderId) {
@@ -92,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Remove the hidden row containing order items
                     const hiddenRow = orderRow.nextElementSibling;
                     if (hiddenRow) {
-                       hiddenRow.remove();
+                        hiddenRow.remove();
                     }
                     // Display success messages
                     if (data.messages && data.messages.length > 0) {
@@ -118,12 +77,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ************** SECTION B: EVENT LISTENERS & HANDLERS *****************************************************************
 
-    //   Handle item_status dropdown colouring dynamically
-    let itemStatusSelects = document.querySelectorAll('.item-status-select');
-    if (itemStatusSelects) {
-        // Initial styling on page load
-        updateSelectStyle();
-    };
+    //   Handle status dropdowns change colouring dynamically
+    // Initial styling on page load
+    updateSelectStyle();
 
     // add event listener that handles first delete button that will trigger the modal
     document.addEventListener("click", (event) => {
