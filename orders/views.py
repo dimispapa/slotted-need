@@ -9,6 +9,7 @@ from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.admin.views.decorators import staff_member_required
+from django.utils.decorators import method_decorator
 from django.db import transaction
 from django.db.models import Count, Q
 from rest_framework import viewsets, permissions
@@ -686,7 +687,7 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     ordering = ['id']  # Default ordering
 
 
-@staff_member_required
+@method_decorator(staff_member_required, name='dispatch')
 class OrderItemListView(LoginRequiredMixin, TemplateView):
     """
     Renders the OrderItem management page.
