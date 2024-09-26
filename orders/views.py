@@ -16,7 +16,8 @@ from rest_framework import viewsets, permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from .models import Client, Order, OrderItem, ComponentFinish
-from .decorators import ajax_login_required, ajax_admin_required
+from .decorators import (ajax_login_required_no_redirect,
+                         ajax_admin_required_no_redirect)
 from products.models import (Product, Option, OptionValue, FinishOption,
                              ProductComponent, Component)
 from .forms import OrderForm, OrderItemFormSet, OrderViewForm, OrderViewFormSet
@@ -617,8 +618,8 @@ def search_clients(request):
 
 
 @require_POST
-@ajax_login_required
-@ajax_admin_required
+@ajax_login_required_no_redirect
+@ajax_admin_required_no_redirect
 def delete_order(request, order_id):
 
     # Verify that the request is AJAX
