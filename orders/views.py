@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.utils.decorators import method_decorator
 from django.db import transaction
 from django.db.models import Count, Q
 from rest_framework import viewsets, permissions
@@ -615,8 +615,8 @@ def search_clients(request):
 
 
 @require_POST
-@ajax_admin_required
 @ajax_login_required
+@ajax_admin_required
 def delete_order(request, order_id):
 
     # Verify that the request is AJAX
@@ -664,7 +664,7 @@ class OrderItemViewSet(viewsets.ModelViewSet):
         'option_values',
         'item_component_finishes__finish_option',
         'item_component_finishes__component'
-    ).all().order_by('-id').distinct()
+    ).all().order_by('-id')
 
     serializer_class = OrderItemSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -685,7 +685,10 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     ordering = ['id']  # Default ordering
 
 
-class OrderItemListView(LoginRequiredMixin, TemplateView):
+# Apply function decorators on class-based view using method_decorator
+@method_decorator(ajax_login_required, name='dispatch')
+@method_decorator(ajax_admin_required, name='dispatch')
+class OrderItemListView(TemplateView):
     """
     Renders the OrderItem management page.
     Only accessible to authenticated users.

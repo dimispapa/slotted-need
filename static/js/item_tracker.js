@@ -23,6 +23,7 @@ $(document).ready(function () {
         searching: false,  // Disable global search as using column filters
         scrollY: true, // Enable vertical scrolling
         scrollX: true, // Enable horizontal scrolling
+        responsive: true,  // Enable responsive layout for smaller screens
         pageLength: pageSize,
         ajax: {
             url: '/api/order_items/',
