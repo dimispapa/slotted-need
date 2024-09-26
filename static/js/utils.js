@@ -57,6 +57,8 @@ function updateSelectStyle() {
         itemStatusSelects.forEach(select => {
             // remove existing style classes
             select.classList.remove('bg-pending', 'bg-warning', 'bg-success', 'bg-secondary', 'text-dark');
+            // Add general styles
+            select.classList.add('text-light', 'fw-bolder', 'text-wrap');
             // Not Started
             if (select.value == 1) {
                 select.classList.add('bg-pending', 'text-dark');
@@ -81,6 +83,8 @@ function updateSelectStyle() {
         paidStatusSelects.forEach(select => {
             // remove existing style classes
             select.classList.remove('bg-danger-light', 'bg-secondary', 'text-light');
+            // add general styles
+            select.classList.add('fw-bolder', 'text-wrap');
             // Not Paid
             if (select.value == 1) {
                 select.classList.add('bg-danger-light');
@@ -99,6 +103,8 @@ function updateSelectStyle() {
         priorityStatusSelects.forEach(select => {
             // remove existing style classes
             select.classList.remove('bg-danger-light', 'bg-light', 'bg-warning');
+            // add general styles
+            select.classList.add('fw-bolder', 'text-wrap');
             // Low priority
             if (select.value == 1) {
                 select.classList.add('bg-light');
