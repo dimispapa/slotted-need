@@ -85,7 +85,7 @@ function updateSelectStyle() {
 
             // Not Paid
             if (select.value == 1) {
-                select.classList.add('bg-danger-light, text-dark');
+                select.classList.add('bg-danger-light', 'text-dark');
                 // Fully Paid
             } else if (select.value == 2) {
                 select.classList.add('bg-secondary', 'text-light');

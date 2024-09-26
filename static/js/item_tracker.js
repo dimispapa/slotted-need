@@ -257,6 +257,10 @@ $(document).ready(function () {
 
     // Handle change for item_status
     $('#orderitem-table').on('change', '.item-status-select', function() {
+        // show spinner
+        let spinner = document.getElementById('filter-item-status-spinner');
+        spinner.classList.remove('d-none');
+        // get order item id and new status
         let orderitemId = $(this).data('id');
         let newStatus = $(this).val();
 
@@ -272,18 +276,22 @@ $(document).ready(function () {
             contentType: 'application/json',
             success: function(response) {
                 // Reload the table without resetting pagination
-                table.ajax.reload(null, false);
+                table.ajax.reload(hideSpinner(spinner), false);
             },
             error: function(xhr, status, error) {
                 console.error('Error updating item status:', error);
                 // Reload the table to revert changes
-                table.ajax.reload(null, false);
-            }
+                table.ajax.reload(hideSpinner(spinner), false);
+            },
         });
     });
 
     // Handle change for priority_level
     $('#orderitem-table').on('change', '.priority-status-select', function() {
+        // show spinner
+        let spinner = document.getElementById('filter-priority-level-spinner');
+        spinner.classList.remove('d-none');
+        // Get order item id and new priority status
         var orderitemId = $(this).data('id');
         var newPriority = $(this).val();
 
@@ -294,14 +302,19 @@ $(document).ready(function () {
             contentType: 'application/json',
             success: function(response) {
                 // Reload the table without resetting pagination
-                table.ajax.reload(null, false);
+                table.ajax.reload(hideSpinner(spinner), false);
             },
             error: function(xhr, status, error) {
                 console.error('Error updating priority level:', error);
                 // Reload the table to revert changes
-                table.ajax.reload(null, false);
-            }
+                table.ajax.reload(hideSpinner, false);
+            },
+            
         });
     });
+
+    function hideSpinner(spinner) {
+        spinner.classList.add('d-none')
+    };
 
 })

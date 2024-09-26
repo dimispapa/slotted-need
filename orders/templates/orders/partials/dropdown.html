@@ -1,9 +1,16 @@
-{% comment %} 
-"Usage: {% include 'orders/partials/dropdown.html' with options=variable selected=value class='additional-class' id='element-id' %}" 
+{% comment %}
+"Usage:
+{% include 'orders/partials/dropdown.html' with options=variable selected=value class='additional-class' id='element-id' %}"
 {% endcomment %}
+<div class="text-center">
+    <div class="spinner-border text-primary m-2 d-none" role="status" id="{{ id }}-spinner">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
 <select class="{{ class }}" id="{{ id }}">
     <option value="">All</option>
     {% for option_value, option_display in options %}
-        <option value="{{ option_value }}" {% if option_value == selected %}selected{% endif %}>{{ option_display }}</option>
+    <option value="{{ option_value }}" {% if option_value == selected %}selected{% endif %}>{{ option_display }}
+    </option>
     {% endfor %}
 </select>
