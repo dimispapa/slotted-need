@@ -85,7 +85,7 @@ of the suggestions div depending on viewport size */
   }
 }
 
-/**** ORDERS PAGE ****/
+/**** ORDER TRACKER PAGE ****/
 /* toggle items btn */
 .toggle-items-btn {
   background-color: #0d6efd;
@@ -131,4 +131,14 @@ of the suggestions div depending on viewport size */
   #order-list-form {
     font-size: 12px;
   }
+}
+
+/* ORDER ITEM TRACKER */
+th.sortable {
+  cursor: pointer;
+}
+
+th.not-sortable {
+  cursor: default;
+  background-color: #f9f9f9;
 }

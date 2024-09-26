@@ -73,23 +73,28 @@ $(document).ready(function () {
             },
         },
         columns: [{
-                data: 'id'
+                data: 'id',
+                className: 'sortable'
             },
             {
                 data: 'order.id',
-                name: 'order__id'
+                name: 'order__id',
+                className: 'sortable'
             },
             {
                 data: 'order.client.client_name',
-                name: 'order__client__client_name'
+                name: 'order__client__client_name',
+                className: 'sortable'
             },
             {
                 data: 'product.name',
-                name: 'product__name'
+                name: 'product__name',
+                className: 'sortable'
             },
             {
                 data: 'option_values',
-                orderable: false,  // Disable ordering
+                orderable: false,  // Disable ordering,
+                className: 'not-sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
                         if(!data || data.length === 0){
@@ -108,6 +113,7 @@ $(document).ready(function () {
             {
                 data: 'product_finish',
                 name: 'product_finish__name',
+                className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
                         return data ? data.name : '-';
@@ -118,6 +124,7 @@ $(document).ready(function () {
             {
                 data: 'item_component_finishes',
                 orderable: false,  // Disable ordering
+                className: 'not-sortable',
                 render: function (data, type, row) {
                     if(type === 'display'){
                         if(!data || data.length === 0){
@@ -134,10 +141,12 @@ $(document).ready(function () {
                 }
             },
             {
-                data: 'item_value'
+                data: 'item_value',
+                className: 'sortable'
             },
             {
                 data: 'item_status',
+                className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
                         let select = '<select class="form-select item-status" data-id="' + row.id + '">';
@@ -154,6 +163,7 @@ $(document).ready(function () {
             },
             {
                 data: 'priority_level',
+                className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
                         let select = '<select class="form-select priority-level" data-id="' + row.id + '">';
@@ -171,6 +181,7 @@ $(document).ready(function () {
             {
                 data: 'order.paid',
                 name: 'order__paid',
+                className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
                         let select = '<select class="form-select payment-status" data-id="' + row.id + '">';
@@ -188,6 +199,7 @@ $(document).ready(function () {
             {
                 data: null,
                 orderable: false,
+                className: 'not-sortable',
                 searchable: false,
                 render: function (data, type, row) {
                     return '<button class="btn btn-danger btn-sm delete-orderitem action-btn" data-id="' + row.id + '"><i class="fa-solid fa-trash"></i></button>';
