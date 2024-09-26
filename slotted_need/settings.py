@@ -73,7 +73,7 @@ REST_FRAMEWORK = {
     ],
     # configure pagination for API responses
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
+    'PAGE_SIZE': 25,
 }
 
 MIDDLEWARE = [
