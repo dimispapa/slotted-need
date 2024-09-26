@@ -25,7 +25,7 @@ $(document).ready(function () {
         orderCellsTop: true, // Place sorting icons to top row
         fixedHeader: true, // Fix the header when scrolling
         searching: false, // Disable global search as using column filters
-        scrollY: true, // Enable vertical scrolling
+        scrollY: '60vh', // Enable vertical scrolling
         scrollX: true, // Enable horizontal scrolling
         responsive: true, // Enable responsive layout for smaller screens
         pageLength: pageSize,
@@ -99,13 +99,13 @@ $(document).ready(function () {
             {
                 data: 'option_values',
                 orderable: false, // Disable ordering,
-                className: 'not-sortable',
+                className: 'not-sortable p2',
                 render: function (data, type, row) {
                     if (type === 'display') {
                         if (!data || data.length === 0) {
                             return '-';
                         }
-                        let list = '<ul class="option-values-list">';
+                        let list = '<ul class="option-values-list list-unstyled mb-0 lh-sm">';
                         data.forEach(function (option) {
                             list += '<li>' + option.value + '</li>';
                         });
@@ -129,13 +129,13 @@ $(document).ready(function () {
             {
                 data: 'item_component_finishes',
                 orderable: false, // Disable ordering
-                className: 'not-sortable',
+                className: 'not-sortable p2',
                 render: function (data, type, row) {
                     if (type === 'display') {
                         if (!data || data.length === 0) {
                             return '-';
                         }
-                        let list = '<ul class="component-finish-list">';
+                        let list = '<ul class="component-finish-list list-unstyled mb-0 lh-sm">';
                         data.forEach(function (cf) {
                             list += '<li>' + cf.component_finish_display + '</li>';
                         });
@@ -160,7 +160,7 @@ $(document).ready(function () {
                 className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        let select = '<select class="form-select item-status-select" data-id="' + row.id + '">';
+                        let select = '<select class="form-select-sm item-status-select" data-id="' + row.id + '">';
                         // Use global variable passed from context into JS
                         itemStatusChoices.forEach(function (option) {
                             select += '<option value="' + option[0] + '"' + (option[0] === data ? ' selected' : '') + '>' + option[1] + '</option>';
@@ -176,7 +176,7 @@ $(document).ready(function () {
                 className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        let select = '<select class="form-select priority-status-select" data-id="' + row.id + '">';
+                        let select = '<select class="form-select-sm priority-status-select" data-id="' + row.id + '">';
                         // Use global variable passed from context into JS
                         priorityLevelChoices.forEach(function (option) {
                             select += '<option value="' + option[0] + '"' + (option[0] === data ? ' selected' : '') + '>' + option[1] + '</option>';
@@ -193,7 +193,7 @@ $(document).ready(function () {
                 className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        let select = '<select class="form-select paid-status-select" data-id="' + row.id + '">';
+                        let select = '<select class="form-select-sm paid-status-select" data-id="' + row.id + '">';
                         // Use global variable passed from context into JS
                         paymentStatusChoices.forEach(function (option) {
                             select += '<option value="' + option[0] + '"' + (option[0] === data ? ' selected' : '') + '>' + option[1] + '</option>';

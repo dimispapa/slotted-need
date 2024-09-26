@@ -144,3 +144,17 @@ th.not-sortable {
   cursor: default;
   background-color: #f9f9f9;
 }
+
+/* Order item table font size */
+#orderitem-table {
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+
+  #orderitem-tracker-container,
+  #orderitem-tracker-container input,
+  #orderitem-tracker-container select {
+    font-size: 12px;
+  }
+}
