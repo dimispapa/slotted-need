@@ -1,5 +1,3 @@
-import { displayMessages } from './utils.js';
-
 $(document).ready(function () {
 
     // Global constants definition
