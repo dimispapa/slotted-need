@@ -17,7 +17,10 @@ $(document).ready(function () {
     // Initialize DataTable with AJAX source and server-side processing
     let table = $('#orderitem-table').DataTable({
         serverSide: true, // Enable server-side processing
-        processing: true,
+        processing: true,  // Enables processing animation
+        orderCellsTop: true,  // Place sorting icons to top row
+        fixedHeader: true,  // Fix the header when scrolling
+        searching: false,  // Disable global search as using column filters
         scrollY: true, // Enable vertical scrolling
         scrollX: true, // Enable horizontal scrolling
         pageLength: pageSize,
@@ -44,8 +47,8 @@ $(document).ready(function () {
                 d.design_options = $('#filter-design-options').val();
                 d.product_finish = $('#filter-product-finish').val();
                 d.component_finishes = $('#filter-component-finishes').val();
-                d.price_min = $('#filter-price-min').val();
-                d.price_max = $('#filter-price-max').val();
+                d.value_min = $('#filter-value-min').val();
+                d.value_max = $('#filter-value-max').val();
                 d.item_status = $('#filter-item-status').val();
                 d.priority_level = $('#filter-priority-level').val();
                 d.payment_status = $('#filter-payment-status').val();
@@ -56,8 +59,8 @@ $(document).ready(function () {
                 if (d.order && d.order.length > 0) {
                     let orderColumnIndex = d.order[0].column;
                     let orderDir = d.order[0].dir;
-                    let orderColumn = d.columns[orderColumnIndex].data;
-                    d.ordering = (orderDir === 'desc' ? '-' : '') + orderColumn;
+                    let orderColumn = d.columns[orderColumnIndex];
+                    d.ordering = (orderDir === 'desc' ? '-' : '') + (orderColumn.name ? orderColumn.name : orderColumn.data);
                 }
 
                 return d;
@@ -66,7 +69,6 @@ $(document).ready(function () {
                 // Map API response to DataTables expected format
                 json.recordsTotal = json.count;
                 json.recordsFiltered = json.count;
-                console.log(json.results);
                 return json.results;
             },
         },
@@ -87,6 +89,7 @@ $(document).ready(function () {
             },
             {
                 data: 'option_values',
+                orderable: false,  // Disable ordering
                 render: function (data, type, row) {
                     if (type === 'display') {
                         if(!data || data.length === 0){
@@ -114,6 +117,7 @@ $(document).ready(function () {
             },
             {
                 data: 'item_component_finishes',
+                orderable: false,  // Disable ordering
                 render: function (data, type, row) {
                     if(type === 'display'){
                         if(!data || data.length === 0){
@@ -190,9 +194,16 @@ $(document).ready(function () {
                 }
             },
         ],
+        // Default ordering by ID ascending
         id: [
             [0, 'asc']
-        ], // Default ordering by ID ascending
+        ],
+    });
+
+    // Prevent triggering sorting when a user clicks in any of the inputs.
+    // Sorting should apply when the user clicks any of the column headers
+    $('#orderitem-table').on('click mousedown touchstart', 'input, select, button', function(e) {
+        e.stopPropagation();
     });
 
     // Function to reload table with new filters
@@ -210,8 +221,8 @@ $(document).ready(function () {
     }
 
     // Event listeners for filter inputs with debounce
-    $('#filter-id, #filter-order, #filter-client, #filter-product, #filter-price-min, ' +
-        '#filter-price-max, #filter-item-status, #filter-priority-level, #filter-payment-status, ' +
+    $('#filter-id, #filter-order, #filter-client, #filter-product, #filter-value-min, ' +
+        '#filter-value-max, #filter-item-status, #filter-priority-level, #filter-payment-status, ' +
         '#filter-design-options, #filter-product-finish, #filter-component-finishes').on('keyup change', debounce(function () {
         applyFilters();
     }, 300));
