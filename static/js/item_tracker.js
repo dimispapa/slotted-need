@@ -85,26 +85,50 @@ $(document).ready(function () {
                 data: 'product.name',
                 name: 'product__name'
             },
-            { data: 'option_values', render: function(data, type, row) {
-                if(type === 'display'){
-                    let values = data.map(option => option.value).join(', ');
-                    return values;
+            {
+                data: 'option_values',
+                render: function (data, type, row) {
+                    if (type === 'display') {
+                        if(!data || data.length === 0){
+                            return '-';
+                        }
+                        let list = '<ul class="option-values-list">';
+                        data.forEach(function(option) {
+                            list += '<li>' + option.value + '</li>';
+                        });
+                        list += '</ul>';
+                        return list;
+                    }
+                    return data;
                 }
-                return data;
-            }},
-            { data: 'product_finish', name: 'product_finish__finish_option', render: function(data, type, row) {
-                if(type === 'display'){
-                    return data || '';
+            },
+            {
+                data: 'product_finish',
+                name: 'product_finish__name',
+                render: function (data, type, row) {
+                    if (type === 'display') {
+                        return data ? data.name : '-';
+                    }
+                    return data;
                 }
-                return data;
-            }},
-            { data: 'item_component_finishes', render: function(data, type, row) {
-                if(type === 'display'){
-                    let finishes = data.map(cf => cf.finish_option).join(', ');
-                    return finishes;
+            },
+            {
+                data: 'item_component_finishes',
+                render: function (data, type, row) {
+                    if(type === 'display'){
+                        if(!data || data.length === 0){
+                            return '-';
+                        }
+                        let list = '<ul class="component-finish-list">';
+                        data.forEach(function(cf) {
+                            list += '<li>' + cf.component_finish_display + '</li>';
+                        });
+                        list += '</ul>';
+                        return list;
+                    }
+                    return data;
                 }
-                return data;
-            }},
+            },
             {
                 data: 'item_value'
             },

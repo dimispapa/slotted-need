@@ -64,7 +64,7 @@ class Component(models.Model):
         ordering = ["name"]
 
     def __str__(self):
-        return f"{self.name} @ €{self.unit_cost}"
+        return f"{self.name}"
 
     def calculate_unit_cost(self):
         """

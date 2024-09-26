@@ -1,6 +1,7 @@
 from rest_framework.serializers import (ModelSerializer,
                                         PrimaryKeyRelatedField,
-                                        StringRelatedField)
+                                        StringRelatedField,
+                                        SerializerMethodField)
 from .models import OrderItem, Order, Product, Client, ComponentFinish
 from products.models import OptionValue, FinishOption
 
@@ -18,6 +19,8 @@ class OptionValueSerializer(ModelSerializer):
 
 
 class FinishOptionSerializer(ModelSerializer):
+    finish = StringRelatedField()
+
     class Meta:
         model = FinishOption
         fields = ['id', 'finish', 'name']
@@ -25,11 +28,16 @@ class FinishOptionSerializer(ModelSerializer):
 
 class ComponentFinishSerializer(ModelSerializer):
     component = StringRelatedField()
-    finish_option = StringRelatedField()
+    finish_option = FinishOptionSerializer(read_only=True)
+    component_finish_display = SerializerMethodField()
 
     class Meta:
         model = ComponentFinish
-        fields = ['id', 'component', 'finish_option']
+        fields = ['id', 'component', 'finish_option',
+                  'component_finish_display']
+
+    def get_component_finish_display(self, obj):
+        return f"{obj.component} - {obj.finish_option.name}"
 
 
 class OrderSerializer(ModelSerializer):
