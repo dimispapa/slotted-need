@@ -16,10 +16,6 @@ $(document).ready(function () {
         }
     });
 
-    if (data.messages && data.messages.length > 0) {
-        displayMessages(data.messages);
-    }
-
     // Initialize DataTable with AJAX source and server-side processing
     let table = $('#orderitem-table').DataTable({
         serverSide: true, // Enable server-side processing
@@ -217,6 +213,7 @@ $(document).ready(function () {
         id: [
             [0, 'asc']
         ],
+        
     });
 
     // Prevent triggering sorting when a user clicks in any of the inputs.
