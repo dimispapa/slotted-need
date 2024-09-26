@@ -656,12 +656,15 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     A ViewSet for viewing and editing OrderItem instances.
     """
     # fetch queryset with optimised query for related objects
-    queryset = OrderItem.objects.\
-        select_related('order', 'product', 'product_finish').\
-        prefetch_related('option_values',
-                         'item_component_finishes__component',
-                         'item_component_finishes__finish_option'
-                         ).all().order_by('-id')
+    queryset = OrderItem.objects.select_related(
+        'order',
+        'product',
+        'product_finish'
+    ).prefetch_related(
+        'option_values',
+        'item_component_finishes__finish_option',
+        'item_component_finishes__component'
+    ).all().order_by('-id').distinct()
 
     serializer_class = OrderItemSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -680,23 +683,6 @@ class OrderItemViewSet(viewsets.ModelViewSet):
         'order__paid',
     ]
     ordering = ['id']  # Default ordering
-    search_fields = [
-        'id',
-        'order__id',
-        'order__client__client_name',
-        'product__name',
-        'option_values__value',
-        'product_finish__name',
-        'item_component_finishes__finish_option__name',
-    ]
-
-    def get_queryset(self):
-        """
-        Optionally restricts the returned OrderItems to a given user,
-        by filtering against a `username` query parameter in the URL.
-        """
-        queryset = self.queryset
-        return queryset
 
 
 class OrderItemListView(LoginRequiredMixin, TemplateView):

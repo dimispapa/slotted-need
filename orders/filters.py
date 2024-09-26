@@ -28,15 +28,15 @@ class OrderItemFilter(django_filters.FilterSet):
         field_name='product_finish__name',
         lookup_expr='icontains')
 
-    component_finishes = django_filters.CharFilter(
+    item_component_finishes = django_filters.CharFilter(
         method='filter_component_finishes')
 
-    price_min = django_filters.NumberFilter(
-        field_name='price',
+    value_min = django_filters.NumberFilter(
+        field_name='item_value',
         lookup_expr='gte')
 
-    price_max = django_filters.NumberFilter(
-        field_name='price',
+    value_max = django_filters.NumberFilter(
+        field_name='item_value',
         lookup_expr='lte')
 
     item_status = django_filters.ChoiceFilter(
@@ -55,17 +55,19 @@ class OrderItemFilter(django_filters.FilterSet):
         model = OrderItem
         fields = [
             'id',
-            'order_id',
-            'client_name',
-            'product',
-            'design_options',
-            'product_finish',
-            'component_finishes',
-            'price_min',
-            'price_max',
+            'order__id',
+            'order__client__client_name',
+            'product__name',
+            'option_values__value',
+            'product_finish__name',
+            'item_component_finishes',
+            'item_component_finishes__component__name',
+            'item_component_finishes__finish_option__name',
+            'option_values__value',
+            'item_value',
             'item_status',
             'priority_level',
-            'payment_status'
+            'order__paid'
         ]
 
     def filter_option_values(self, queryset, name, value):
@@ -84,7 +86,7 @@ class OrderItemFilter(django_filters.FilterSet):
 
         # Build Q objects for each value using __iexact
         for val in values:
-            q_objects |= Q(option_values__value__iexact=val)
+            q_objects |= Q(option_values__value__icontains=val)
 
         # Apply the Q object to filter the queryset
         return queryset.filter(q_objects).distinct()

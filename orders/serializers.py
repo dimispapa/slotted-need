@@ -1,7 +1,8 @@
 from rest_framework.serializers import (ModelSerializer,
                                         PrimaryKeyRelatedField,
                                         StringRelatedField,
-                                        SerializerMethodField)
+                                        SerializerMethodField,
+                                        )
 from .models import OrderItem, Order, Product, Client, ComponentFinish
 from products.models import OptionValue, FinishOption
 
@@ -95,4 +96,5 @@ class OrderItemSerializer(ModelSerializer):
         ]
         read_only_fields = ['id', 'order', 'product', 'order_id', 'product_id',
                             'option_values', 'product_finish',
-                            'item_component_finishes', 'item_value',]
+                            'option_value_id', 'item_value',
+                            'item_component_finishes',]
