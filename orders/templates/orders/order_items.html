@@ -28,28 +28,28 @@
                 <th>Item Status</th>
                 <th>Priority Level</th>
                 <th>Payment Status</th>
-                <th>Actions</th>
+                <th></th>
             </tr>
             <tr class="filter-row">
-                <th><input type="number" id="filter-id" placeholder="Filter ID" /></th>
-                <th><input type="number" id="filter-order" placeholder="Filter Order ID" /></th>
-                <th><input type="text" id="filter-client" placeholder="Filter Client Name" /></th>
-                <th><input type="text" id="filter-product" placeholder="Filter Product" /></th>
-                <th><input type="text" id="filter-design-options" placeholder="Filter Design Options" /></th>
-                <th><input type="text" id="filter-product-finish" placeholder="Filter Product Finish" /></th>
-                <th><input type="text" id="filter-component-finishes" placeholder="Filter Component Finishes" /></th>
+                <th><input type="number" class="form-control" id="filter-id" placeholder="Filter" /></th>
+                <th><input type="number" class="form-control" id="filter-order" placeholder="Filter" /></th>
+                <th><input type="text" class="form-control" id="filter-client" placeholder="Filter" /></th>
+                <th><input type="text" class="form-control" id="filter-product" placeholder="Filter" /></th>
+                <th><input type="text" class="form-control" id="filter-design-options" placeholder="Filter" /></th>
+                <th><input type="text" class="form-control" id="filter-product-finish" placeholder="Filter" /></th>
+                <th><input type="text" class="form-control" id="filter-component-finishes" placeholder="Filter" /></th>
                 <th>
-                    <input type="number" id="filter-price-min" placeholder="Min Value" />
-                    <input type="number" id="filter-price-max" placeholder="Max Value" />
+                    <input type="number" class="form-control" id="filter-value-min" placeholder="Min" />
+                    <input type="number" class="form-control" id="filter-value-max" placeholder="Max" />
                 </th>
                 <th>
-                    {% include 'orders/partials/dropdown.html' with options=item_status_choices selected="" class="filter-item-status" id="filter-item-status" %}
+                    {% include 'orders/partials/dropdown.html' with options=item_status_choices selected="" class="filter-item-status form-select" id="filter-item-status" %}
                 </th>
                 <th>
-                    {% include 'orders/partials/dropdown.html' with options=priority_level_choices selected="" class="filter-priority-level" id="filter-priority-level" %}
+                    {% include 'orders/partials/dropdown.html' with options=priority_level_choices selected="" class="filter-priority-level form-select" id="filter-priority-level" %}
                 </th>
                 <th>
-                    {% include 'orders/partials/dropdown.html' with options=payment_status_choices selected="" class="filter-payment-status" id="filter-payment-status" %}
+                    {% include 'orders/partials/dropdown.html' with options=payment_status_choices selected="" class="filter-payment-status form-select" id="filter-payment-status" %}
                 </th>
                 <th></th> <!-- No filter for actions -->
             </tr>
