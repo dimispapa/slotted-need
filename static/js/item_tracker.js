@@ -1,3 +1,7 @@
+import {
+    updateSelectStyle
+} from "./utils.js";
+
 $(document).ready(function () {
 
     // Global constants definition
@@ -17,13 +21,13 @@ $(document).ready(function () {
     // Initialize DataTable with AJAX source and server-side processing
     let table = $('#orderitem-table').DataTable({
         serverSide: true, // Enable server-side processing
-        processing: true,  // Enables processing animation
-        orderCellsTop: true,  // Place sorting icons to top row
-        fixedHeader: true,  // Fix the header when scrolling
-        searching: false,  // Disable global search as using column filters
+        processing: true, // Enables processing animation
+        orderCellsTop: true, // Place sorting icons to top row
+        fixedHeader: true, // Fix the header when scrolling
+        searching: false, // Disable global search as using column filters
         scrollY: true, // Enable vertical scrolling
         scrollX: true, // Enable horizontal scrolling
-        responsive: true,  // Enable responsive layout for smaller screens
+        responsive: true, // Enable responsive layout for smaller screens
         pageLength: pageSize,
         ajax: {
             url: '/api/order_items/',
@@ -94,15 +98,15 @@ $(document).ready(function () {
             },
             {
                 data: 'option_values',
-                orderable: false,  // Disable ordering,
+                orderable: false, // Disable ordering,
                 className: 'not-sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        if(!data || data.length === 0){
+                        if (!data || data.length === 0) {
                             return '-';
                         }
                         let list = '<ul class="option-values-list">';
-                        data.forEach(function(option) {
+                        data.forEach(function (option) {
                             list += '<li>' + option.value + '</li>';
                         });
                         list += '</ul>';
@@ -124,15 +128,15 @@ $(document).ready(function () {
             },
             {
                 data: 'item_component_finishes',
-                orderable: false,  // Disable ordering
+                orderable: false, // Disable ordering
                 className: 'not-sortable',
                 render: function (data, type, row) {
-                    if(type === 'display'){
-                        if(!data || data.length === 0){
+                    if (type === 'display') {
+                        if (!data || data.length === 0) {
                             return '-';
                         }
                         let list = '<ul class="component-finish-list">';
-                        data.forEach(function(cf) {
+                        data.forEach(function (cf) {
                             list += '<li>' + cf.component_finish_display + '</li>';
                         });
                         list += '</ul>';
@@ -150,8 +154,7 @@ $(document).ready(function () {
                 className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        let select = '<select class="form-select item-status" data-id="' + row.id + '">';
-                        select += '<option value="">All</option>';
+                        let select = '<select class="form-select item-status-select" data-id="' + row.id + '">';
                         // Use global variable passed from context into JS
                         itemStatusChoices.forEach(function (option) {
                             select += '<option value="' + option[0] + '"' + (option[0] === data ? ' selected' : '') + '>' + option[1] + '</option>';
@@ -167,8 +170,7 @@ $(document).ready(function () {
                 className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        let select = '<select class="form-select priority-level" data-id="' + row.id + '">';
-                        select += '<option value="">All</option>';
+                        let select = '<select class="form-select priority-status-select" data-id="' + row.id + '">';
                         // Use global variable passed from context into JS
                         priorityLevelChoices.forEach(function (option) {
                             select += '<option value="' + option[0] + '"' + (option[0] === data ? ' selected' : '') + '>' + option[1] + '</option>';
@@ -185,8 +187,7 @@ $(document).ready(function () {
                 className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        let select = '<select class="form-select payment-status" data-id="' + row.id + '">';
-                        select += '<option value="">All</option>';
+                        let select = '<select class="form-select paid-status-select" data-id="' + row.id + '">';
                         // Use global variable passed from context into JS
                         paymentStatusChoices.forEach(function (option) {
                             select += '<option value="' + option[0] + '"' + (option[0] === data ? ' selected' : '') + '>' + option[1] + '</option>';
@@ -211,12 +212,20 @@ $(document).ready(function () {
         id: [
             [0, 'asc']
         ],
-        
+        // Callback after every draw (initial load and subsequent updates)
+        drawCallback: function (settings) {
+            console.log('DataTable drawCallback triggered');
+            // update dropdown styles
+            updateSelectStyle();
+        },
     });
+
+    // Handle dynamic status dropdown colouring on page load and when changed
+    updateSelectStyle();
 
     // Prevent triggering sorting when a user clicks in any of the inputs.
     // Sorting should apply when the user clicks any of the column headers
-    $('#orderitem-table').on('click mousedown touchstart', 'input, select, button', function(e) {
+    $('#orderitem-table').on('click mousedown touchstart', 'input, select, button', function (e) {
         e.stopPropagation();
     });
 
@@ -241,48 +250,4 @@ $(document).ready(function () {
         applyFilters();
     }, 300));
 
-
-    // Function to display messages
-    function displayMessages(messages) {
-        // Clear existing messages
-        messageContainer.innerHTML = '';
-
-        messages.forEach(msg => {
-            // Create a div for each message
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('alert', 'alert-dismissible', 'fade', 'show');
-            // Determine the alert class based on message level
-            switch (msg.level_tag) {
-                case 'debug':
-                case 'info':
-                    messageDiv.classList.add('alert-info');
-                    break;
-                case 'success':
-                    messageDiv.classList.add('alert-success');
-                    break;
-                case 'warning':
-                    messageDiv.classList.add('alert-warning');
-                    break;
-                case 'error':
-                    messageDiv.classList.add('alert-danger');
-                    break;
-                default:
-                    messageDiv.classList.add('alert-secondary');
-            }
-
-            messageDiv.setAttribute('role', 'alert');
-            messageDiv.innerText = msg.message;
-
-            // add a close button
-            const closeBtn = document.createElement('button');
-            closeBtn.type = 'button';
-            closeBtn.classList.add('btn-close');
-            closeBtn.setAttribute('data-bs-dismiss', 'alert');
-            closeBtn.setAttribute('aria-label', 'Close');
-            messageDiv.appendChild(closeBtn);
-
-            // Append the message to the container
-            messageContainer.appendChild(messageDiv);
-        });
-    }
 })

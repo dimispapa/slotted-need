@@ -102,11 +102,13 @@ of the suggestions div depending on viewport size */
 .bg-danger-light {
   background-color: #ef868f;
   text-decoration: none;
-  opacity: 1;  
+  opacity: 1;
 }
 
 /* ensure status dropdowns don't shrink too much */
-.item-status-select, .paid-status-select {
+.item-status-select,
+.paid-status-select,
+.priority-status-select {
   min-width: 75px;
   width: auto;
   font-size: inherit;
