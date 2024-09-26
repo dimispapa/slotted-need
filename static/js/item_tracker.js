@@ -147,7 +147,13 @@ $(document).ready(function () {
             },
             {
                 data: 'item_value',
-                className: 'sortable'
+                className: 'sortable',
+                render: function (data, type, row) {
+                    if (type === 'display') {
+                        return `€${data}`
+                    }
+                    return data
+                }
             },
             {
                 data: 'item_status',
@@ -214,7 +220,6 @@ $(document).ready(function () {
         ],
         // Callback after every draw (initial load and subsequent updates)
         drawCallback: function (settings) {
-            console.log('DataTable drawCallback triggered');
             // update dropdown styles
             updateSelectStyle();
         },
@@ -249,5 +254,32 @@ $(document).ready(function () {
         '#filter-design-options, #filter-product-finish, #filter-component-finishes').on('keyup change', debounce(function () {
         applyFilters();
     }, 300));
+
+    // Handle change for item_status
+    $('#orderitem-table').on('change', '.item-status-select', function() {
+        let orderitemId = $(this).data('id');
+        let newStatus = $(this).val();
+
+        if(newStatus === ""){
+            // If "All" is selected, do not perform an update
+            return;
+        }
+
+        $.ajax({
+            url: '/api/order_items/' + orderitemId + '/',
+            type: 'PATCH',
+            data: JSON.stringify({ 'item_status': newStatus }),
+            contentType: 'application/json',
+            success: function(response) {
+                // Reload the table without resetting pagination
+                table.ajax.reload(null, false);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error updating item status:', error);
+                // Reload the table to revert changes
+                table.ajax.reload(null, false);
+            }
+        });
+    });
 
 })
