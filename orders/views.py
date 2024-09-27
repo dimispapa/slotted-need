@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponseBadRequest
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.admin.views.decorators import staff_member_required
@@ -711,3 +711,33 @@ class OrderItemListView(LoginRequiredMixin, TemplateView):
         context['payment_status_choices_json'] = json.dumps(
             context['payment_status_choices'])
         return context
+
+
+@require_GET
+def order_details(request, order_id):
+    # get order object
+    order = get_object_or_404(Order, id=order_id)
+    # get order items
+    order_items = OrderItem.objects.filter(
+        order=order).values(
+            'product',
+            'item_value',
+            'option_values',
+            'product_finish',
+            'item_component_finishes',
+            'item_status',
+            'priority_level'
+    )
+
+    client = {
+        'name': order.client.name,
+        'phone': order.client.phone,
+        'email': order.client.email
+    }
+    data = {
+        'order_id': order.id,
+        'paid_status': order.paid_status,
+        'client': client,
+        'order_items': list(order_items)
+    }
+    return JsonResponse(data)
