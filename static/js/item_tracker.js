@@ -155,7 +155,7 @@ $(document).ready(function () {
                     return data
                 }
             },
-            {   // Item Status
+            { // Item Status
                 data: 'item_status',
                 className: 'sortable',
                 render: function (data, type, row) {
@@ -171,7 +171,7 @@ $(document).ready(function () {
                     return data;
                 }
             },
-            {   // Priority Level Status
+            { // Priority Level Status
                 data: 'priority_level',
                 className: 'sortable',
                 render: function (data, type, row) {
@@ -187,7 +187,7 @@ $(document).ready(function () {
                     return data;
                 }
             },
-            {   // Paid Status
+            { // Paid Status
                 data: 'order.paid',
                 name: 'order__paid',
                 className: 'sortable',
@@ -197,7 +197,7 @@ $(document).ready(function () {
                         let optionStr = paymentStatusChoices[data];
                         return `
                         <button class="btn btn-sm fw-bolder text-wrap paid-status-button"
-                        data-order-id="${row.order_id}" data-value="${data}">
+                        data-order-id="${row.order.id}" data-value="${data}">
                         ${optionStr}
                         </button>
                         `
@@ -268,7 +268,7 @@ $(document).ready(function () {
         }
 
         $.ajax({
-            url: '/api/order_items/' + orderitemId + '/',
+            url: `/api/order_items/${orderitemId}/`,
             type: 'PATCH',
             data: JSON.stringify({
                 'item_status': newStatus
@@ -296,7 +296,7 @@ $(document).ready(function () {
         var newPriority = $(this).val();
 
         $.ajax({
-            url: '/api/order_items/' + orderitemId + '/',
+            url: `/api/order_items/${orderitemId}/`,
             type: 'PATCH',
             data: JSON.stringify({
                 'priority_level': newPriority
@@ -323,6 +323,66 @@ $(document).ready(function () {
     // initialize tooltips
     $(function () {
         $('[data-toggle="tooltip"]').tooltip()
-      })
+    })
 
+    // Function that opens the paid status modal and performs an AJAX call for order details
+    function openPaidStatusModal(orderId) {
+
+        // Show the modal
+        $('#paidStatusModal').modal('show');
+
+        // Clear previous data
+        $('#paidStatusModal .modal-body').html('<p>Loading...</p>');
+
+        // Fetch order details via AJAX
+        $.ajax({
+            url: `/api/${orderId}/details/`,
+            method: 'GET',
+            success: function (data) {
+                // Populate the modal with order and client details
+                populatePaidStatusModal(data);
+            },
+            error: function (error) {
+                console.error('Error fetching order details:', error);
+                $('#paidStatusModal .modal-body').html('<p>Error loading data.</p>');
+            }
+        });
+    }
+
+    // Event delegation for dynamically added buttons
+    $('#orderitem-table tbody').on('click', '.paid-status-button', function () {
+        let orderId = $(this).data('order-id');
+        openPaidStatusModal(orderId);
+    });
+
+    // Function that populates the paid status modal with order details
+    function populatePaidStatusModal(data) {
+        // Construct HTML content for the modal
+        let clientInfo = `
+            <h5>Client Details</h5>
+            <p>Name: ${data.client.name}</p>
+            <p>Phone: ${data.client.phone}</p>
+            <p>Email: ${data.client.email}</p>
+        `;
+
+        let orderItems = '<h5>Order Items</h5><ul>';
+        data.order_items.forEach(item => {
+            orderItems += `<li><strong>${item.str}</strong>
+            <ul>
+                <li><em>Design:</em> ${item.option_values}</li>
+                <li><em>Product Finish:</em> ${item.product_finish || 'None'}</li>
+                <li><em>Component Finishes:</em> ${item.item_component_finishes}</li>
+            </ul>
+            </li>`;
+        });
+        orderItems += '</ul>';
+
+        $('#paidStatusModal .modal-body').html(clientInfo + orderItems);
+
+        // Attach form submission handler
+        $('#paidStatusForm').on('submit', function (e) {
+            e.preventDefault();
+            submitPaidStatusForm();
+        });
+    }
 })
