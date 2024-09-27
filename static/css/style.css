@@ -6,6 +6,19 @@
   color: #0d6efd;
 }
 
+/********* General font size media queries *************/
+/* reduce font-size for smaller viewports */
+@media (max-width: 768px) {
+  /* order item tracker */
+  #orderitem-tracker-container,
+  #orderitem-tracker-container input,
+  #orderitem-tracker-container select,
+  /* order tracker */
+  #order-list-form {
+    font-size: 12px;
+  }
+}
+
 /*************** CREATE ORDERS PAGE **************************/
 
 /******* CLIENT SEARCH FEATURE */
@@ -92,6 +105,11 @@ of the suggestions div depending on viewport size */
   color: white;
 }
 
+/* order status badge */
+.order-status-badge {
+  font-size: inherit;
+}
+
 /* custom boostrap-like classes for bg colours */
 .bg-pending {
   background-color: #e3ff2c;
@@ -114,26 +132,18 @@ of the suggestions div depending on viewport size */
   font-size: inherit;
 }
 
-/* Ensure badge has consistent font size with rest of table */
-.badge {
-  font-size: inherit;
-}
-
+/* sticky header */
 .sticky-head {
   position: sticky;
   top: 0;
 }
 
+/* set max height for scrolling table */
 .table-container {
   overflow: auto;
   max-height: 80vh;
 }
 
-@media (max-width: 768px) {
-  #order-list-form {
-    font-size: 12px;
-  }
-}
 
 /* ORDER ITEM TRACKER */
 th.sortable {
@@ -148,13 +158,5 @@ th.not-sortable {
 /* Order item table font size */
 #orderitem-table {
   font-size: 14px;
-}
-
-@media (max-width: 768px) {
-
-  #orderitem-tracker-container,
-  #orderitem-tracker-container input,
-  #orderitem-tracker-container select {
-    font-size: 12px;
-  }
+  width: 100% !important
 }
