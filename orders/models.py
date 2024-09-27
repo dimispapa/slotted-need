@@ -27,18 +27,18 @@ class Order(models.Model):
     order_value = models.DecimalField(
         max_digits=10, decimal_places=2, default=0)
     # create a PROGRESS status mapping to use as choices for order_status
-    STATUS_CHOICES = [(1, 'Not Started'),
-                      (2, 'In Progress'),
-                      (3, 'Made'),
-                      (4, 'Delivered')]
+    STATUS_CHOICES = {1: 'Not Started',
+                      2: 'In Progress',
+                      3: 'Made',
+                      4: 'Delivered'}
     order_status = models.IntegerField(
         choices=STATUS_CHOICES,
         default=1,
         editable=False,  # Prevents editing in forms and admin
     )
     # create a PAID status mapping to use as choices for order_status
-    PAID_CHOICES = [(1, 'Not Paid'),
-                    (2, 'Fully Paid')]
+    PAID_CHOICES = {1: 'Not Paid',
+                    2: 'Fully Paid'}
     paid = models.IntegerField(
         choices=PAID_CHOICES,
         default=1
@@ -121,18 +121,18 @@ class OrderItem(models.Model):
                                        related_name='order_items'
                                        )
     # create a status mapping to use as choices for order_status
-    STATUS_CHOICES = [(1, 'Not Started'),
-                      (2, 'In Progress'),
-                      (3, 'Made'),
-                      (4, 'Delivered')]
+    STATUS_CHOICES = {1: 'Not Started',
+                      2: 'In Progress',
+                      3: 'Made',
+                      4: 'Delivered'}
     item_status = models.IntegerField(
         choices=STATUS_CHOICES,
         default=1
     )
     # create a priority level field and use a mapping for choices
-    PRIORITY_CHOICES = [(1, 'Low'),
-                        (2, 'Medium'),
-                        (3, 'High')]
+    PRIORITY_CHOICES = {1: 'Low',
+                        2: 'Medium',
+                        3: 'High'}
     priority_level = models.IntegerField(
         choices=PRIORITY_CHOICES,
         default=1

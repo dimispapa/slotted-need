@@ -161,9 +161,9 @@ $(document).ready(function () {
                 render: function (data, type, row) {
                     if (type === 'display') {
                         let select = '<select class="form-select-sm item-status-select fw-bolder text-wrap" data-id="' + row.id + '">';
-                        // Use global variable passed from context into JS
-                        itemStatusChoices.forEach(function (option) {
-                            select += '<option value="' + option[0] + '"' + (option[0] === data ? ' selected' : '') + '>' + option[1] + '</option>';
+                        // Use global variable passed from context into JS and iterate through each key-value pair
+                        Object.entries(itemStatusChoices).forEach(([optionInt, optionStr]) => {
+                            select += '<option value="' + optionInt + '"' + (optionInt == data ? ' selected' : '') + '>' + optionStr + '</option>';
                         });
                         select += '</select>';
                         return select;
@@ -177,9 +177,9 @@ $(document).ready(function () {
                 render: function (data, type, row) {
                     if (type === 'display') {
                         let select = '<select class="form-select-sm priority-status-select fw-bolder text-wrap" data-id="' + row.id + '">';
-                        // Use global variable passed from context into JS
-                        priorityLevelChoices.forEach(function (option) {
-                            select += '<option value="' + option[0] + '"' + (option[0] === data ? ' selected' : '') + '>' + option[1] + '</option>';
+                        // Use global variable passed from context into JS and iterate through each key-value pair
+                        Object.entries(priorityLevelChoices).forEach(([optionInt, optionStr]) => {
+                            select += '<option value="' + optionInt + '"' + (optionInt == data ? ' selected' : '') + '>' + optionStr + '</option>';
                         });
                         select += '</select>';
                         return select;
@@ -193,13 +193,16 @@ $(document).ready(function () {
                 className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        let select = '<select class="form-select-sm paid-status-select fw-bolder text-wrap" data-id="' + row.id + '">';
                         // Use global variable passed from context into JS
-                        paymentStatusChoices.forEach(function (option) {
-                            select += '<option value="' + option[0] + '"' + (option[0] === data ? ' selected' : '') + '>' + option[1] + '</option>';
-                        });
-                        select += '</select>';
-                        return select;
+                        let optionStr = paymentStatusChoices[data];
+                        // Assign bootstrap class based on integer value of status
+                        let btnClass = (data == 2) ? 'btn-secondary' : 'btn-danger';
+                        return `
+                        <button class="btn ${btnClass} paid-status-button"
+                        data-order-id="${row.order_id}" data-value="${data}">
+                        ${optionStr}
+                        </button>
+                        `
                     }
                     return data;
                 }
@@ -256,7 +259,7 @@ $(document).ready(function () {
     }, 300));
 
     // Handle change for item_status
-    $('#orderitem-table').on('change', '.item-status-select', function() {
+    $('#orderitem-table').on('change', '.item-status-select', function () {
         // show spinner
         let spinner = document.getElementById('filter-item-status-spinner');
         spinner.classList.remove('d-none');
@@ -264,7 +267,7 @@ $(document).ready(function () {
         let orderitemId = $(this).data('id');
         let newStatus = $(this).val();
 
-        if(newStatus === ""){
+        if (newStatus === "") {
             // If "All" is selected, do not perform an update
             return;
         }
@@ -272,13 +275,15 @@ $(document).ready(function () {
         $.ajax({
             url: '/api/order_items/' + orderitemId + '/',
             type: 'PATCH',
-            data: JSON.stringify({ 'item_status': newStatus }),
+            data: JSON.stringify({
+                'item_status': newStatus
+            }),
             contentType: 'application/json',
-            success: function(response) {
+            success: function (response) {
                 // Reload the table without resetting pagination
                 table.ajax.reload(hideSpinner(spinner), false);
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 console.error('Error updating item status:', error);
                 // Reload the table to revert changes
                 table.ajax.reload(hideSpinner(spinner), false);
@@ -287,7 +292,7 @@ $(document).ready(function () {
     });
 
     // Handle change for priority_level
-    $('#orderitem-table').on('change', '.priority-status-select', function() {
+    $('#orderitem-table').on('change', '.priority-status-select', function () {
         // show spinner
         let spinner = document.getElementById('filter-priority-level-spinner');
         spinner.classList.remove('d-none');
@@ -298,18 +303,20 @@ $(document).ready(function () {
         $.ajax({
             url: '/api/order_items/' + orderitemId + '/',
             type: 'PATCH',
-            data: JSON.stringify({ 'priority_level': newPriority }),
+            data: JSON.stringify({
+                'priority_level': newPriority
+            }),
             contentType: 'application/json',
-            success: function(response) {
+            success: function (response) {
                 // Reload the table without resetting pagination
                 table.ajax.reload(hideSpinner(spinner), false);
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 console.error('Error updating priority level:', error);
                 // Reload the table to revert changes
                 table.ajax.reload(hideSpinner, false);
             },
-            
+
         });
     });
 

@@ -9,7 +9,7 @@
 </div>
 <select class="{{ class }}" id="{{ id }}">
     <option value="">All</option>
-    {% for option_value, option_display in options %}
+    {% for option_value, option_display in options.items %}
     <option value="{{ option_value }}" {% if option_value == selected %}selected{% endif %}>{{ option_display }}
     </option>
     {% endfor %}
