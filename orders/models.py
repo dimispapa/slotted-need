@@ -169,5 +169,5 @@ class ComponentFinish(models.Model):
         verbose_name_plural = 'Component Finishes'
 
     def __str__(self):
-        return (f"{self.order_item} - {self.component.name} - "
+        return (f"{self.component.name} - "
                 f"{self.finish_option.name}")

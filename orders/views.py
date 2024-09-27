@@ -11,7 +11,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.decorators import method_decorator
 from django.db import transaction
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Prefetch
 from rest_framework import viewsets, permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
@@ -717,27 +717,67 @@ class OrderItemListView(LoginRequiredMixin, TemplateView):
 def order_details(request, order_id):
     # get order object
     order = get_object_or_404(Order, id=order_id)
-    # get order items
-    order_items = OrderItem.objects.filter(
-        order=order).values(
-            'product',
-            'item_value',
-            'option_values',
-            'product_finish',
-            'item_component_finishes',
-            'item_status',
-            'priority_level'
+    # Define Prefetch objects with 'to_attr' to avoid duplicates
+    option_values_prefetch = Prefetch('option_values',
+                                      to_attr='prefetched_option_values')
+    item_component_finishes_prefetch = Prefetch(
+        'item_component_finishes',
+        to_attr='prefetched_item_component_finishes')
+
+    # Get order items as a queryset of model instances
+    order_items_queryset = OrderItem.objects.filter(
+        order=order).select_related(
+        'product', 'product_finish'
+    ).prefetch_related(
+        option_values_prefetch,
+        item_component_finishes_prefetch
     )
 
+    # Build a list of order items with desired fields
+    order_items = []
+    for item in order_items_queryset:
+        item_data = {
+            'product': item.product.name if item.product else None,
+            'item_value': item.item_value,
+            'option_values':
+                [ov.value for ov in item.prefetched_option_values],
+            'product_finish':
+                item.product_finish.name if item.product_finish else None,
+            'item_component_finishes':
+                [str(icf) for icf in item.prefetched_item_component_finishes],
+            'item_status': item.item_status,
+            'item_status_display': item.get_item_status_display(),
+            'priority_level': item.priority_level,
+            'priority_level_display': item.get_priority_level_display(),
+            'str': str(item),
+        }
+        order_items.append(item_data)
+
+    # fetch client details
     client = {
-        'name': order.client.name,
-        'phone': order.client.phone,
-        'email': order.client.email
+        'name': order.client.client_name,
+        'phone': order.client.client_phone,
+        'email': order.client.client_email
     }
+    # compile data
     data = {
         'order_id': order.id,
-        'paid_status': order.paid_status,
+        'paid_status': order.paid,
         'client': client,
         'order_items': list(order_items)
     }
     return JsonResponse(data)
+
+
+@require_POST
+def update_paid_status(request):
+    # get order id and paid status from POST request
+    order_id = request.POST.get('order_id')
+    paid_status = request.POST.get('paid_status')
+    # fetch order
+    order = get_object_or_404(Order, id=order_id)
+    # update paid_status
+    order.paid = paid_status
+    order.save()
+
+    return JsonResponse({'success': True})
