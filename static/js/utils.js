@@ -44,76 +44,84 @@ function displayMessages(messages) {
     });
 };
 
-// Define function that updates the item_status and paid_status dropdown bg colour
-function updateSelectStyle() {
-    // Get select elements
-    let itemStatusSelects = document.querySelectorAll('.item-status-select');
-    let paidStatusSelects = document.querySelectorAll('.paid-status-select');
-    let priorityStatusSelects = document.querySelectorAll('.priority-status-select');
+// Define function that updates statuses bg colour with default parameters set initially
+function updateStatusStyle(
+    itemStatusClass='.item-status-select',
+    paidStatusClass='.paid-status-select',
+    priorityStatusClass='.priority-status-select'
+) {
+    // Get elements
+    let itemStatuses = document.querySelectorAll(itemStatusClass);
+    let paidStatuses = document.querySelectorAll(paidStatusClass);
+    let priorityStatuses = document.querySelectorAll(priorityStatusClass);
 
-    // loop through item status dropdowns
-    if (itemStatusSelects && itemStatusSelects.length > 0) {
+    // loop through item status
+    if (itemStatuses && itemStatuses.length > 0) {
 
-        itemStatusSelects.forEach(select => {
+        itemStatuses.forEach(status => {
             // remove existing style classes
-            select.classList.remove('bg-pending', 'bg-warning', 'bg-success', 'bg-secondary', 'text-dark', 'text-light');
+            status.classList.remove('bg-pending', 'bg-warning', 'bg-success', 'bg-secondary', 'text-dark', 'text-light');
 
             // Not Started
-            if (select.value == 1) {
-                select.classList.add('bg-pending', 'text-dark');
+            if (status.value == 1) {
+                status.classList.add('bg-pending', 'text-dark');
                 // In Progress
-            } else if (select.value == 2) {
-                select.classList.add('bg-warning', 'text-dark');
+            } else if (status.value == 2) {
+                status.classList.add('bg-warning', 'text-dark');
                 // Made
-            } else if (select.value == 3) {
-                select.classList.add('bg-success', 'text-light');
+            } else if (status.value == 3) {
+                status.classList.add('bg-success', 'text-light');
                 // Delivered
-            } else if (select.value == 4) {
-                select.classList.add('bg-secondary', 'text-light');
+            } else if (status.value == 4) {
+                status.classList.add('bg-secondary', 'text-light');
             }
             // Add listener to update styling on change
-            select.addEventListener('change', updateSelectStyle);
+            status.addEventListener('change', updateStatusStyle);
         });
     }
 
-    // loop through paid status dropdowns
-    if (paidStatusSelects && paidStatusSelects.length > 0) {
+    // loop through paid status
+    if (paidStatuses && paidStatuses.length > 0) {
 
-        paidStatusSelects.forEach(select => {
+        paidStatuses.forEach(status => {
+            // Set boostrap class prefix dynamically based on element type and also get status value integer
+            let bsTag = (status.tagName == 'BUTTON') ? 'btn' : 'bg'
+            let statusValue = (status.tagName == 'BUTTON') ? status.getAttribute('data-value') : status.value
             // remove existing style classes
-            select.classList.remove('bg-danger-light', 'bg-secondary', 'text-dark', 'text-light');
+            status.classList.remove(`${bsTag}-danger`, `${bsTag}-secondary`, 'text-light');
 
             // Not Paid
-            if (select.value == 1) {
-                select.classList.add('bg-danger-light', 'text-dark');
+            if (statusValue == 1) {
+                status.classList.add(`${bsTag}-danger`, 'text-light');
                 // Fully Paid
-            } else if (select.value == 2) {
-                select.classList.add('bg-secondary', 'text-light');
+            } else if (statusValue == 2) {
+                status.classList.add(`${bsTag}-secondary`, 'text-light');
             }
             // Add listener to update styling on change
-            select.addEventListener('change', updateSelectStyle);
+            status.addEventListener('change', updateStatusStyle);
         });
     }
 
-    // loop through paid status dropdowns
-    if (priorityStatusSelects && priorityStatusSelects.length > 0) {
+    // loop through paid status
+    if (priorityStatuses && priorityStatuses.length > 0) {
 
-        priorityStatusSelects.forEach(select => {
+        priorityStatuses.forEach(status => {
+
             // remove existing style classes
-            select.classList.remove('bg-danger-light', 'bg-light', 'bg-warning', 'text-dark');
+            status.classList.remove('bg-danger', 'bg-light', 'bg-warning', 'text-dark', 'text-light');
 
             // Low priority
-            if (select.value == 1) {
-                select.classList.add('bg-light', 'text-dark');
+            if (status.value == 1) {
+                status.classList.add('bg-light', 'text-dark');
                 // Medium priority
-            } else if (select.value == 2) {
-                select.classList.add('bg-warning', 'text-dark');
+            } else if (status.value == 2) {
+                status.classList.add('bg-warning', 'text-dark');
                 // High priority
-            } else if (select.value == 3) {
-                select.classList.add('bg-danger-light', 'text-dark');
+            } else if (status.value == 3) {
+                status.classList.add('bg-danger', 'text-light');
             }
             // Add listener to update styling on change
-            select.addEventListener('change', updateSelectStyle);
+            status.addEventListener('change', updateStatusStyle);
         });
     }
 };
@@ -121,5 +129,5 @@ function updateSelectStyle() {
 
 export {
     displayMessages,
-    updateSelectStyle
+    updateStatusStyle
 };

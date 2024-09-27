@@ -1,5 +1,5 @@
 import {
-    updateSelectStyle
+    updateStatusStyle
 } from "./utils.js";
 
 $(document).ready(function () {
@@ -155,7 +155,7 @@ $(document).ready(function () {
                     return data
                 }
             },
-            {
+            {   // Item Status
                 data: 'item_status',
                 className: 'sortable',
                 render: function (data, type, row) {
@@ -171,7 +171,7 @@ $(document).ready(function () {
                     return data;
                 }
             },
-            {
+            {   // Priority Level Status
                 data: 'priority_level',
                 className: 'sortable',
                 render: function (data, type, row) {
@@ -187,7 +187,7 @@ $(document).ready(function () {
                     return data;
                 }
             },
-            {
+            {   // Paid Status
                 data: 'order.paid',
                 name: 'order__paid',
                 className: 'sortable',
@@ -195,10 +195,8 @@ $(document).ready(function () {
                     if (type === 'display') {
                         // Use global variable passed from context into JS
                         let optionStr = paymentStatusChoices[data];
-                        // Assign bootstrap class based on integer value of status
-                        let btnClass = (data == 2) ? 'btn-secondary' : 'btn-danger';
                         return `
-                        <button class="btn ${btnClass} paid-status-button"
+                        <button class="btn btn-sm fw-bolder text-wrap paid-status-button"
                         data-order-id="${row.order_id}" data-value="${data}">
                         ${optionStr}
                         </button>
@@ -223,13 +221,10 @@ $(document).ready(function () {
         ],
         // Callback after every draw (initial load and subsequent updates)
         drawCallback: function (settings) {
-            // update dropdown styles
-            updateSelectStyle();
+            // update status styles
+            updateStatusStyle('.item-status-select', '.paid-status-button', '.priority-status-select');
         },
     });
-
-    // Handle dynamic status dropdown colouring on page load and when changed
-    updateSelectStyle();
 
     // Prevent triggering sorting when a user clicks in any of the inputs.
     // Sorting should apply when the user clicks any of the column headers

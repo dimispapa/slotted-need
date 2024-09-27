@@ -1,6 +1,6 @@
 import {
     displayMessages,
-    updateSelectStyle
+    updateStatusStyle
 } from './utils.js'
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     //   Handle status dropdowns change colouring dynamically
     // Initial styling on page load
-    updateSelectStyle();
+    updateStatusStyle();
 
     // add event listener that handles first delete button that will trigger the modal
     document.addEventListener("click", (event) => {
