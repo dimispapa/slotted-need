@@ -315,8 +315,14 @@ $(document).ready(function () {
         });
     });
 
+    // hide spinner on initial load
     function hideSpinner(spinner) {
         spinner.classList.add('d-none')
     };
+
+    // initialize tooltips
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      })
 
 })

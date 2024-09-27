@@ -4,6 +4,8 @@
 {% block extra_head %}
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" type="text/javascript"></script>
+<!-- Popper JS -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" type="text/javascript"></script>
 <!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" type="text/css">
 <!-- DataTables JS -->
@@ -12,7 +14,6 @@
 
 {% block content %}
 <div id="orderitem-tracker-container" class="container-fluid mt-2 mt-md-4">
-
     <!-- Filtering and DataTable -->
     <table id="orderitem-table" class="display table table-bordered table-responsive table-striped">
         <thead>
@@ -35,9 +36,23 @@
                 <th><input type="number" class="form-control" id="filter-order" placeholder="Filter" /></th>
                 <th><input type="text" class="form-control" id="filter-client" placeholder="Filter" /></th>
                 <th><input type="text" class="form-control" id="filter-product" placeholder="Filter" /></th>
-                <th><input type="text" class="form-control" id="filter-design-options" placeholder="Filter" /></th>
+                <th>
+                    <!-- Tooltip -->
+                    <div class="text-center align-baseline mb-2" data-toggle="tooltip" data-html="true"
+                        title="Use comma to separate multiple filter criteria" aria-label="Info on filter tooltip">
+                        <i class="fa-solid fa-circle-info btn-secondary fs-4 fw-bolder"></i>
+                    </div>
+                    <input type="text" class="form-control" id="filter-design-options" placeholder="Filter" />
+                </th>
                 <th><input type="text" class="form-control" id="filter-product-finish" placeholder="Filter" /></th>
-                <th><input type="text" class="form-control" id="filter-component-finishes" placeholder="Filter" /></th>
+                <th>
+                    <!-- Tooltip -->
+                    <div class="text-center align-baseline mb-2" data-toggle="tooltip" data-html="true"
+                        title="Use comma to separate multiple filter criteria" aria-label="Info on filter tooltip">
+                        <i class="fa-solid fa-circle-info btn-secondary fs-4 fw-bolder"></i>
+                    </div>
+                    <input type="text" class="form-control" id="filter-component-finishes" placeholder="Filter" />
+                </th>
                 <th>
                     <input type="number" class="form-control" id="filter-value-min" placeholder="Min" />
                     <input type="number" class="form-control" id="filter-value-max" placeholder="Max" />
@@ -59,11 +74,11 @@
         </tbody>
     </table>
 
-{% endblock %}
+    {% endblock %}
 
-{% block extra_scripts %}
-<!-- Include the partial that defines JS variables using DTL -->
-{% include 'orders/partials/js_variables.html' %}
-<!-- External JS file -->
-<script src="{% static 'js/item_tracker.js' %}" type="module"></script>
-{% endblock %}
+    {% block extra_scripts %}
+    <!-- Include the partial that defines JS variables using DTL -->
+    {% include 'orders/partials/js_variables.html' %}
+    <!-- External JS file -->
+    <script src="{% static 'js/item_tracker.js' %}" type="module"></script>
+    {% endblock %}

@@ -146,17 +146,20 @@ of the suggestions div depending on viewport size */
 
 
 /* ORDER ITEM TRACKER */
+/* Custom header styles */
+/* mouse pointer on sortable columns */
 th.sortable {
   cursor: pointer;
 }
-
+/* default pointer on non-sortable */
 th.not-sortable {
   cursor: default;
-  background-color: #f9f9f9;
 }
 
-/* Order item table font size */
+/* Order item table */
 #orderitem-table {
+  /* set font-size */
   font-size: 14px;
+  /* ensure width takes 100% of container */
   width: 100% !important
 }
