@@ -701,15 +701,15 @@ class OrderItemListView(LoginRequiredMixin, TemplateView):
         # Extract choices from the OrderItem model
         context['item_status_choices'] = OrderItem.STATUS_CHOICES
         context['priority_level_choices'] = OrderItem.PRIORITY_CHOICES
-        context['payment_status_choices'] = Order.PAID_CHOICES
+        context['paid_status_choices'] = Order.PAID_CHOICES
 
         # Serialize choices to JSON for JavaScript
         context['item_status_choices_json'] = json.dumps(
             context['item_status_choices'])
         context['priority_level_choices_json'] = json.dumps(
             context['priority_level_choices'])
-        context['payment_status_choices_json'] = json.dumps(
-            context['payment_status_choices'])
+        context['paid_status_choices_json'] = json.dumps(
+            context['paid_status_choices'])
         return context
 
 
@@ -770,12 +770,22 @@ def order_details(request, order_id):
 
 
 @require_POST
+@ajax_login_required_no_redirect
+@ajax_admin_required_no_redirect
 def update_paid_status(request):
+    # Parse JSON data from request.body
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+
     # get order id and paid status from POST request
-    order_id = request.POST.get('order_id')
-    paid_status = request.POST.get('paid_status')
+    order_id = data.get('order_id')
+    paid_status = data.get('paid_status')
+
     # fetch order
     order = get_object_or_404(Order, id=order_id)
+
     # update paid_status
     order.paid = paid_status
     order.save()

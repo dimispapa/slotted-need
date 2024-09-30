@@ -1,5 +1,7 @@
 import {
-    updateStatusStyle
+    displayMessages,
+    updateStatusStyle,
+    updatePaidStatusStyle
 } from "./utils.js";
 
 $(document).ready(function () {
@@ -30,7 +32,7 @@ $(document).ready(function () {
         responsive: true, // Enable responsive layout for smaller screens
         pageLength: pageSize,
         ajax: {
-            url: '/api/order_items/',
+            url: '/api/order-items/',
             type: 'GET',
             data: function (d) {
                 // Map DataTables parameters to API query parameters
@@ -56,7 +58,7 @@ $(document).ready(function () {
                 d.value_max = $('#filter-value-max').val();
                 d.item_status = $('#filter-item-status').val();
                 d.priority_level = $('#filter-priority-level').val();
-                d.payment_status = $('#filter-payment-status').val();
+                d.paid_status = $('#filter-paid-status').val();
 
                 // Ordering parameters
                 // WARNING: "order" is a reserved array name to store sorting instructions
@@ -160,7 +162,7 @@ $(document).ready(function () {
                 className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        let select = '<select class="form-select-sm item-status-select fw-bolder text-wrap" data-id="' + row.id + '">';
+                        let select = '<select class="form-select-sm item-status fw-bolder text-wrap" data-id="' + row.id + '">';
                         // Use global variable passed from context into JS and iterate through each key-value pair
                         Object.entries(itemStatusChoices).forEach(([optionInt, optionStr]) => {
                             select += '<option value="' + optionInt + '"' + (optionInt == data ? ' selected' : '') + '>' + optionStr + '</option>';
@@ -176,7 +178,7 @@ $(document).ready(function () {
                 className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        let select = '<select class="form-select-sm priority-status-select fw-bolder text-wrap" data-id="' + row.id + '">';
+                        let select = '<select class="form-select-sm priority-status fw-bolder text-wrap" data-id="' + row.id + '">';
                         // Use global variable passed from context into JS and iterate through each key-value pair
                         Object.entries(priorityLevelChoices).forEach(([optionInt, optionStr]) => {
                             select += '<option value="' + optionInt + '"' + (optionInt == data ? ' selected' : '') + '>' + optionStr + '</option>';
@@ -194,9 +196,9 @@ $(document).ready(function () {
                 render: function (data, type, row) {
                     if (type === 'display') {
                         // Use global variable passed from context into JS
-                        let optionStr = paymentStatusChoices[data];
+                        let optionStr = paidStatusChoices[data];
                         return `
-                        <button class="btn btn-sm fw-bolder text-wrap paid-status-button"
+                        <button class="btn btn-sm fw-bolder text-wrap paid-status"
                         data-order-id="${row.order.id}" data-value="${data}">
                         ${optionStr}
                         </button>
@@ -222,7 +224,7 @@ $(document).ready(function () {
         // Callback after every draw (initial load and subsequent updates)
         drawCallback: function (settings) {
             // update status styles
-            updateStatusStyle('.item-status-select', '.paid-status-button', '.priority-status-select');
+            updateStatusStyle();
         },
     });
 
@@ -248,13 +250,13 @@ $(document).ready(function () {
 
     // Event listeners for filter inputs with debounce
     $('#filter-id, #filter-order, #filter-client, #filter-product, #filter-value-min, ' +
-        '#filter-value-max, #filter-item-status, #filter-priority-level, #filter-payment-status, ' +
+        '#filter-value-max, #filter-item-status, #filter-priority-level, #filter-paid-status, ' +
         '#filter-design-options, #filter-product-finish, #filter-component-finishes').on('keyup change', debounce(function () {
         applyFilters();
     }, 300));
 
     // Handle change for item_status
-    $('#orderitem-table').on('change', '.item-status-select', function () {
+    $('#orderitem-table').on('change', '.item-status', function () {
         // show spinner
         let spinner = document.getElementById('filter-item-status-spinner');
         spinner.classList.remove('d-none');
@@ -268,7 +270,7 @@ $(document).ready(function () {
         }
 
         $.ajax({
-            url: `/api/order_items/${orderitemId}/`,
+            url: `/api/order-items/${orderitemId}/`,
             type: 'PATCH',
             data: JSON.stringify({
                 'item_status': newStatus
@@ -287,7 +289,7 @@ $(document).ready(function () {
     });
 
     // Handle change for priority_level
-    $('#orderitem-table').on('change', '.priority-status-select', function () {
+    $('#orderitem-table').on('change', '.priority-status', function () {
         // show spinner
         let spinner = document.getElementById('filter-priority-level-spinner');
         spinner.classList.remove('d-none');
@@ -296,7 +298,7 @@ $(document).ready(function () {
         var newPriority = $(this).val();
 
         $.ajax({
-            url: `/api/order_items/${orderitemId}/`,
+            url: `/api/order-items/${orderitemId}/`,
             type: 'PATCH',
             data: JSON.stringify({
                 'priority_level': newPriority
@@ -309,7 +311,7 @@ $(document).ready(function () {
             error: function (xhr, status, error) {
                 console.error('Error updating priority level:', error);
                 // Reload the table to revert changes
-                table.ajax.reload(hideSpinner, false);
+                table.ajax.reload(hideSpinner(spinner), false);
             },
 
         });
@@ -350,7 +352,7 @@ $(document).ready(function () {
     }
 
     // Event delegation for dynamically added buttons
-    $('#orderitem-table tbody').on('click', '.paid-status-button', function () {
+    $('#orderitem-table tbody').on('click', '.paid-status', function () {
         let orderId = $(this).data('order-id');
         openPaidStatusModal(orderId);
     });
@@ -377,7 +379,31 @@ $(document).ready(function () {
         });
         orderItems += '</ul>';
 
-        $('#paidStatusModal .modal-body').html(clientInfo + orderItems);
+        // Generate `paid_status` options dynamically
+        let paidStatusOptions = '';
+        for (let [value, display] of Object.entries(paidStatusChoices)) {
+            paidStatusOptions += `<option value="${value}" ${data.paid_status == value ? 'selected' : ''}>${display}</option>`;
+        }
+
+        let paidStatusForm = `
+            <form id="paidStatusForm">
+                <div class="form-group col-3 mb-2 mb-mb-3 fw-bold">
+                    <label for="id_paid_status">Payment Status</label>
+                    <select name="paid_status" id="id_paid_status" class="form-select paid-status fw-bold">
+                        ${paidStatusOptions}
+                    </select>
+                </div>
+                <input type="hidden" name="order_id" value="${data.order_id}">
+                <button type="submit" class="btn btn-primary fw-bold">Update Payment Status</button>
+            </form>
+        `;
+
+        $('#paidStatusModal .modal-body').html(clientInfo + orderItems + paidStatusForm);
+
+        // Apply paid status style + listener
+        let paidStatus = document.getElementById('id_paid_status');
+        updatePaidStatusStyle(paidStatus);
+        paidStatus.addEventListener('change', (event) => updatePaidStatusStyle(event.target));
 
         // Attach form submission handler
         $('#paidStatusForm').on('submit', function (e) {
@@ -385,4 +411,39 @@ $(document).ready(function () {
             submitPaidStatusForm();
         });
     }
+
+    function submitPaidStatusForm() {
+        let formData = {
+            'order_id': $('#paidStatusForm input[name="order_id"]').val(),
+            'paid_status': $('#paidStatusForm select[name="paid_status"]').val()
+        };
+
+        $.ajax({
+            url: `/api/update-paid-status/`,
+            method: 'POST',
+            data: JSON.stringify(formData),
+            contentType: 'application/json',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                // To identify AJAX request in the backend
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            success: function(response) {
+                // Close the modal
+                $('#paidStatusModal').modal('hide');
+    
+                // Reload the DataTable to reflect changes
+                $('#orderitem-table').DataTable().ajax.reload(null, false);
+            },
+            error: function(error) {
+                console.error('Error updating payment status:', error);
+                displayMessages([{
+                    level: 40,
+                    level_tag: 'error',
+                    message: `Failed to update payment status: ${error.message}`
+                }]);
+            }
+        });
+    }
+    
 })

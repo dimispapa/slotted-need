@@ -140,5 +140,6 @@ function updatePriorityStatusStyle(status) {
 
 export {
     displayMessages,
-    updateStatusStyle
+    updateStatusStyle,
+    updatePaidStatusStyle
 };
