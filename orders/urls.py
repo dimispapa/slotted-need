@@ -33,6 +33,6 @@ urlpatterns = [
     path('api/<int:order_id>/details/',
          views.order_details, name='order_details'),
     # update paid status API
-    path('api/update_paid_status/',
+    path('api/update-paid-status/',
          views.update_paid_status, name='update_paid_status'),
 ]
