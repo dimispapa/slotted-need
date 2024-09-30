@@ -104,6 +104,7 @@ class OrderItemFilter(django_filters.FilterSet):
         # Split the input into individual entries separated by commas
         entries = [entry.strip()
                    for entry in value.split(',') if entry.strip()]
+        print(entries)
 
         if not entries:
             return queryset
@@ -111,19 +112,24 @@ class OrderItemFilter(django_filters.FilterSet):
         q_objects = Q()
 
         for entry in entries:
+            print('Filter entry:', entry)
             # Check if the entry contains a hyphen
             if '-' in entry:
                 # Split into Component Name and Finish Option Name
                 component_name, finish_option_name = [
                     part.strip() for part in entry.split('-', 1)]
+                print('Component name:', component_name, 'Finish option:',
+                      finish_option_name)
                 q_objects |= Q(
                     item_component_finishes__component__name__icontains=component_name,  # noqa
                     item_component_finishes__finish_option__name__icontains=finish_option_name)  # noqa
+                print('q filter object:', q_objects)
             else:
                 # If no hyphen, assume input could be either Component Name or
                 # Finish Option Name
                 q_objects |= Q(
                     item_component_finishes__component__name__icontains=entry) | \
                     Q(item_component_finishes__finish_option__name__icontains=entry)  # noqa
+                print('q filter object:', q_objects)
 
         return queryset.filter(q_objects).distinct()

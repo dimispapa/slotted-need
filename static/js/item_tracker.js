@@ -53,7 +53,7 @@ $(document).ready(function () {
                 d.product = $('#filter-product').val();
                 d.design_options = $('#filter-design-options').val();
                 d.product_finish = $('#filter-product-finish').val();
-                d.component_finishes = $('#filter-component-finishes').val();
+                d.item_component_finishes = $('#filter-component-finishes').val();
                 d.value_min = $('#filter-value-min').val();
                 d.value_max = $('#filter-value-max').val();
                 d.item_status = $('#filter-item-status').val();
