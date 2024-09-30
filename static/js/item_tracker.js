@@ -217,9 +217,9 @@ $(document).ready(function () {
                 }
             },
         ],
-        // Default ordering by ID ascending
-        id: [
-            [0, 'asc']
+        // Default ordering by priority_level descending
+        order: [
+            [9, 'desc']
         ],
         // Callback after every draw (initial load and subsequent updates)
         drawCallback: function (settings) {
