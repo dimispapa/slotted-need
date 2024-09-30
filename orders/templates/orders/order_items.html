@@ -101,7 +101,7 @@
 
     {% block extra_scripts %}
     <!-- Include the partial that defines JS variables using DTL -->
-    {% include 'orders/partials/js_variables.html' %}
+    {% include 'orders/partials/js_var_order_items.html' %}
     <!-- External JS file -->
     <script src="{% static 'js/item_tracker.js' %}" type="module"></script>
     {% endblock %}

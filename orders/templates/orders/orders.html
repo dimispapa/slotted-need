@@ -2,64 +2,94 @@
 {% load static %}
 {% load crispy_forms_tags %}
 
+{% block extra_head %}
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" type="text/javascript"></script>
+<!-- Popper JS -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" type="text/javascript"></script>
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" type="text/css">
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js" type="text/javascript"></script>
+{% endblock %}
+
 {% block content %}
-<div class="container mt-2 mt-md-4">
-  <!-- Form start -->
-  <form method="post" id="order-list-form" action="{% url 'order_tracker' %}">
-    {% csrf_token %}
+<div id="order-tracker-container" class="container-fluid mt-2 mt-md-4">
+  <div class="table-responsive order mb-3 table-container">
     <!-- Orders table -->
-    <div class="table-responsive order mb-3 table-container">
-      <table id="orders-table" class="table shadow table-hover">
-        <!-- table headers -->
-        <thead class="sticky-head">
-          <tr>
-            <th scope="col" class="sticky-head"></th>
-            <th scope="col" class="sticky-head">Order ID</th>
-            <th scope="col" class="sticky-head">Created On</th>
-            <th scope="col" class="sticky-head">Updated On</th>
-            <th scope="col" class="sticky-head">Client</th>
-            <th scope="col" class="sticky-head">Discount</th>
-            <th scope="col" class="sticky-head">Deposit</th>
-            <th scope="col" class="sticky-head">Order Value</th>
-            <th scope="col" class="sticky-head">Order Status</th>
-            <th scope="col" class="sticky-head">Payment Status</th>
-            <th scope="col" class="sticky-head"></th>
-          </tr>
-        </thead>
-        <tbody class="table-secondary">
-          <!-- loop through order and form objects -->
-          {% for order_set in order_data %}
-          <!-- Apply conditional classes based on order status and paid status -->
-          <tr {% if order_set.order.order_status == 4 and order_set.order.paid == 1 %} class="table-danger"
-            {% elif order_set.order.order_status == 4 and order_set.order.paid == 2 %} class="table-light opacity-50 shadow-none"
-            {% endif %} id="order-{{ order_set.order.id  }}">
-            <!-- Populate order row values -->
-            <td>
-              <!-- Toggle Button -->
-              <button type="button" class="btn btn-sm btn-info toggle-items-btn" data-bs-toggle="collapse"
-                data-bs-target="#order-items-{{ order_set.order.id  }}" aria-expanded="false"
-                aria-controls="order-items-{{ order_set.order.id  }}">
-                <i class="fa-solid fa-chevron-down"></i>
-              </button>
-            </td>
-            <th scope="row">
-              {{ order_set.order.id }}</th>
-            <th scope="row">
-              {{ order_set.order.created_on|date:"d/m/y" }}</th>
-            <th scope="row">
-              {% if order_set.order.updated_on|date:"d/m/y" == order_set.order.created_on|date:"d/m/y" %}
-              -
-              {% else %}
-              {{ order_set.order.updated_on|date:"d/m/y" }}
-              {% endif %}
-            </th>
-            <td>{{ order_set.order.client.client_name }}</td>
-            <td>€{{ order_set.order.discount|default_if_none:"0.00" }}</td>
-            <td>€{{ order_set.order.deposit|default_if_none:"0.00" }}</td>
-            <td>€{{ order_set.order.order_value }}</td>
-            <td>
-              <!-- Order Status badge -->
-              <span class="badge position-relative order-status-badge align-middle
+    <table id="orders-table" class="table shadow table-hover">
+      <!-- table headers -->
+      <thead>
+        <tr>
+          <th></th>
+          <th>Order ID</th>
+          <th>Client</th>
+          <th>Discount</th>
+          <th>Deposit</th>
+          <th>Order Value</th>
+          <th>Order Status</th>
+          <th>Payment Status</th>
+          <th></th>
+        </tr>
+        <tr class="filter-row">
+          <th></th>
+          <th><input type="number" class="form-control" id="filter-id" placeholder="Filter" /></th>
+          <th><input type="text" class="form-control" id="filter-client" placeholder="Filter" /></th>
+          <th>
+            <input type="number" class="form-control" id="filter-discount-min" placeholder="Min" />
+            <input type="number" class="form-control" id="filter-discount-max" placeholder="Max" />
+          </th>
+          <th>
+            <input type="number" class="form-control" id="filter-deposit-min" placeholder="Min" />
+            <input type="number" class="form-control" id="filter-deposit-max" placeholder="Max" />
+          </th>
+          <th>
+            <input type="number" class="form-control" id="filter-value-min" placeholder="Min" />
+            <input type="number" class="form-control" id="filter-value-max" placeholder="Max" />
+          </th>
+          <th>
+            {% include 'orders/partials/dropdown.html' with options=order_status_choices selected="" class="filter-order-status form-select" id="filter-order-status" %}
+          </th>
+          <th>
+            {% include 'orders/partials/dropdown.html' with options=paid_status_choices selected="" class="filter-paid-status form-select" id="filter-paid-status" %}
+          </th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody class="table-secondary">
+        <!-- loop through order and form objects -->
+        {% for order_set in order_data %}
+        <!-- Apply conditional classes based on order status and paid status -->
+        <tr {% if order_set.order.order_status == 4 and order_set.order.paid == 1 %} class="table-danger"
+          {% elif order_set.order.order_status == 4 and order_set.order.paid == 2 %}
+          class="table-light opacity-50 shadow-none" {% endif %} id="order-{{ order_set.order.id  }}">
+          <!-- Populate order row values -->
+          <td>
+            <!-- Toggle Button -->
+            <button type="button" class="btn btn-sm btn-info toggle-items-btn" data-bs-toggle="collapse"
+              data-bs-target="#order-items-{{ order_set.order.id  }}" aria-expanded="false"
+              aria-controls="order-items-{{ order_set.order.id  }}">
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+          </td>
+          <th scope="row">
+            {{ order_set.order.id }}</th>
+          <th scope="row">
+            {{ order_set.order.created_on|date:"d/m/y" }}</th>
+          <th scope="row">
+            {% if order_set.order.updated_on|date:"d/m/y" == order_set.order.created_on|date:"d/m/y" %}
+            -
+            {% else %}
+            {{ order_set.order.updated_on|date:"d/m/y" }}
+            {% endif %}
+          </th>
+          <td>{{ order_set.order.client.client_name }}</td>
+          <td>€{{ order_set.order.discount|default_if_none:"0.00" }}</td>
+          <td>€{{ order_set.order.deposit|default_if_none:"0.00" }}</td>
+          <td>€{{ order_set.order.order_value }}</td>
+          <td>
+            <!-- Order Status badge -->
+            <span class="badge position-relative order-status-badge align-middle
               {% if order_set.order.order_status == 2 %}
                 bg-warning text-dark
               {% elif order_set.order.order_status == 3 %}
@@ -70,100 +100,94 @@
                 bg-pending text-dark
               {% endif %}
             ">
-                {{ order_set.order.get_order_status_display }}
-                <!-- Alert icon -->
-                {% if order_set.order.order_status == 4 and order_set.order.paid == 1 %}
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"><i
-                    class="fa-solid fa-exclamation"></i></i> <span class="visually-hidden">Alert: delivered
-                    but unpaid</span>
-                </span>
-                {% endif %}
+              {{ order_set.order.get_order_status_display }}
+              <!-- Alert icon -->
+              {% if order_set.order.order_status == 4 and order_set.order.paid == 1 %}
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"><i
+                  class="fa-solid fa-exclamation"></i></i> <span class="visually-hidden">Alert: delivered
+                  but unpaid</span>
               </span>
+              {% endif %}
+            </span>
 
-            </td>
-            <td>{{ order_set.order_form.paid }}</td>
-            <td>
-              <!-- Delete Button -->
-              <button type="button" id="delete-order-btn-{{ order_set.order.id  }}" name="delete_order"
-                class="btn btn-sm btn-danger delete-order-btn" value="{{ order_set.order.id  }}">
-                <i class="fa-solid fa-trash"></i>
-              </button>
-            </td>
-          </tr>
-          <!-- Hidden Row for Order Items -->
-          <tr>
-            <td colspan="11" class="p-0">
-              <div id="order-items-{{ order_set.order.id  }}" class="collapse">
-                <table class="table table-hover table-bordered border-primary m-0">
-                  <thead>
-                    <tr>
-                      <th scope="col">Item ID</th>
-                      <th scope="col">Product</th>
-                      <th scope="col">Item Value</th>
-                      <th scope="col">Product Finish</th>
-                      <th scope="col">Design Options</th>
-                      <th scope="col">Component Finishes</th>
-                      <th scope="col">Item Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <!-- Include the management form for the item formset -->
-                    {{ order_set.item_formset.management_form }}
-                    <!-- Render each order item and form in the item formset -->
-                    {% for form_item in order_set.item_formset %}
-                    <tr>
-                      <!-- Include hidden fields -->
-                      {% for hidden_field in form_item.hidden_fields %}
-                      {{ hidden_field }}
-                      {% endfor %}
-                      <!-- Render order item data -->
-                      <th scope="row">{{ form_item.instance.id }}</th>
-                      <td>{{ form_item.instance.product.name }}</td>
-                      <td>€{{ form_item.instance.item_value }}</td>
-                      <td>{{ form_item.instance.product_finish|default_if_none:"-" }}</td>
-                      <td>
-                        <!-- Render option values -->
-                        <ul>
-                          {% for option_value in form_item.instance.option_values.all %}
-                          <li>{{ option_value.value }}</li>
-                          {% empty %}
-                          -
-                          {% endfor %}
-                        </ul>
-                      </td>
-                      <td>
-                        <!-- Render finishes -->
-                        <ul>
-                          {% for finish in form_item.instance.item_component_finishes.all %}
-                          <li>{{ finish.component.name }} - {{ finish.finish_option.name }}</li>
-                          {% empty %}
-                          -
-                          {% endfor %}
-                        </ul>
-                      </td>
-                      <!-- Render item status form field -->
-                      <td>{{ form_item.item_status }}</td>
-                    </tr>
+          </td>
+          <td>{{ order_set.order_form.paid }}</td>
+          <td>
+            <!-- Delete Button -->
+            <button type="button" id="delete-order-btn-{{ order_set.order.id  }}" name="delete_order"
+              class="btn btn-sm btn-danger delete-order-btn" value="{{ order_set.order.id  }}">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        <!-- Hidden Row for Order Items -->
+        <tr>
+          <td colspan="11" class="p-0">
+            <div id="order-items-{{ order_set.order.id  }}" class="collapse">
+              <table class="table table-hover table-bordered border-primary m-0">
+                <thead>
+                  <tr>
+                    <th scope="col">Item ID</th>
+                    <th scope="col">Product</th>
+                    <th scope="col">Item Value</th>
+                    <th scope="col">Product Finish</th>
+                    <th scope="col">Design Options</th>
+                    <th scope="col">Component Finishes</th>
+                    <th scope="col">Item Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Include the management form for the item formset -->
+                  {{ order_set.item_formset.management_form }}
+                  <!-- Render each order item and form in the item formset -->
+                  {% for form_item in order_set.item_formset %}
+                  <tr>
+                    <!-- Include hidden fields -->
+                    {% for hidden_field in form_item.hidden_fields %}
+                    {{ hidden_field }}
                     {% endfor %}
-                  </tbody>
-                </table>
-              </div>
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="11">No orders found.</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    <!-- Save All Changes button -->
-    <div>
-
-    </div>
-    <button type="submit" class="btn btn-primary sticky-bottom">Save All Changes</button>
-  </form>
+                    <!-- Render order item data -->
+                    <th scope="row">{{ form_item.instance.id }}</th>
+                    <td>{{ form_item.instance.product.name }}</td>
+                    <td>€{{ form_item.instance.item_value }}</td>
+                    <td>{{ form_item.instance.product_finish|default_if_none:"-" }}</td>
+                    <td>
+                      <!-- Render option values -->
+                      <ul>
+                        {% for option_value in form_item.instance.option_values.all %}
+                        <li>{{ option_value.value }}</li>
+                        {% empty %}
+                        -
+                        {% endfor %}
+                      </ul>
+                    </td>
+                    <td>
+                      <!-- Render finishes -->
+                      <ul>
+                        {% for finish in form_item.instance.item_component_finishes.all %}
+                        <li>{{ finish.component.name }} - {{ finish.finish_option.name }}</li>
+                        {% empty %}
+                        -
+                        {% endfor %}
+                      </ul>
+                    </td>
+                    <!-- Render item status form field -->
+                    <td>{{ form_item.item_status }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="11">No orders found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <!-- Delete confirmation modal -->
@@ -189,6 +213,8 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<!-- Include the partial that defines JS variables using DTL -->
+{% include 'orders/partials/js_var_order_items.html' %}
 <!-- External JS logic -->
 <script type="module" src="{% static 'js/order_tracker.js' %}"></script>
 {% endblock %}
