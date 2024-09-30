@@ -64,6 +64,12 @@
                     {% include 'orders/partials/dropdown.html' with options=priority_level_choices selected="" class="filter-priority-level form-select" id="filter-priority-level" %}
                 </th>
                 <th>
+                    <!-- Tooltip -->
+                    <div class="text-center align-baseline mb-2" data-toggle="tooltip" data-html="true"
+                        title="The payment status displayed corresponds to the order that this item belongs.
+                        Click the button to view the order and make changes." aria-label="Info on filter tooltip">
+                        <i class="fa-solid fa-circle-info btn-secondary fs-4 fw-bolder"></i>
+                    </div>
                     {% include 'orders/partials/dropdown.html' with options=paid_status_choices selected="" class="filter-paid-status form-select" id="filter-paid-status" %}
                 </th>
                 <th></th> <!-- No filter for actions -->
