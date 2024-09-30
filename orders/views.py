@@ -443,7 +443,7 @@ class OrderListView(View):
         else:
             messages.warning(request, "No changes were made.")
 
-        return redirect('orders')
+        return redirect('order_tracker')
 
 
 # API view to get the products on initial load of order form
