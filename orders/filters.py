@@ -47,7 +47,7 @@ class OrderItemFilter(django_filters.FilterSet):
         field_name='priority_level',
         choices=OrderItem.PRIORITY_CHOICES)
 
-    payment_status = django_filters.ChoiceFilter(
+    paid_status = django_filters.ChoiceFilter(
         field_name='order__paid',
         choices=Order.PAID_CHOICES)
 

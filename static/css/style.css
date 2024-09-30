@@ -124,9 +124,9 @@ of the suggestions div depending on viewport size */
 }
 
 /* ensure status dropdowns don't shrink too much */
-.item-status-select,
-.paid-status-select,
-.priority-status-select {
+.item-status,
+.paid-status,
+.priority-status {
   min-width: 75px;
   width: auto;
   font-size: inherit;
