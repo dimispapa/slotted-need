@@ -46,7 +46,8 @@ class OrderSerializer(ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'client', 'paid', 'created_on']
+        fields = ['id', 'client', 'discount', 'deposit', 'order_value',
+                  'order_status', 'paid', 'created_on', 'updated_on']
 
 
 class ProductSerializer(ModelSerializer):

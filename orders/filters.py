@@ -133,3 +133,58 @@ class OrderItemFilter(django_filters.FilterSet):
                 print('q filter object:', q_objects)
 
         return queryset.filter(q_objects).distinct()
+
+
+class OrderFilter(django_filters.FilterSet):
+
+    id = django_filters.NumberFilter(
+        field_name='id',
+        lookup_expr='exact')
+
+    client_name = django_filters.CharFilter(
+        field_name='client__client_name',
+        lookup_expr='icontains')
+
+    dicount_min = django_filters.NumberFilter(
+        field_name='discount',
+        lookup_expr='gte')
+
+    discount_max = django_filters.NumberFilter(
+        field_name='discount',
+        lookup_expr='lte')
+
+    deposit_min = django_filters.NumberFilter(
+        field_name='deposit',
+        lookup_expr='gte')
+
+    deposit_max = django_filters.NumberFilter(
+        field_name='deposit',
+        lookup_expr='lte')
+
+    value_min = django_filters.NumberFilter(
+        field_name='order_value',
+        lookup_expr='gte')
+
+    value_max = django_filters.NumberFilter(
+        field_name='order_value',
+        lookup_expr='lte')
+
+    order_status = django_filters.ChoiceFilter(
+        field_name='order_status',
+        choices=Order.STATUS_CHOICES)
+
+    paid_status = django_filters.ChoiceFilter(
+        field_name='paid',
+        choices=Order.PAID_CHOICES)
+
+    class Meta:
+        model = Order
+        fields = [
+            'id',
+            'client__client_name',
+            'discount',
+            'deposit',
+            'order_value',
+            'order_status',
+            'paid'
+        ]
