@@ -226,7 +226,7 @@ class OrderViewForm(forms.ModelForm):
         widgets = {
             'paid': forms.Select(
                 attrs={'class':
-                       'form-select form-select-sm paid-status-select '
+                       'form-select form-select-sm paid-status '
                        'fw-bolder text-wrap'
                        })
         }
@@ -240,7 +240,7 @@ class OrderItemViewForm(forms.ModelForm):
         widgets = {
             'item_status': forms.Select(
                 attrs={'class':
-                       'form-select form-select-sm item-status-select '
+                       'form-select form-select-sm item-status '
                        'fw-bolder text-wrap'})
         }
 
