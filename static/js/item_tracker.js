@@ -150,19 +150,14 @@ $(document).ready(function () {
             {
                 data: 'item_value',
                 className: 'sortable',
-                render: function (data, type, row) {
-                    if (type === 'display') {
-                        return `€${data}`
-                    }
-                    return data
-                }
+                render: $.fn.dataTable.render.number(',', '.', 0, '€')
             },
             { // Item Status
                 data: 'item_status',
                 className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        let select = '<select class="form-select-sm item-status fw-bolder text-wrap" data-id="' + row.id + '">';
+                        let select = `<select class="form-select-sm item-status fw-bolder text-wrap" data-id="${row.id}">`;
                         // Use global variable passed from context into JS and iterate through each key-value pair
                         Object.entries(itemStatusChoices).forEach(([optionInt, optionStr]) => {
                             select += '<option value="' + optionInt + '"' + (optionInt == data ? ' selected' : '') + '>' + optionStr + '</option>';

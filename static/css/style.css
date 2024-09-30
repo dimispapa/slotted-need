@@ -9,6 +9,7 @@
 /********* General font size media queries *************/
 /* reduce font-size for smaller viewports */
 @media (max-width: 768px) {
+
   /* order item tracker */
   #orderitem-tracker-container,
   #orderitem-tracker-container input,
@@ -151,13 +152,15 @@ of the suggestions div depending on viewport size */
 th.sortable {
   cursor: pointer;
 }
+
 /* default pointer on non-sortable */
 th.not-sortable {
   cursor: default;
 }
 
 /* Order item table */
-#orderitem-table {
+#orderitem-table,
+#orders-table {
   /* set font-size */
   font-size: 14px;
   /* ensure width takes 100% of container */
