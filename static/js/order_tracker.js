@@ -132,10 +132,40 @@ $(document).ready(function () {
                     return data;
                 }
             },
+            {
+                data: 'paid',
+                render: function (data, type, row) {
+                    if (type === 'display') {
+                        let select = `<select class="form-select-sm paid-status fw-bolder text-wrap" data-id="${row.id}">`;
+                        // Use global variable passed from context into JS and iterate through each key-value pair
+                        Object.entries(paidStatusChoices).forEach(([optionInt, optionStr]) => {
+                            select += '<option value="' + optionInt + '"' + (optionInt == data ? ' selected' : '') + '>' + optionStr + '</option>';
+                        });
+                        select += '</select>';
+                        return select;
+                    }
+                    return data;
+                }
+            },            
+            {
+                data: 'id',
+                render: function (data, type, row) {
+                    if (type === 'display') {
+                        return `
+                    <button type="button" id="delete-order-btn-${data}" name="delete_order"
+                    class="btn btn-sm btn-danger delete-order-btn" value="${data}">
+                    <i class="fa-solid fa-trash"></i>
+                    </button>
+                    `;
+                    }
+                    return data;
+                }
+            },
         ],
         // Callback after every draw (initial load and subsequent updates)
         drawCallback: function (settings) {
             // update status styles
+            debugger;
             updateStatusStyle();
         },
     });
