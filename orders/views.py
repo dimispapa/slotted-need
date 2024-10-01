@@ -1,6 +1,5 @@
 import re
 import json
-from django.views import View
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.exceptions import ValidationError
 from django.contrib import messages
@@ -20,7 +19,7 @@ from .decorators import (ajax_login_required_no_redirect,
                          ajax_admin_required_no_redirect)
 from products.models import (Product, Option, OptionValue, FinishOption,
                              ProductComponent, Component)
-from .forms import OrderForm, OrderItemFormSet, OrderViewForm, OrderViewFormSet
+from .forms import OrderForm, OrderItemFormSet
 from .filters import OrderItemFilter, OrderFilter
 from .serializers import OrderItemSerializer, OrderSerializer
 
@@ -353,98 +352,6 @@ def copy_order_item(order_item):
 
 
 # *** ORDER LIST VIEW ***
-# View that handles the orders list template rendering
-# class OrderListView(View):
-#     model = Order
-#     template_name = 'orders/orders.html'
-
-#     # GET request
-#     def get(self, request, *args, **kwargs):
-#         # fetch orders and prefetch items (optimised query)
-#         orders = Order.objects.all().prefetch_related('items')
-#         # Intialise empty order data list
-#         order_data = []
-
-#         # Create a form for each order to edit paid checkbox on the view
-#         for order in orders:
-#             order_form = OrderViewForm(instance=order,
-#                                        prefix=f'order-{order.id}')
-#             formset = OrderViewFormSet(instance=order,
-#                                        prefix=f'items-{order.id}')
-
-#             # Append data and forms to order data list
-#             order_data.append({
-#                 'order': order,
-#                 'order_form': order_form,
-#                 'item_formset': formset,
-#             })
-
-#         # render template with orders and forms
-#         return render(request, self.template_name, {
-#             'order_data': order_data,
-#         })
-
-#     # use transaction decorator to ensure operations to roll back in
-#     # case of failure in any one operation - ensure data integrity
-#     @transaction.atomic
-#     # POST request
-#     def post(self, request, *args, **kwargs):
-#         orders = Order.objects.all()
-#         order_data = []
-#         updated = False
-#         has_errors = False
-
-#         # Iterate through orders and bind the POST data to each form
-#         for order in orders:
-#             order_form = OrderViewForm(request.POST,
-#                                        instance=order,
-#                                        prefix=f'order-{order.id}')
-#             formset = OrderViewFormSet(
-#                 request.POST,
-#                 instance=order,
-#                 prefix=f'items-{order.id}'
-#             )
-
-#             # Check if any form errors
-#             if order_form.is_valid() and formset.is_valid():
-#                 # Only save if something has changed
-#                 if order_form.has_changed():
-#                     order_form.save()
-#                     updated = True
-#                 if formset.has_changed():
-#                     formset.save()
-#                     updated = True
-#                     # Call update_order_status after saving the formset
-#                     order.update_order_status()
-#             else:
-#                 has_errors = True
-#                 print(f"Order {order.id} form errors: {order_form.errors}")
-#                 print(f"Order {order.id} formset errors: {formset.errors}")
-
-#             # Re-fetch the order from the database to ensure it's up-to-date
-#             order.refresh_from_db()
-#             order_data.append({
-#                 'order': order,
-#                 'order_form': order_form,
-#                 'item_formset': formset,
-#             })
-
-#         # Handle form errors and maintain form data
-#         if has_errors:
-#             messages.error(
-#                 request,
-#                 "There were errors in the forms. Please correct them.")
-#             return render(request,
-#                           self.template_name,
-#                           {'order_data': order_data})
-
-#         if updated:
-#             messages.success(request, "Orders updated successfully.")
-#         else:
-#             messages.warning(request, "No changes were made.")
-
-#         return redirect('order_tracker')
-
 
 # API view to get the products on initial load of order form
 def get_products(request):
@@ -686,6 +593,20 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     ]
     ordering = ['-priority_level']  # Default ordering
 
+    def get_queryset(self):
+        # Start with the base queryset
+        queryset = super().get_queryset()
+
+        # Get 'order_id' from query parameters
+        order_id = self.request.query_params.get('order_id', None)
+
+        # If 'order_id' is provided, filter the queryset
+        if order_id:
+            queryset = queryset.filter(order__id=order_id)
+
+        # Return the filtered or full queryset
+        return queryset
+
 
 @method_decorator(staff_member_required, name='dispatch')
 class OrderItemListView(LoginRequiredMixin, TemplateView):
@@ -831,6 +752,7 @@ class OrderListView(LoginRequiredMixin, TemplateView):
         context['order_status_choices'] = Order.STATUS_CHOICES
         context['item_status_choices'] = OrderItem.STATUS_CHOICES
         context['paid_status_choices'] = Order.PAID_CHOICES
+        context['priority_level_choices'] = OrderItem.PRIORITY_CHOICES
 
         # Serialize choices to JSON for JavaScript
         context['order_status_choices_json'] = json.dumps(
@@ -839,4 +761,7 @@ class OrderListView(LoginRequiredMixin, TemplateView):
             context['item_status_choices'])
         context['paid_status_choices_json'] = json.dumps(
             context['paid_status_choices'])
+        context['priority_level_choices_json'] = json.dumps(
+            context['priority_level_choices'])
+
         return context
