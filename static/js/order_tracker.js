@@ -82,13 +82,16 @@ $(document).ready(function () {
             },
         },
         columns: [{
-                data: 'id',
+                data: null,
+                orderable: false,
+                className: 'not-sortable',
+                searchable: false,
                 render: function (data, type, row) {
                     if (type === 'display') {
                         return `
                     <button type="button" class="btn btn-sm btn-info toggle-items-btn" data-bs-toggle="collapse"
-                      data-bs-target="#order-items-${data}" aria-expanded="false"
-                      aria-controls="order-items-${data}">
+                      data-bs-target="#order-items-${row.id}" aria-expanded="false"
+                      aria-controls="order-items-${row.id}">
                       <i class="fa-solid fa-chevron-down"></i>
                     </button>
                     `;
@@ -146,26 +149,29 @@ $(document).ready(function () {
                     }
                     return data;
                 }
-            },            
+            },
             {
-                data: 'id',
+                data: null,
+                orderable: false,
+                className: 'not-sortable',
+                searchable: false,
                 render: function (data, type, row) {
-                    if (type === 'display') {
-                        return `
-                    <button type="button" id="delete-order-btn-${data}" name="delete_order"
-                    class="btn btn-sm btn-danger delete-order-btn" value="${data}">
+                    return `
+                    <button type="button" id="delete-order-btn-${row.id}" name="delete_order"
+                    class="btn btn-sm btn-danger delete-order-btn" value="${row.id}">
                     <i class="fa-solid fa-trash"></i>
                     </button>
                     `;
-                    }
-                    return data;
                 }
             },
+        ],
+        // Default ordering by order id descending
+        order: [
+            [1, 'desc']
         ],
         // Callback after every draw (initial load and subsequent updates)
         drawCallback: function (settings) {
             // update status styles
-            debugger;
             updateStatusStyle();
         },
     });
