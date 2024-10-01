@@ -5,6 +5,7 @@ import {
     ajaxSetupToken,
     applyFilters,
     debounce,
+    initTooltips,
 
 } from "./utils.js";
 
@@ -301,9 +302,7 @@ $(document).ready(function () {
     };
 
     // initialize tooltips
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-    })
+    initTooltips();
 
     // Function that opens the paid status modal and performs an AJAX call for order details
     function openPaidStatusModal(orderId) {

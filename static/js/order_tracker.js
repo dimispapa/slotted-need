@@ -4,6 +4,7 @@ import {
     ajaxSetupToken,
     applyFilters,
     debounce,
+    initTooltips,
 
 } from './utils.js'
 
@@ -121,13 +122,10 @@ $(document).ready(function () {
                 data: 'order_status',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        let select = `<select class="form-select-sm item-status fw-bolder text-wrap" data-id="${row.id}">`;
-                        // Use global variable passed from context into JS and iterate through each key-value pair
-                        Object.entries(orderStatusChoices).forEach(([optionInt, optionStr]) => {
-                            select += '<option value="' + optionInt + '"' + (optionInt == data ? ' selected' : '') + '>' + optionStr + '</option>';
-                        });
-                        select += '</select>';
-                        return select;
+                        // Use global variable passed from context into JS to map the badge value into string
+                        let badge = `<badge class="badge position-relative order-status-badge align-middle item-status" 
+                        data-id="${row.id}" data-value="${data}">${orderStatusChoices[data]}</badge>`;
+                        return badge;
                     }
                     return data;
                 }
@@ -222,7 +220,7 @@ $(document).ready(function () {
                         orderRow.remove();
                     }
                     // Remove the hidden row containing order items
-                    const hiddenRow = orderRow.nextElementSibling;
+                    const hiddenRow = orderRow.nextElementSibling ? orderRow.nextElementSibling : null;
                     if (hiddenRow) {
                         hiddenRow.remove();
                     }
@@ -248,6 +246,9 @@ $(document).ready(function () {
             });
     };
 
+    // initialize tooltips
+    initTooltips();
+
     // ************** SECTION B: EVENT LISTENERS & HANDLERS *****************************************************************
 
     //   Handle status dropdowns change colouring dynamically
@@ -271,7 +272,7 @@ $(document).ready(function () {
     // add event listener on confirm delete button that will handle the deletion
     confirmDeleteBtn.addEventListener('click', () => {
         // Get order ID from modal attribute
-        orderId = deleteModalElement.getAttribute('data-order-id');
+        let orderId = deleteModalElement.getAttribute('data-order-id');
         if (orderId) {
             // Delete item
             deleteOrder(orderId);

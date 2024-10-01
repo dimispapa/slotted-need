@@ -90,26 +90,28 @@ function updateStatusStyle(
 function updateItemStatusStyle(status) {
     // remove existing style classes
     status.classList.remove('bg-pending', 'bg-warning', 'bg-success', 'bg-secondary', 'text-dark', 'text-light');
+    // get status value differently depending if it's a select or badge element
+    let statusValue = (status.tagName == 'BADGE') ? status.getAttribute('data-value') : status.value;
 
     // Not Started
-    if (status.value == 1) {
+    if (statusValue == 1) {
         status.classList.add('bg-pending', 'text-dark');
         // In Progress
-    } else if (status.value == 2) {
+    } else if (statusValue == 2) {
         status.classList.add('bg-warning', 'text-dark');
         // Made
-    } else if (status.value == 3) {
+    } else if (statusValue == 3) {
         status.classList.add('bg-success', 'text-light');
         // Delivered
-    } else if (status.value == 4) {
+    } else if (statusValue == 4) {
         status.classList.add('bg-secondary', 'text-light');
     }
 };
 
 function updatePaidStatusStyle(status) {
     // Set boostrap class prefix dynamically based on element type and also get status value integer
-    let bsTag = (status.tagName == 'BUTTON') ? 'btn' : 'bg'
-    let statusValue = (status.tagName == 'BUTTON') ? status.getAttribute('data-value') : status.value
+    let bsTag = (status.tagName == 'BUTTON') ? 'btn' : 'bg';
+    let statusValue = (status.tagName == 'BUTTON') ? status.getAttribute('data-value') : status.value;
     // remove existing style classes
     status.classList.remove(`${bsTag}-danger`, `${bsTag}-secondary`, 'text-light');
 
@@ -138,6 +140,10 @@ function updatePriorityStatusStyle(status) {
     }
 };
 
+// initialize tooltips
+function initTooltips() {
+    $('[data-toggle="tooltip"]').tooltip()
+};
 
 //*********** Util functions related to DataTables and AJAX operations *********************
 
@@ -174,4 +180,5 @@ export {
     applyFilters,
     debounce,
     ajaxSetupToken,
+    initTooltips
 };

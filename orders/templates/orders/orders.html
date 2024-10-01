@@ -48,6 +48,11 @@
             <input type="number" class="form-control" id="filter-value-max" placeholder="Max" />
           </th>
           <th>
+            <!-- Tooltip -->
+            <div class="text-center align-baseline mb-2" data-toggle="tooltip" data-html="true"
+            title="The order status is set automatically as it reflects the underlying status of its items" aria-label="Info on filter tooltip">
+              <i class="fa-solid fa-circle-info btn-secondary fs-4 fw-bolder"></i>
+            </div>
             {% include 'orders/partials/dropdown.html' with options=order_status_choices selected="" class="filter-order-status form-select" id="filter-order-status" %}
           </th>
           <th>
