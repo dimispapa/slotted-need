@@ -33,6 +33,14 @@ $(document).ready(function () {
         scrollX: true, // Enable horizontal scrolling
         responsive: true, // Enable responsive layout for smaller screens
         pageLength: pageSize,
+        // conditionally add bootstrap classes for each row when loaded
+        createdRow: function (row, data, dataIndex) {
+            if (data.order_status == 4 && data.paid == 1) {
+                $(row).addClass('table-danger');
+            } else if (data.order_status == 4 && data.paid == 2) {
+                $(row).addClass('table-light opacity-50 shadow-none')
+            }
+        },
         ajax: {
             url: '/api/orders/',
             type: 'GET',
@@ -77,7 +85,7 @@ $(document).ready(function () {
                 json.recordsTotal = json.count;
                 json.recordsFiltered = json.count;
                 return json.results;
-            },
+            }
         },
         columns: [{
                 data: null,
