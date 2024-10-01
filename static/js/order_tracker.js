@@ -5,6 +5,8 @@ import {
     applyFilters,
     debounce,
     initTooltips,
+    generateSelectOptions,
+    generateOptionsList
 
 } from './utils.js'
 
@@ -90,7 +92,7 @@ $(document).ready(function () {
         columns: [{
                 data: null,
                 orderable: false,
-                className: 'not-sortable',
+                className: 'not-sortable details-control',
                 searchable: false,
                 render: function (data, type, row) {
                     if (type === 'display') {
@@ -156,10 +158,9 @@ $(document).ready(function () {
                 render: function (data, type, row) {
                     if (type === 'display') {
                         let select = `<select class="form-select-sm paid-status fw-bolder text-wrap" data-id="${row.id}">`;
-                        // Use global variable passed from context into JS and iterate through each key-value pair
-                        Object.entries(paidStatusChoices).forEach(([optionInt, optionStr]) => {
-                            select += '<option value="' + optionInt + '"' + (optionInt == data ? ' selected' : '') + '>' + optionStr + '</option>';
-                        });
+                        // Use global variable passed from context into JS and generate select options
+                        let options = generateSelectOptions(paidStatusChoices, data);
+                        select += options;
                         select += '</select>';
                         return select;
                     }
@@ -217,7 +218,6 @@ $(document).ready(function () {
                 }
             })
             .then(response => {
-                console.log(response);
                 // handle bad reponse status
                 if (!response.ok) {
                     if (response.status === 403) {
@@ -231,7 +231,6 @@ $(document).ready(function () {
                 return response.json();
             })
             .then(data => {
-                console.log(data);
                 if (data.success) {
                     // get order row element to target for deletion
                     const orderRow = document.getElementById(`order-${orderId}`);
@@ -302,4 +301,93 @@ $(document).ready(function () {
         }
     });
 
+
+    // add event listener to show/hide the row child with item details
+    $('#orders-table tbody').on('click', 'td.details-control', function () {
+        let tr = $(this).closest('tr');
+        let row = table.row(tr);
+    
+        if (row.child.isShown()) {
+            // Close the child row
+            row.child.hide();
+            tr.removeClass('shown');
+        } else {
+            // Open the child row
+            // Fetch order items via AJAX
+            let orderId = row.data().id;
+            fetchOrderItems(orderId, function (orderItemsHtml) {
+                // callback function to add and show row child with order items
+                row.child(orderItemsHtml).show();
+                tr.addClass('shown');
+                updateStatusStyle();
+            });
+        }
+    });
+
+    // Function that uses the order_items API to fetch item details for an order
+    function fetchOrderItems(orderId, callback) {
+        $.ajax({
+            url: `/api/order-items/?order_id=${orderId}`,
+            method: 'GET',
+            success: function (data) {
+                // store item data in a variable
+                let orderItems = data.results || data;
+                // format item data into html elements
+                let orderItemsHtml = formatOrderItems(orderItems);
+                // call the callback function to add and show order items
+                callback(orderItemsHtml);
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching order items:', xhr.responseText);
+                // call callback function returning an error message div
+                callback('<div>Error loading order items.</div>');
+            }
+        });
+    };
+
+    // Function that formats the order item data into html tr and td elements
+    function formatOrderItems(orderItems) {
+        let html = '<table class="table table-sm table-hover table-bordered border-primary">';
+        html += `
+                <thead>
+                    <tr>
+                        <th>Item ID</th>
+                        <th>Product</th>
+                        <th>Design Options</th>
+                        <th>Product Finish</th>
+                        <th>Component Finishes</th>
+                        <th>Item Value</th>
+                        <th>Item Status</th>
+                        <th>Priority Level</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+    
+        orderItems.forEach(function (item) {
+            html += `
+                <tr>
+                    <td>${item.id}</td>
+                    <td>${item.product.name}</td>
+                    <td>${generateOptionsList('option_values', item.option_values)}</td>
+                    <td>${item.product_finish ? item.product_finish : '-'}</td>
+                    <td>${generateOptionsList('component_finishes', item.item_component_finishes)}</td>
+                    <td>€${item.item_value}</td>
+                    <td>
+                        <select class="form-select-sm fw-bolder text-wrap item-status" data-id="${item.id}">
+                            ${generateSelectOptions(itemStatusChoices, item.item_status)}
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-select-sm fw-bolder text-wrap priority-status" data-id="${item.id}">
+                            ${generateSelectOptions(priorityLevelChoices, item.priority_level)}
+                        </select>
+                    </td>
+                </tr>
+            `;
+        });
+    
+        html += '</tbody></table>';
+        return html;
+    };
+    
 });
