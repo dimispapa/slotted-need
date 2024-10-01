@@ -154,7 +154,7 @@ function ajaxSetupToken(csrftoken) {
 };
 
 // Function to reload table with new filters
-function applyFilters() {
+function applyFilters(table) {
     table.ajax.reload();
 };
 

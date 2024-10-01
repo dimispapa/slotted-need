@@ -183,7 +183,7 @@ $(document).ready(function () {
     $('#filter-id, #filter-client, #filter-discount-min, #filter-discount-max, ' +
         '#filter-deposit-min, #filter-deposit-max, #filter-value-min, #filter-value-max, ' +
         '#filter-order-status, #filter-paid-status').on('keyup change', debounce(function () {
-        applyFilters();
+        applyFilters(table);
     }, 300));
 
     // Define function that deletes an order item and remaining items index
