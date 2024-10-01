@@ -631,7 +631,6 @@ def delete_order(request, order_id):
 
     # Delete the order
     order.delete()
-    print('Order deleted')
     messages.success(request,
                      f'Order {order_id} deleted successfully.')
     return JsonResponse(
@@ -830,11 +829,14 @@ class OrderListView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         # Extract choices from the Order model
         context['order_status_choices'] = Order.STATUS_CHOICES
+        context['item_status_choices'] = OrderItem.STATUS_CHOICES
         context['paid_status_choices'] = Order.PAID_CHOICES
 
         # Serialize choices to JSON for JavaScript
         context['order_status_choices_json'] = json.dumps(
             context['order_status_choices'])
+        context['item_status_choices_json'] = json.dumps(
+            context['item_status_choices'])
         context['paid_status_choices_json'] = json.dumps(
             context['paid_status_choices'])
         return context
