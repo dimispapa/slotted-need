@@ -1,3 +1,5 @@
+// ***** Util functions related to general DOM manipulation, generation of HTML elements and styling **********
+
 // Function to display messages
 function displayMessages(messages) {
 
@@ -145,6 +147,32 @@ function initTooltips() {
     $('[data-toggle="tooltip"]').tooltip()
 };
 
+// Function that generates options for select html element
+function generateSelectOptions(choices, selectedValue) {
+    let options = '';
+    for (let [value, string] of Object.entries(choices)) {
+        options += `<option value="${value}" ${value == selectedValue ? 'selected' : ''}>${string}</option>`;
+    }
+    return options;
+}
+
+// Function that generates component finishes ul element
+function generateOptionsList(type, data) {
+    
+    let list = `<ul class="${type}-list list-unstyled mb-0 lh-sm">`;
+    data.forEach(function (option) {
+        if (type == 'component_finishes') {
+            list += '<li>' + option.component_finish_display + '</li>';
+        } else if (type == 'option_values') {
+            list += '<li>' + option.value + '</li>';
+        } else {
+            list += '<li>' + option.name + '</li>';
+        }
+    });
+    list += '</ul>';
+    return list;
+};
+
 //*********** Util functions related to DataTables and AJAX operations *********************
 
 // Function to set up AJAX with CSRF token
@@ -180,5 +208,7 @@ export {
     applyFilters,
     debounce,
     ajaxSetupToken,
-    initTooltips
+    initTooltips,
+    generateSelectOptions,
+    generateOptionsList
 };

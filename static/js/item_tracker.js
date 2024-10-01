@@ -6,6 +6,8 @@ import {
     applyFilters,
     debounce,
     initTooltips,
+    generateSelectOptions,
+    generateOptionsList
 
 } from "./utils.js";
 
@@ -105,11 +107,8 @@ $(document).ready(function () {
                         if (!data || data.length === 0) {
                             return '-';
                         }
-                        let list = '<ul class="option-values-list list-unstyled mb-0 lh-sm">';
-                        data.forEach(function (option) {
-                            list += '<li>' + option.value + '</li>';
-                        });
-                        list += '</ul>';
+                        console.log(data);
+                        let list = generateOptionsList('option_values', data);
                         return list;
                     }
                     return data;
@@ -135,11 +134,7 @@ $(document).ready(function () {
                         if (!data || data.length === 0) {
                             return '-';
                         }
-                        let list = '<ul class="component-finish-list list-unstyled mb-0 lh-sm">';
-                        data.forEach(function (cf) {
-                            list += '<li>' + cf.component_finish_display + '</li>';
-                        });
-                        list += '</ul>';
+                        let list = generateOptionsList('component_finishes', data);
                         return list;
                     }
                     return data;
@@ -156,10 +151,9 @@ $(document).ready(function () {
                 render: function (data, type, row) {
                     if (type === 'display') {
                         let select = `<select class="form-select-sm item-status fw-bolder text-wrap" data-id="${row.id}">`;
-                        // Use global variable passed from context into JS and iterate through each key-value pair
-                        Object.entries(itemStatusChoices).forEach(([optionInt, optionStr]) => {
-                            select += '<option value="' + optionInt + '"' + (optionInt == data ? ' selected' : '') + '>' + optionStr + '</option>';
-                        });
+                        // Use global variable passed from context into JS and generate select options
+                        let options = generateSelectOptions(itemStatusChoices, data);
+                        select += options;
                         select += '</select>';
                         return select;
                     }
@@ -172,10 +166,9 @@ $(document).ready(function () {
                 render: function (data, type, row) {
                     if (type === 'display') {
                         let select = '<select class="form-select-sm priority-status fw-bolder text-wrap" data-id="' + row.id + '">';
-                        // Use global variable passed from context into JS and iterate through each key-value pair
-                        Object.entries(priorityLevelChoices).forEach(([optionInt, optionStr]) => {
-                            select += '<option value="' + optionInt + '"' + (optionInt == data ? ' selected' : '') + '>' + optionStr + '</option>';
-                        });
+                        // Use global variable passed from context into JS and generate select options
+                        let options = generateSelectOptions(priorityLevelChoices, data);
+                        select += options;
                         select += '</select>';
                         return select;
                     }
