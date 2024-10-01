@@ -131,9 +131,22 @@ $(document).ready(function () {
                 render: function (data, type, row) {
                     if (type === 'display') {
                         // Use global variable passed from context into JS to map the badge value into string
-                        let badge = `<badge class="badge position-relative order-status-badge align-middle item-status" 
-                        data-id="${row.id}" data-value="${data}">${orderStatusChoices[data]}</badge>`;
-                        return badge;
+                        let badge = `
+                        <span class="badge position-relative order-status-badge align-middle item-status" 
+                        data-id="${row.id}" data-value="${data}">${orderStatusChoices[data]}
+                        `;
+                        // create exclamation badge to show when order is delivered but unpaid
+                        let exclamation = `
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            <i class="fa-solid fa-exclamation fs-6"></i>
+                            <span class="visually-hidden">Alert: delivered but unpaid </span>
+                        </span>               
+                        `;
+                        if (row.order_status == 4 && row.paid == 1) {
+                            return badge + exclamation + '</span>';
+                        } else {
+                            return badge + '</span>';
+                        }
                     }
                     return data;
                 }

@@ -91,7 +91,7 @@ function updateItemStatusStyle(status) {
     // remove existing style classes
     status.classList.remove('bg-pending', 'bg-warning', 'bg-success', 'bg-secondary', 'text-dark', 'text-light');
     // get status value differently depending if it's a select or badge element
-    let statusValue = (status.tagName == 'BADGE') ? status.getAttribute('data-value') : status.value;
+    let statusValue = (status.tagName == 'SPAN') ? status.getAttribute('data-value') : status.value;
 
     // Not Started
     if (statusValue == 1) {
