@@ -1,6 +1,10 @@
 import {
     displayMessages,
-    updateStatusStyle
+    updateStatusStyle,
+    ajaxSetupToken,
+    applyFilters,
+    debounce,
+
 } from './utils.js'
 
 $(document).ready(function () {
@@ -13,14 +17,7 @@ $(document).ready(function () {
     const pageSize = 25;
 
     // Setup AJAX to include CSRF token
-    $.ajaxSetup({
-        beforeSend: function (xhr, settings) {
-            if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-                // Only send the token to relative URLs i.e., locally.
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            }
-        }
-    });
+    ajaxSetupToken(csrftoken);
 
     // ************** SECTION A: FUNCTION DEFINITIONS ********************************************************************
 
@@ -175,6 +172,19 @@ $(document).ready(function () {
             updateStatusStyle();
         },
     });
+
+    // Prevent triggering sorting when a user clicks in any of the inputs.
+    // Sorting should apply when the user clicks any of the column headers
+    $('#orderitem-table').on('click mousedown touchstart', 'input, select, button', function (e) {
+        e.stopPropagation();
+    });
+
+    // Event listeners for filter inputs with debounce
+    $('#filter-id, #filter-client, #filter-discount-min, #filter-discount-max, ' +
+        '#filter-deposit-min, #filter-deposit-max, #filter-value-min, #filter-value-max, ' +
+        '#filter-order-status, #filter-paid-status').on('keyup change', debounce(function () {
+        applyFilters();
+    }, 300));
 
     // Define function that deletes an order item and remaining items index
     function deleteOrder(orderId) {

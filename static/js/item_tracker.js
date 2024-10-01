@@ -1,7 +1,11 @@
 import {
     displayMessages,
     updateStatusStyle,
-    updatePaidStatusStyle
+    updatePaidStatusStyle,
+    ajaxSetupToken,
+    applyFilters,
+    debounce,
+
 } from "./utils.js";
 
 $(document).ready(function () {
@@ -11,14 +15,7 @@ $(document).ready(function () {
     const pageSize = 25;
 
     // Setup AJAX to include CSRF token
-    $.ajaxSetup({
-        beforeSend: function (xhr, settings) {
-            if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-                // Only send the token to relative URLs i.e., locally.
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            }
-        }
-    });
+    ajaxSetupToken(csrftoken);
 
     // Initialize DataTable with AJAX source and server-side processing
     let table = $('#orderitem-table').DataTable({
@@ -228,20 +225,6 @@ $(document).ready(function () {
     $('#orderitem-table').on('click mousedown touchstart', 'input, select, button', function (e) {
         e.stopPropagation();
     });
-
-    // Function to reload table with new filters
-    function applyFilters() {
-        table.ajax.reload();
-    }
-
-    // Debounce function to limit the rate of function execution
-    function debounce(func, delay) {
-        let timeout;
-        return function (...args) {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(this, args), delay);
-        }
-    }
 
     // Event listeners for filter inputs with debounce
     $('#filter-id, #filter-order, #filter-client, #filter-product, #filter-value-min, ' +

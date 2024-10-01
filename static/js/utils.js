@@ -138,8 +138,40 @@ function updatePriorityStatusStyle(status) {
     }
 };
 
+
+//*********** Util functions related to DataTables and AJAX operations *********************
+
+// Function to set up AJAX with CSRF token
+function ajaxSetupToken(csrftoken) {
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                // Only send the token to relative URLs i.e., locally.
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+};
+
+// Function to reload table with new filters
+function applyFilters() {
+    table.ajax.reload();
+};
+
+// Debounce function to limit the rate of function execution
+function debounce(func, delay) {
+    let timeout;
+    return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), delay);
+    }
+};
+
 export {
     displayMessages,
     updateStatusStyle,
-    updatePaidStatusStyle
+    updatePaidStatusStyle,
+    applyFilters,
+    debounce,
+    ajaxSetupToken,
 };
