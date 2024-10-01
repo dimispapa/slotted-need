@@ -7,7 +7,8 @@ import {
     debounce,
     initTooltips,
     generateSelectOptions,
-    generateOptionsList
+    generateOptionsList,
+    hideSpinner
 
 } from "./utils.js";
 
@@ -229,11 +230,6 @@ $(document).ready(function () {
         let orderitemId = $(this).data('id');
         let newStatus = $(this).val();
 
-        if (newStatus === "") {
-            // If "All" is selected, do not perform an update
-            return;
-        }
-
         $.ajax({
             url: `/api/order-items/${orderitemId}/`,
             type: 'PATCH',
@@ -281,11 +277,6 @@ $(document).ready(function () {
 
         });
     });
-
-    // hide spinner on initial load
-    function hideSpinner(spinner) {
-        spinner.classList.add('d-none')
-    };
 
     // initialize tooltips
     initTooltips();

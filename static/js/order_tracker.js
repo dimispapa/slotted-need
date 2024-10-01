@@ -6,7 +6,8 @@ import {
     debounce,
     initTooltips,
     generateSelectOptions,
-    generateOptionsList
+    generateOptionsList,
+    hideSpinner
 
 } from './utils.js'
 
@@ -205,6 +206,34 @@ $(document).ready(function () {
         '#filter-order-status, #filter-paid-status').on('keyup change', debounce(function () {
         applyFilters(table);
     }, 300));
+
+    // Handle change for paid_status
+    $('#orders-table').on('change', '.paid-status', function () {
+        // show spinner
+        let spinner = document.getElementById('filter-paid-status-spinner');
+        spinner.classList.remove('d-none');
+        // get order item id and new status
+        let orderId = $(this).data('id');
+        let newStatus = $(this).val();
+
+        $.ajax({
+            url: `/api/orders/${orderId}/`,
+            type: 'PATCH',
+            data: JSON.stringify({
+                'paid': newStatus
+            }),
+            contentType: 'application/json',
+            success: function (response) {
+                // Reload the table without resetting pagination
+                table.ajax.reload(hideSpinner(spinner), false);
+            },
+            error: function (xhr, status, error) {
+                console.error('Error updating paid status:', error);
+                // Reload the table to revert changes
+                table.ajax.reload(hideSpinner(spinner), false);
+            },
+        });
+    });
 
     // Define function that deletes an order item and remaining items index
     function deleteOrder(orderId) {

@@ -204,6 +204,11 @@ function debounce(func, delay) {
     }
 };
 
+// Function to hide spinner
+function hideSpinner(spinner) {
+    spinner.classList.add('d-none')
+};
+
 export {
     displayMessages,
     updateStatusStyle,
@@ -213,5 +218,6 @@ export {
     ajaxSetupToken,
     initTooltips,
     generateSelectOptions,
-    generateOptionsList
+    generateOptionsList,
+    hideSpinner
 };
