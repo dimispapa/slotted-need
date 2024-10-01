@@ -158,9 +158,12 @@ function generateSelectOptions(choices, selectedValue) {
 
 // Function that generates component finishes ul element
 function generateOptionsList(type, data) {
-    
+    if (!data || data.length === 0) {
+        return '-';
+    }
     let list = `<ul class="${type}-list list-unstyled mb-0 lh-sm">`;
-    data.forEach(function (option) {
+    for (let option of data) {
+
         if (type == 'component_finishes') {
             list += '<li>' + option.component_finish_display + '</li>';
         } else if (type == 'option_values') {
@@ -168,7 +171,7 @@ function generateOptionsList(type, data) {
         } else {
             list += '<li>' + option.name + '</li>';
         }
-    });
+    };
     list += '</ul>';
     return list;
 };

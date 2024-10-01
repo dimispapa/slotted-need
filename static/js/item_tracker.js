@@ -104,10 +104,6 @@ $(document).ready(function () {
                 className: 'not-sortable p2',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        if (!data || data.length === 0) {
-                            return '-';
-                        }
-                        console.log(data);
                         let list = generateOptionsList('option_values', data);
                         return list;
                     }
@@ -131,9 +127,6 @@ $(document).ready(function () {
                 className: 'not-sortable p2',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        if (!data || data.length === 0) {
-                            return '-';
-                        }
                         let list = generateOptionsList('component_finishes', data);
                         return list;
                     }
