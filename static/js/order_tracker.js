@@ -7,7 +7,10 @@ import {
     initTooltips,
     generateSelectOptions,
     generateOptionsList,
-    hideSpinner
+    hideSpinner,
+    fetchOrderItems,
+    checkExpandedRows,
+    toggleChildRow
 
 } from './utils.js'
 
@@ -207,7 +210,7 @@ $(document).ready(function () {
         applyFilters(table);
     }, 300));
 
-    // Handle change for paid_status
+    // Handle change for paid_status and update the backend with AJAX call
     $('#orders-table').on('change', '.paid-status', function () {
         // show spinner
         let spinner = document.getElementById('filter-paid-status-spinner');
@@ -224,8 +227,70 @@ $(document).ready(function () {
             }),
             contentType: 'application/json',
             success: function (response) {
-                // Reload the table without resetting pagination
+                // Check which rows were expanded before reloading table
+                let expandedRows = checkExpandedRows(table);
+
+                // Reload the table with callback function and without resetting pagination
+                table.ajax.reload(function () {
+                        // After the table is reloaded check which child rows to re-expand
+                        table.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                            let tr = $(this.node());
+                            let data = this.data();
+                            if (expandedRows.includes(data.id)) {
+                                // Re-open the child row
+                                let row = this;
+                                toggleChildRow(tr, row);
+                            }
+                        });
+                        // hide the spinner on completion
+                        hideSpinner(spinner)
+                    },
+                    false);
+            },
+            error: function (xhr, status, error) {
+                console.error('Error updating paid status:', error);
+                // Reload the table to revert changes
                 table.ajax.reload(hideSpinner(spinner), false);
+            },
+        });
+    });
+
+    // Handle change for item_status and update the backend with AJAX call
+    $('#orders-table').on('change', '.item-status', function () {
+        // show spinner
+        let spinner = document.getElementById('item-status-spinner');
+        spinner.classList.remove('d-none');
+        // get order item id and new status
+        let orderitemId = $(this).data('id');
+        let newStatus = $(this).val();
+
+        $.ajax({
+            url: `/api/order-items/${orderitemId}/`,
+            type: 'PATCH',
+            data: JSON.stringify({
+                'item_status': newStatus
+            }),
+            contentType: 'application/json',
+            success: function (response) {
+                // Check which rows were expanded before reloading table
+                let expandedRows = checkExpandedRows(table);
+
+                // Reload the table with callback function and without resetting pagination
+                table.ajax.reload(function () {
+                    // After the table is reloaded check which child rows to re-expand
+                    table.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                        let tr = $(this.node());
+                        let data = this.data();
+                        if (expandedRows.includes(data.id)) {
+                            // Re-open the child row
+                            let row = this;
+                            toggleChildRow(tr, row);
+                        }
+                    });
+                    // hide the spinner on completion
+                    hideSpinner(spinner)
+                },
+                false);
             },
             error: function (xhr, status, error) {
                 console.error('Error updating paid status:', error);
@@ -330,93 +395,12 @@ $(document).ready(function () {
         }
     });
 
-
     // add event listener to show/hide the row child with item details
     $('#orders-table tbody').on('click', 'td.details-control', function () {
         let tr = $(this).closest('tr');
         let row = table.row(tr);
-    
-        if (row.child.isShown()) {
-            // Close the child row
-            row.child.hide();
-            tr.removeClass('shown');
-        } else {
-            // Open the child row
-            // Fetch order items via AJAX
-            let orderId = row.data().id;
-            fetchOrderItems(orderId, function (orderItemsHtml) {
-                // callback function to add and show row child with order items
-                row.child(orderItemsHtml).show();
-                tr.addClass('shown');
-                updateStatusStyle();
-            });
-        }
+
+        toggleChildRow(tr, row);
     });
 
-    // Function that uses the order_items API to fetch item details for an order
-    function fetchOrderItems(orderId, callback) {
-        $.ajax({
-            url: `/api/order-items/?order_id=${orderId}`,
-            method: 'GET',
-            success: function (data) {
-                // store item data in a variable
-                let orderItems = data.results || data;
-                // format item data into html elements
-                let orderItemsHtml = formatOrderItems(orderItems);
-                // call the callback function to add and show order items
-                callback(orderItemsHtml);
-            },
-            error: function (xhr, status, error) {
-                console.error('Error fetching order items:', xhr.responseText);
-                // call callback function returning an error message div
-                callback('<div>Error loading order items.</div>');
-            }
-        });
-    };
-
-    // Function that formats the order item data into html tr and td elements
-    function formatOrderItems(orderItems) {
-        let html = '<table class="table table-sm table-hover table-bordered border-primary">';
-        html += `
-                <thead>
-                    <tr>
-                        <th>Item ID</th>
-                        <th>Product</th>
-                        <th>Design Options</th>
-                        <th>Product Finish</th>
-                        <th>Component Finishes</th>
-                        <th>Item Value</th>
-                        <th>Item Status</th>
-                        <th>Priority Level</th>
-                    </tr>
-                </thead>
-                <tbody>`;
-    
-        orderItems.forEach(function (item) {
-            html += `
-                <tr>
-                    <td>${item.id}</td>
-                    <td>${item.product.name}</td>
-                    <td>${generateOptionsList('option_values', item.option_values)}</td>
-                    <td>${item.product_finish ? item.product_finish : '-'}</td>
-                    <td>${generateOptionsList('component_finishes', item.item_component_finishes)}</td>
-                    <td>€${item.item_value}</td>
-                    <td>
-                        <select class="form-select-sm fw-bolder text-wrap item-status" data-id="${item.id}">
-                            ${generateSelectOptions(itemStatusChoices, item.item_status)}
-                        </select>
-                    </td>
-                    <td>
-                        <select class="form-select-sm fw-bolder text-wrap priority-status" data-id="${item.id}">
-                            ${generateSelectOptions(priorityLevelChoices, item.priority_level)}
-                        </select>
-                    </td>
-                </tr>
-            `;
-        });
-    
-        html += '</tbody></table>';
-        return html;
-    };
-    
 });
