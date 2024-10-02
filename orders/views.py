@@ -11,7 +11,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.decorators import method_decorator
 from django.db import transaction
 from django.db.models import Count, Q, Prefetch
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status, response
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from .models import Client, Order, OrderItem, ComponentFinish
@@ -593,6 +593,7 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     ]
     ordering = ['-priority_level']  # Default ordering
 
+    # Define fetching queryset process
     def get_queryset(self):
         # Start with the base queryset
         queryset = super().get_queryset()
@@ -606,6 +607,21 @@ class OrderItemViewSet(viewsets.ModelViewSet):
 
         # Return the filtered or full queryset
         return queryset
+
+    # Define deletion (destroy) process
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        # Store instance id before deletion
+        id = instance.id
+        # Delete the instance
+        self.perform_destroy(instance)
+
+        # Perform any post-deletion logic here
+        return response.Response(
+            {'success': True,
+             'message': f'Order item {id} deleted successfully.'},
+            status=status.HTTP_200_OK
+        )
 
 
 @method_decorator(staff_member_required, name='dispatch')

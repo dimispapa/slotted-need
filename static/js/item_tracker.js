@@ -1,5 +1,6 @@
 import {
     displayMessages,
+    displayMessage,
     updateStatusStyle,
     updatePaidStatusStyle,
     ajaxSetupToken,
@@ -14,6 +15,9 @@ import {
 $(document).ready(function () {
 
     // Global constants definition
+    const deleteModalElement = document.getElementById('DeleteOrderItemConfirmationModal');
+    const deleteModal = new bootstrap.Modal(document.getElementById('DeleteOrderItemConfirmationModal'));
+    const confirmDeleteBtn = document.getElementById("confirm-delete-order-item-btn");
     const csrftoken = document.querySelector("meta[name='csrf-token']").content;
     const pageSize = 25;
 
@@ -209,8 +213,8 @@ $(document).ready(function () {
                 searchable: false,
                 render: function (data, type, row) {
                     return `
-                    <button type="button" id="delete-item-btn-${row.id}" name="delete_order"
-                    class="btn btn-sm btn-danger delete-item-btn" value="${row.id}">
+                    <button type="button" id="delete-order-item-btn-${row.id}" name="delete_order"
+                    class="btn btn-sm btn-danger delete-order-item-btn" value="${row.id}">
                     <i class="fa-solid fa-trash"></i>
                     </button>
                     `;
@@ -300,8 +304,144 @@ $(document).ready(function () {
         });
     });
 
+
+    // Event delegation for delete buttons within the DataTable
+    $('#orderitem-table tbody').on('click', '.delete-order-item-btn, .delete-order-item-btn *', (event) => {
+        // Use .closest() to find the button in case the icon is clicked
+        let deleteBtn = $(event.target).closest('.delete-order-item-btn');
+        if (deleteBtn.length) {
+            // stop propagation to prevent event bubbling up the parents
+            event.preventDefault();
+            event.stopPropagation();
+            // Get order item ID from the button value
+            let orderItemId = deleteBtn.val();
+            // Set the order item ID as an attribute on the modal
+            deleteModalElement.setAttribute('data-order-item-id', orderItemId);
+            // Show the confirmation modal
+            deleteModal.show();
+        }
+    });
+
+    // add event listener that handles first delete button that will trigger the modal
+    document.addEventListener("click", (event) => {
+        // get delete button as reference point. Allow clicking on icon inside
+        let deleteBtn = event.target.closest('.delete-order-item-btn')
+        if (deleteBtn) {
+            // get orderId from the button value
+            let orderItemId = deleteBtn.value;
+            // Set orderId as attribute for the modal to be used for front-end deletion
+            deleteModalElement.setAttribute('data-order-item-id', orderItemId);
+            // show the confirmation delete modal
+            deleteModal.show();
+        }
+    });
+
+    // add event listener on confirm delete button that will handle the deletion
+    confirmDeleteBtn.addEventListener('click', () => {
+        // Get order ID from modal attribute
+        let orderItemId = deleteModalElement.getAttribute('data-order-item-id');
+        if (orderItemId) {
+            // Delete item
+            deleteOrderItem(orderItemId);
+            // Clear the data attribute
+            deleteModalElement.removeAttribute('data-order-item-id');
+        }
+    });
+
     // initialize tooltips
     initTooltips();
+
+    // Define function that deletes an order item and remaining items index
+    function deleteOrderItem(orderItemId) {
+        // show spinner
+        let spinner = document.getElementById('delete-spinner');
+        toggleSpinner(spinner);
+
+        // API delete call
+        $.ajax({
+            url: `/api/order-items/${orderItemId}/`,
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                // To identify AJAX request in the backend
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            success: function (response) {
+                // Reload the table to show changes
+                table.ajax.reload(toggleSpinner(spinner), false);
+                // display message
+                if (response.success) {
+                    displayMessage(response.message, 'success');
+                }
+            },
+            error: function (xhr, status, error) {
+                // Reload the table to revert changes
+                table.ajax.reload(toggleSpinner(spinner), false);
+                // display message
+                let errorMessage = error || 'An error occurred while deleting the order item.';
+                displayMessage(errorMessage, 'error');
+            }
+        });
+    };
+
+    // function deleteOrderItem(orderId) {
+    //     // show spinner
+    //     let spinner = document.getElementById('delete-spinner');
+    //     toggleSpinner(spinner);
+    //     // call delete_order API to handle deletion in the backend
+    //     fetch(`/api/delete-order/${orderId}/`, {
+    //             method: 'POST',
+    //             headers: {
+    //                 'X-CSRFToken': csrftoken,
+    //                 // To identify AJAX request in the backend
+    //                 'X-Requested-With': 'XMLHttpRequest',
+    //             }
+    //         })
+    //         .then(response => {
+    //             // handle bad reponse status
+    //             if (!response.ok) {
+    //                 if (response.status === 403) {
+    //                     throw new Error('You do not have permission to delete this order.');
+    //                 } else if (response.status === 404) {
+    //                     throw new Error('Order was not found.');
+    //                 } else {
+    //                     throw new Error('Network response was not ok.');
+    //                 }
+    //             }
+    //             return response.json();
+    //         })
+    //         .then(data => {
+    //             if (data.success) {
+    //                 // get order row element to target for deletion
+    //                 const orderRow = document.getElementById(`order-${orderId}`);
+    //                 // delete row from table to handle deletion in the front-end
+    //                 // (will eliminate the need to redirect page)
+    //                 if (orderRow) {
+    //                     orderRow.remove();
+    //                 }
+    //                 // Display success messages
+    //                 if (data.messages && data.messages.length > 0) {
+    //                     displayMessages(data.messages);
+    //                 }
+    //             } else {
+    //                 // Display error messages
+    //                 if (data.messages && data.messages.length > 0) {
+    //                     displayMessages(data.messages);
+    //                 }
+    //             }
+    //             // hide spinner
+    //             toggleSpinner(spinner);
+    //         })
+    //         // handle other errors
+    //         .catch((error) => {
+    //             console.error(`There was a problem with deleting order ${orderId}:`, error);
+    //             displayMessages([{
+    //                 level: 40,
+    //                 level_tag: 'error',
+    //                 message: `An error occurred: ${error.message}`
+    //             }]);
+    //         });
+    // };
 
     // Function that opens the paid status modal and performs an AJAX call for order details
     function openPaidStatusModal(orderId) {
@@ -404,14 +544,14 @@ $(document).ready(function () {
                 // To identify AJAX request in the backend
                 'X-Requested-With': 'XMLHttpRequest',
             },
-            success: function(response) {
+            success: function (response) {
                 // Close the modal
                 $('#paidStatusModal').modal('hide');
-    
+
                 // Reload the DataTable to reflect changes
                 $('#orderitem-table').DataTable().ajax.reload(null, false);
             },
-            error: function(error) {
+            error: function (error) {
                 console.error('Error updating payment status:', error);
                 displayMessages([{
                     level: 40,
@@ -421,5 +561,5 @@ $(document).ready(function () {
             }
         });
     }
-    
+
 })

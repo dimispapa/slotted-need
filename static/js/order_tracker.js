@@ -5,8 +5,6 @@ import {
     debounce,
     initTooltips,
     generateSelectOptions,
-    generateOptionsList,
-    fetchOrderItems,
     checkExpandedRows,
     toggleChildRow,
     toggleSpinner
@@ -347,20 +345,24 @@ $(document).ready(function () {
                         orderRow.remove();
                     }
                     // Display success messages
+                    // hide spinner
+                    toggleSpinner(spinner);
                     if (data.messages && data.messages.length > 0) {
                         displayMessages(data.messages);
                     }
                 } else {
+                    // hide spinner
+                    toggleSpinner(spinner);
                     // Display error messages
                     if (data.messages && data.messages.length > 0) {
                         displayMessages(data.messages);
                     }
                 }
-                // hide spinner
-                toggleSpinner(spinner);
             })
             // handle other errors
             .catch((error) => {
+                // hide spinner
+                toggleSpinner(spinner);
                 console.error(`There was a problem with deleting order ${orderId}:`, error);
                 displayMessages([{
                     level: 40,

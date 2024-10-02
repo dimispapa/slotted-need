@@ -1,6 +1,33 @@
 // ***** Util functions related to general DOM manipulation, generation of HTML elements and styling **********
 
 // Function to display messages
+function displayMessage(message, type) {
+
+    // Use Bootstrap alert classes based on the message type
+    let alertClass = 'alert-secondary';
+    switch (type) {
+        case 'debug':
+        case 'success':
+            alertClass = 'alert-success';
+            break;
+        case 'error':
+            alertClass = 'alert-danger';
+            break;
+        case 'warning':
+            alertClass = 'alert-warning';
+            break;
+        case 'info':
+            alertClass = 'alert-info';
+    }
+    // Create the alert element
+    let alert = `<div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                 </div>`;
+    // Append to a container in your HTML
+    $('#msg-container').html(alert);
+};
+
 function displayMessages(messages) {
 
     const messageContainer = document.getElementById('msg-container');
@@ -314,9 +341,9 @@ function toggleChildRow(tr, row) {
 
 export {
     displayMessages,
+    displayMessage,
     updateStatusStyle,
     updatePaidStatusStyle,
-    applyFilters,
     debounce,
     ajaxSetupToken,
     initTooltips,
