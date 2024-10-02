@@ -8,7 +8,7 @@ import {
     initTooltips,
     generateSelectOptions,
     generateOptionsList,
-    hideSpinner
+    toggleSpinner
 
 } from "./utils.js";
 
@@ -149,6 +149,14 @@ $(document).ready(function () {
                         let options = generateSelectOptions(itemStatusChoices, data);
                         select += options;
                         select += '</select>';
+                        // Add a spinner
+                        select += `
+                        <span class="text-center inline-spinner-div">
+                            <div class="spinner-border text-primary d-none" role="status" id="item-status-spinner-${row.id}">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </span>
+                        `;
                         return select;
                     }
                     return data;
@@ -164,6 +172,14 @@ $(document).ready(function () {
                         let options = generateSelectOptions(priorityLevelChoices, data);
                         select += options;
                         select += '</select>';
+                        // Add a spinner
+                        select += `
+                        <span class="text-center inline-spinner-div">
+                            <div class="spinner-border text-primary d-none" role="status" id="priority-status-spinner-${row.id}">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </span>
+                        `;
                         return select;
                     }
                     return data;
@@ -193,7 +209,12 @@ $(document).ready(function () {
                 className: 'not-sortable',
                 searchable: false,
                 render: function (data, type, row) {
-                    return '<button class="btn btn-danger btn-sm delete-orderitem action-btn" data-id="' + row.id + '"><i class="fa-solid fa-trash"></i></button>';
+                    return `
+                    <button type="button" id="delete-item-btn-${row.id}" name="delete_order"
+                    class="btn btn-sm btn-danger delete-item-btn" value="${row.id}">
+                    <i class="fa-solid fa-trash"></i>
+                    </button>
+                    `;
                 }
             },
         ],
@@ -218,18 +239,19 @@ $(document).ready(function () {
     $('#filter-id, #filter-order, #filter-client, #filter-product, #filter-value-min, ' +
         '#filter-value-max, #filter-item-status, #filter-priority-level, #filter-paid-status, ' +
         '#filter-design-options, #filter-product-finish, #filter-component-finishes').on('keyup change', debounce(function () {
-        applyFilters();
+        applyFilters(table);
     }, 300));
 
     // Handle change for item_status
     $('#orderitem-table').on('change', '.item-status', function () {
-        // show spinner
-        let spinner = document.getElementById('filter-item-status-spinner');
-        spinner.classList.remove('d-none');
         // get order item id and new status
         let orderitemId = $(this).data('id');
         let newStatus = $(this).val();
+        // show spinner
+        let spinner = document.getElementById(`item-status-spinner-${orderitemId}`);
+        toggleSpinner(spinner);
 
+        // API AJAX patch call to update backend data
         $.ajax({
             url: `/api/order-items/${orderitemId}/`,
             type: 'PATCH',
@@ -239,25 +261,26 @@ $(document).ready(function () {
             contentType: 'application/json',
             success: function (response) {
                 // Reload the table without resetting pagination
-                table.ajax.reload(hideSpinner(spinner), false);
+                table.ajax.reload(toggleSpinner(spinner), false);
             },
             error: function (xhr, status, error) {
                 console.error('Error updating item status:', error);
                 // Reload the table to revert changes
-                table.ajax.reload(hideSpinner(spinner), false);
+                table.ajax.reload(toggleSpinner(spinner), false);
             },
         });
     });
 
-    // Handle change for priority_level
+    // Handle change for priority_level to update backend data
     $('#orderitem-table').on('change', '.priority-status', function () {
-        // show spinner
-        let spinner = document.getElementById('filter-priority-level-spinner');
-        spinner.classList.remove('d-none');
         // Get order item id and new priority status
         var orderitemId = $(this).data('id');
         var newPriority = $(this).val();
+        // show spinner
+        let spinner = document.getElementById(`priority-status-spinner-${orderitemId}`);
+        toggleSpinner(spinner);
 
+        // API AJAX patch call
         $.ajax({
             url: `/api/order-items/${orderitemId}/`,
             type: 'PATCH',
@@ -267,12 +290,12 @@ $(document).ready(function () {
             contentType: 'application/json',
             success: function (response) {
                 // Reload the table without resetting pagination
-                table.ajax.reload(hideSpinner(spinner), false);
+                table.ajax.reload(toggleSpinner(spinner), false);
             },
             error: function (xhr, status, error) {
                 console.error('Error updating priority level:', error);
                 // Reload the table to revert changes
-                table.ajax.reload(hideSpinner(spinner), false);
+                table.ajax.reload(toggleSpinner(spinner), false);
             },
 
         });
