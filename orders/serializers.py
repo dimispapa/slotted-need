@@ -99,3 +99,16 @@ class OrderItemSerializer(ModelSerializer):
                             'option_values', 'product_finish',
                             'option_value_id', 'item_value',
                             'item_component_finishes',]
+
+    # customise update to ensure the related order status is also updated
+    def update(self, instance, validated_data):
+        # Update the OrderItem instance
+        instance = super().update(instance, validated_data)
+
+        # After updating the OrderItem,
+        # call update_order_status on the associated Order
+        order = instance.order
+        order.update_order_status()
+        # Since update_order_status saves the order, no need to save again
+
+        return instance
