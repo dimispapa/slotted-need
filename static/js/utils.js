@@ -190,11 +190,6 @@ function ajaxSetupToken(csrftoken) {
     });
 };
 
-// Function to reload table with new filters
-function applyFilters(table) {
-    table.ajax.reload();
-};
-
 // Debounce function to limit the rate of function execution
 function debounce(func, delay) {
     let timeout;

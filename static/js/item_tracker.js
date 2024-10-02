@@ -3,7 +3,6 @@ import {
     updateStatusStyle,
     updatePaidStatusStyle,
     ajaxSetupToken,
-    applyFilters,
     debounce,
     initTooltips,
     generateSelectOptions,
@@ -239,7 +238,7 @@ $(document).ready(function () {
     $('#filter-id, #filter-order, #filter-client, #filter-product, #filter-value-min, ' +
         '#filter-value-max, #filter-item-status, #filter-priority-level, #filter-paid-status, ' +
         '#filter-design-options, #filter-product-finish, #filter-component-finishes').on('keyup change', debounce(function () {
-        applyFilters(table);
+        table.ajax.reload();
     }, 300));
 
     // Handle change for item_status

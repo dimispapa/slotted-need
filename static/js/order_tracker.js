@@ -2,7 +2,6 @@ import {
     displayMessages,
     updateStatusStyle,
     ajaxSetupToken,
-    applyFilters,
     debounce,
     initTooltips,
     generateSelectOptions,
@@ -214,7 +213,7 @@ $(document).ready(function () {
         '#filter-deposit-min, #filter-deposit-max, #filter-value-min, #filter-value-max, ' +
         '#filter-order-status, #filter-paid-status').on('keyup change', debounce(function () {
         // apply filters
-        applyFilters(table);
+        table.ajax.reload();
     }, 300));
 
     // Handle change for paid_status and update the backend with AJAX call
