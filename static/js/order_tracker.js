@@ -7,10 +7,10 @@ import {
     initTooltips,
     generateSelectOptions,
     generateOptionsList,
-    hideSpinner,
     fetchOrderItems,
     checkExpandedRows,
-    toggleChildRow
+    toggleChildRow,
+    toggleSpinner
 
 } from './utils.js'
 
@@ -166,6 +166,12 @@ $(document).ready(function () {
                         let options = generateSelectOptions(paidStatusChoices, data);
                         select += options;
                         select += '</select>';
+                        select += `
+                            <span class="text-center inline-spinner-div">
+                                <div class="spinner-border text-primary d-none" role="status" id="paid-status-spinner-${row.id}">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </span>`
                         return select;
                     }
                     return data;
@@ -207,18 +213,21 @@ $(document).ready(function () {
     $('#filter-id, #filter-client, #filter-discount-min, #filter-discount-max, ' +
         '#filter-deposit-min, #filter-deposit-max, #filter-value-min, #filter-value-max, ' +
         '#filter-order-status, #filter-paid-status').on('keyup change', debounce(function () {
+        // apply filters
         applyFilters(table);
     }, 300));
 
     // Handle change for paid_status and update the backend with AJAX call
     $('#orders-table').on('change', '.paid-status', function () {
-        // show spinner
-        let spinner = document.getElementById('filter-paid-status-spinner');
-        spinner.classList.remove('d-none');
         // get order item id and new status
         let orderId = $(this).data('id');
         let newStatus = $(this).val();
 
+        // show spinner
+        let spinner = document.getElementById(`paid-status-spinner-${orderId}`);
+        toggleSpinner(spinner);
+
+        // API AJAX patch call
         $.ajax({
             url: `/api/orders/${orderId}/`,
             type: 'PATCH',
@@ -243,27 +252,29 @@ $(document).ready(function () {
                             }
                         });
                         // hide the spinner on completion
-                        hideSpinner(spinner)
+                        toggleSpinner(spinner);
                     },
                     false);
             },
             error: function (xhr, status, error) {
                 console.error('Error updating paid status:', error);
                 // Reload the table to revert changes
-                table.ajax.reload(hideSpinner(spinner), false);
+                table.ajax.reload(toggleSpinner(spinner), false);
             },
         });
     });
 
     // Handle change for item_status and update the backend with AJAX call
     $('#orders-table').on('change', '.item-status', function () {
-        // show spinner
-        let spinner = document.getElementById('item-status-spinner');
-        spinner.classList.remove('d-none');
         // get order item id and new status
         let orderitemId = $(this).data('id');
         let newStatus = $(this).val();
 
+        // show spinner
+        let spinner = document.getElementById(`item-status-spinner-${orderitemId}`);
+        toggleSpinner(spinner);
+
+        // API AJAX patch call
         $.ajax({
             url: `/api/order-items/${orderitemId}/`,
             type: 'PATCH',
@@ -277,31 +288,34 @@ $(document).ready(function () {
 
                 // Reload the table with callback function and without resetting pagination
                 table.ajax.reload(function () {
-                    // After the table is reloaded check which child rows to re-expand
-                    table.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                        let tr = $(this.node());
-                        let data = this.data();
-                        if (expandedRows.includes(data.id)) {
-                            // Re-open the child row
-                            let row = this;
-                            toggleChildRow(tr, row);
-                        }
-                    });
-                    // hide the spinner on completion
-                    hideSpinner(spinner)
-                },
-                false);
+                        // After the table is reloaded check which child rows to re-expand
+                        table.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                            let tr = $(this.node());
+                            let data = this.data();
+                            if (expandedRows.includes(data.id)) {
+                                // Re-open the child row
+                                let row = this;
+                                toggleChildRow(tr, row);
+                            }
+                        });
+                        // hide the spinner on completion
+                        toggleSpinner(spinner);
+                    },
+                    false);
             },
             error: function (xhr, status, error) {
                 console.error('Error updating paid status:', error);
                 // Reload the table to revert changes
-                table.ajax.reload(hideSpinner(spinner), false);
+                table.ajax.reload(toggleSpinner(spinner), false);
             },
         });
     });
 
     // Define function that deletes an order item and remaining items index
     function deleteOrder(orderId) {
+        // show spinner
+        let spinner = document.getElementById('delete-spinner');
+        toggleSpinner(spinner);
         // call delete_order API to handle deletion in the backend
         fetch(`/api/delete-order/${orderId}/`, {
                 method: 'POST',
@@ -333,11 +347,6 @@ $(document).ready(function () {
                     if (orderRow) {
                         orderRow.remove();
                     }
-                    // Remove the hidden row containing order items
-                    const hiddenRow = orderRow.nextElementSibling ? orderRow.nextElementSibling : null;
-                    if (hiddenRow) {
-                        hiddenRow.remove();
-                    }
                     // Display success messages
                     if (data.messages && data.messages.length > 0) {
                         displayMessages(data.messages);
@@ -348,6 +357,8 @@ $(document).ready(function () {
                         displayMessages(data.messages);
                     }
                 }
+                // hide spinner
+                toggleSpinner(spinner);
             })
             // handle other errors
             .catch((error) => {

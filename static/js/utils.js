@@ -205,8 +205,12 @@ function debounce(func, delay) {
 };
 
 // Function to hide spinner
-function hideSpinner(spinner) {
-    spinner.classList.add('d-none')
+function toggleSpinner(spinner) {
+    if (spinner.classList.contains('d-none')) {
+        spinner.classList.remove('d-none')
+    } else {
+        spinner.classList.add('d-none')
+    }
 };
 
 // Function that formats the order item data into html tr and td elements
@@ -240,8 +244,8 @@ function formatOrderItems(orderItems) {
                     <select class="form-select-sm fw-bolder text-wrap item-status" data-id="${item.id}">
                         ${generateSelectOptions(itemStatusChoices, item.item_status)}
                     </select>
-                    <span class="text-center">
-                        <div class="spinner-border text-primary m-2 d-none" role="status" id="item-status-spinner">
+                    <span class="text-center inline-spinner-div">
+                        <div class="spinner-border text-primary d-none" role="status" id="item-status-spinner-${item.id}">
                             <span class="visually-hidden">Loading...</span>
                         </div>
                     </span>
@@ -323,7 +327,7 @@ export {
     initTooltips,
     generateSelectOptions,
     generateOptionsList,
-    hideSpinner,
+    toggleSpinner,
     checkExpandedRows,
     toggleChildRow,
     fetchOrderItems

@@ -6,7 +6,7 @@
   color: #0d6efd;
 }
 
-/********* General font size media queries *************/
+/********* General commonly used elements *************/
 /* reduce font-size for smaller viewports */
 @media (max-width: 768px) {
 
@@ -18,6 +18,11 @@
   #order-list-form {
     font-size: 12px;
   }
+}
+
+.inline-spinner-div {
+  position: absolute;
+  margin-left: 5px;
 }
 
 /*************** CREATE ORDERS PAGE **************************/

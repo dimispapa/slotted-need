@@ -32,33 +32,50 @@
           <th></th>
         </tr>
         <tr class="filter-row">
-          <th></th>
+          <th>
+            <!-- Empty header for dropdown toggle column -->
+          </th>
+          <!-- ID filter -->
           <th><input type="number" class="form-control" id="filter-id" placeholder="Filter" /></th>
+          <!-- Client filter -->
           <th><input type="text" class="form-control" id="filter-client" placeholder="Filter" /></th>
+          <!-- Discount filter -->
           <th>
             <input type="number" class="form-control" id="filter-discount-min" placeholder="Min" />
             <input type="number" class="form-control" id="filter-discount-max" placeholder="Max" />
           </th>
+          <!-- Deposit filter -->
           <th>
             <input type="number" class="form-control" id="filter-deposit-min" placeholder="Min" />
             <input type="number" class="form-control" id="filter-deposit-max" placeholder="Max" />
           </th>
+          <!-- Value filter -->
           <th>
             <input type="number" class="form-control" id="filter-value-min" placeholder="Min" />
             <input type="number" class="form-control" id="filter-value-max" placeholder="Max" />
           </th>
+          <!-- Order Status filter -->
           <th>
             <!-- Tooltip -->
             <div class="text-center align-baseline mb-2" data-toggle="tooltip" data-html="true"
-            title="The order status is set automatically as it reflects the underlying status of its items" aria-label="Info on filter tooltip">
+              title="The order status is set automatically as it reflects the underlying status of its items"
+              aria-label="Info on filter tooltip">
               <i class="fa-solid fa-circle-info btn-secondary fs-4 fw-bolder"></i>
             </div>
             {% include 'orders/partials/dropdown.html' with options=order_status_choices selected="" class="filter-order-status form-select" id="filter-order-status" %}
           </th>
+          <!-- Paid Status filter -->
           <th>
             {% include 'orders/partials/dropdown.html' with options=paid_status_choices selected="" class="filter-paid-status form-select" id="filter-paid-status" %}
           </th>
-          <th></th>
+          <th>
+            <!-- Delete spinner -->
+            <div class="text-center">
+              <div class="spinner-border text-primary m-2 d-none" role="status" id="delete-spinner">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          </th>
         </tr>
       </thead>
       <tbody class="table-secondary">
