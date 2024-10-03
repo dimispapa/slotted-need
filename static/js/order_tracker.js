@@ -1,13 +1,13 @@
 import {
-    displayMessages,
+    displayMessage,
     updateStatusStyle,
+    updateItemStatusStyle,
     ajaxSetupToken,
     debounce,
     initTooltips,
     generateSelectOptions,
-    checkExpandedRows,
     toggleChildRow,
-    toggleSpinner
+    toggleSpinner,
 
 } from './utils.js'
 
@@ -36,13 +36,10 @@ $(document).ready(function () {
         scrollX: true, // Enable horizontal scrolling
         responsive: true, // Enable responsive layout for smaller screens
         pageLength: pageSize,
-        // conditionally add bootstrap classes for each row when loaded
-        createdRow: function (row, data, dataIndex) {
-            if (data.order_status == 4 && data.paid == 1) {
-                $(row).addClass('table-danger');
-            } else if (data.order_status == 4 && data.paid == 2) {
-                $(row).addClass('table-light opacity-50 shadow-none')
-            }
+        // callback function after creation but before drawing
+        createdRow: (row, data, dataIndex) => {
+            // add row id attribute as orderId
+            $(row).attr('id', `order-${data.id}`);
         },
         ajax: {
             url: '/api/orders/',
@@ -133,23 +130,10 @@ $(document).ready(function () {
                 data: 'order_status',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        // Use global variable passed from context into JS to map the badge value into string
-                        let badge = `
-                        <span class="badge position-relative order-status-badge align-middle item-status" 
-                        data-id="${row.id}" data-value="${data}">${orderStatusChoices[data]}
-                        `;
-                        // create exclamation badge to show when order is delivered but unpaid
-                        let exclamation = `
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                            <i class="fa-solid fa-exclamation fs-6"></i>
-                            <span class="visually-hidden">Alert: delivered but unpaid </span>
-                        </span>               
-                        `;
-                        if (row.order_status == 4 && row.paid == 1) {
-                            return badge + exclamation + '</span>';
-                        } else {
-                            return badge + '</span>';
-                        }
+                        // render the order status HTML
+                        let orderStatusDiv = '<div>';
+                        orderStatusDiv += renderOrderStatus(row.id, data, row.paid);
+                        return orderStatusDiv += '</div>';
                     }
                     return data;
                 }
@@ -197,6 +181,18 @@ $(document).ready(function () {
         drawCallback: function (settings) {
             // update status styles
             updateStatusStyle();
+            // get the rows from the API
+            let rows = this.api().rows()
+            // Iterate through the rows
+            rows.every(function ( rowIdx, tableLoop, rowLoop ) {
+                // get the row data
+                let data = this.data();
+                // Find the DataTable row
+                let row = $(`#order-${data.id}`);
+                // update row styles
+                updateRowStyle(row, data);
+            })
+
         },
     });
 
@@ -216,7 +212,7 @@ $(document).ready(function () {
 
     // Handle change for paid_status and update the backend with AJAX call
     $('#orders-table').on('change', '.paid-status', function () {
-        // get order item id and new status
+        // get order id and new status
         let orderId = $(this).data('id');
         let newStatus = $(this).val();
 
@@ -233,25 +229,14 @@ $(document).ready(function () {
             }),
             contentType: 'application/json',
             success: function (response) {
-                // Check which rows were expanded before reloading table
-                let expandedRows = checkExpandedRows(table);
-
-                // Reload the table with callback function and without resetting pagination
-                table.ajax.reload(function () {
-                        // After the table is reloaded check which child rows to re-expand
-                        table.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                            let tr = $(this.node());
-                            let data = this.data();
-                            if (expandedRows.includes(data.id)) {
-                                // Re-open the child row
-                                let row = this;
-                                toggleChildRow(tr, row);
-                            }
-                        });
-                        // hide the spinner on completion
-                        toggleSpinner(spinner);
-                    },
-                    false);
+                // hide the spinner on completion
+                toggleSpinner(spinner);
+                // Get order details
+                let orderData = response;
+                // Find the DataTable row
+                let row = $(`#order-${orderId}`)
+                // Refresh the row styles
+                updateRowStyle(row, orderData);
             },
             error: function (xhr, status, error) {
                 console.error('Error updating paid status:', error);
@@ -280,25 +265,26 @@ $(document).ready(function () {
             }),
             contentType: 'application/json',
             success: function (response) {
-                // Check which rows were expanded before reloading table
-                let expandedRows = checkExpandedRows(table);
+                // Get order details
+                let orderData = response.order;
+                // Find the DataTable row
+                let row = $(`#order-${orderData.id}`)
+                // get the new order status badge html
+                let orderStatusBadgeHTML = renderOrderStatus(orderData.id, orderData.order_status, orderData.paid);
+                // Update the badge
+                let orderStatusBadge = $(`#order-status-badge-${orderData.id}`);
+                let orderStatusDiv = document.createElement('div');
+                orderStatusDiv.innerHTML = orderStatusBadgeHTML;
+                orderStatusBadge.replaceWith(orderStatusDiv);
+                // get the new badge element
+                let newOrderStatusBadge = $(`#order-status-badge-${orderData.id}`);
+                // Refresh badge status styles
+                updateItemStatusStyle(newOrderStatusBadge[0]);
+                // Refresh the row styles
+                updateRowStyle(row, orderData);
 
-                // Reload the table with callback function and without resetting pagination
-                table.ajax.reload(function () {
-                        // After the table is reloaded check which child rows to re-expand
-                        table.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                            let tr = $(this.node());
-                            let data = this.data();
-                            if (expandedRows.includes(data.id)) {
-                                // Re-open the child row
-                                let row = this;
-                                toggleChildRow(tr, row);
-                            }
-                        });
-                        // hide the spinner on completion
-                        toggleSpinner(spinner);
-                    },
-                    false);
+                // hide the spinner on completion
+                toggleSpinner(spinner);
             },
             error: function (xhr, status, error) {
                 console.error('Error updating paid status:', error);
@@ -308,68 +294,143 @@ $(document).ready(function () {
         });
     });
 
-    // Define function that deletes an order item and remaining items index
+    // Handle change for item_status and update the backend with AJAX call
+    $('#orders-table').on('change', '.priority-status', function () {
+        // get order item id and new status
+        let orderitemId = $(this).data('id');
+        let newStatus = $(this).val();
+
+        // show spinner
+        let spinner = document.getElementById(`priority-status-spinner-${orderitemId}`);
+        toggleSpinner(spinner);
+
+        // API AJAX patch call
+        $.ajax({
+            url: `/api/order-items/${orderitemId}/`,
+            type: 'PATCH',
+            data: JSON.stringify({
+                'priority_level': newStatus
+            }),
+            contentType: 'application/json',
+            success: function (response) {
+                // hide the spinner on completion
+                toggleSpinner(spinner);
+            },
+            error: function (xhr, status, error) {
+                console.error('Error updating paid status:', error);
+                // Reload the table to revert changes
+                table.ajax.reload(toggleSpinner(spinner), false);
+            },
+        });
+    });
+
+    // Handle change for paid_status and update the backend with AJAX call
+    $('#orders-table').on('change', '.paid-status', function () {
+        // get order id and new status
+        let orderId = $(this).data('id');
+        let newStatus = $(this).val();
+
+        // show spinner
+        let spinner = document.getElementById(`paid-status-spinner-${orderId}`);
+        toggleSpinner(spinner);
+
+        // API AJAX patch call
+        $.ajax({
+            url: `/api/orders/${orderId}/`,
+            type: 'PATCH',
+            data: JSON.stringify({
+                'paid': newStatus
+            }),
+            contentType: 'application/json',
+            success: function (response) {
+                // hide the spinner on completion
+                toggleSpinner(spinner);
+                // Get order details
+                let orderData = response;
+                // Find the DataTable row
+                let row = $(`#order-${orderId}`)
+                // Refresh the row styles
+                updateRowStyle(row, orderData);
+            },
+            error: function (xhr, status, error) {
+                console.error('Error updating paid status:', error);
+                // Reload the table to revert changes
+                table.ajax.reload(toggleSpinner(spinner), false);
+            },
+        });
+    });
+
+    // Function that renders the order status
+    function renderOrderStatus(orderId, orderStatus) {
+
+        // Use global variable passed from context into JS to map the badge value into string
+        let badge = `
+        <span class="badge position-relative align-middle item-status" id="order-status-badge-${orderId}"
+        data-id="${orderId}" data-value="${orderStatus}">${orderStatusChoices[orderStatus]}
+        `;
+        // create exclamation badge to show when order is delivered but unpaid
+        let exclamation = `
+        <span id="exclamation-${orderId}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            <i class="fa-solid fa-exclamation fs-6"></i>
+            <span class="visually-hidden">Alert: delivered but unpaid </span>
+        </span>               
+        `;
+
+        return badge + exclamation + '</span>';
+
+    };
+
+    // Function that styles the row based on status
+    function updateRowStyle(row, data) {
+
+        // Delivered and Not Paid
+        if (data.order_status == 4 && data.paid == 1) {
+            $(row).removeClass('table-light opacity-50 shadow-none');
+            $(row).addClass('table-danger');
+            $(`#exclamation-${data.id}`).removeClass('d-none');
+        // Delivered and Fully Paid
+        } else if (data.order_status == 4 && data.paid == 2) {
+            $(row).removeClass('table-danger');
+            $(row).addClass('table-light opacity-50 shadow-none');
+            $(`#exclamation-${data.id}`).addClass('d-none');
+        // All other cases
+        } else {
+            $(row).removeClass('table-light opacity-50 shadow-none');
+            $(row).removeClass('table-danger');
+            $(`#exclamation-${data.id}`).addClass('d-none');
+        }
+    };
+
+    // Function that deletes an order
     function deleteOrder(orderId) {
         // show spinner
         let spinner = document.getElementById('delete-spinner');
         toggleSpinner(spinner);
-        // call delete_order API to handle deletion in the backend
-        fetch(`/api/delete-order/${orderId}/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': csrftoken,
-                    // To identify AJAX request in the backend
-                    'X-Requested-With': 'XMLHttpRequest',
+
+        // API delete call
+        $.ajax({
+            url: `/api/orders/${orderId}/`,
+            method: 'DELETE',
+            success: function (response) {
+                // Reload the table to show changes
+                table.ajax.reload(toggleSpinner(spinner), false);
+                // display message
+                if (response.success) {
+                    displayMessage(response.message, 'success');
                 }
-            })
-            .then(response => {
-                // handle bad reponse status
-                if (!response.ok) {
-                    if (response.status === 403) {
-                        throw new Error('You do not have permission to delete this order.');
-                    } else if (response.status === 404) {
-                        throw new Error('Order was not found.');
-                    } else {
-                        throw new Error('Network response was not ok.');
-                    }
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    // get order row element to target for deletion
-                    const orderRow = document.getElementById(`order-${orderId}`);
-                    // delete row from table to handle deletion in the front-end
-                    // (will eliminate the need to redirect page)
-                    if (orderRow) {
-                        orderRow.remove();
-                    }
-                    // Display success messages
-                    // hide spinner
-                    toggleSpinner(spinner);
-                    if (data.messages && data.messages.length > 0) {
-                        displayMessages(data.messages);
-                    }
-                } else {
-                    // hide spinner
-                    toggleSpinner(spinner);
-                    // Display error messages
-                    if (data.messages && data.messages.length > 0) {
-                        displayMessages(data.messages);
-                    }
-                }
-            })
-            // handle other errors
-            .catch((error) => {
-                // hide spinner
-                toggleSpinner(spinner);
-                console.error(`There was a problem with deleting order ${orderId}:`, error);
-                displayMessages([{
-                    level: 40,
-                    level_tag: 'error',
-                    message: `An error occurred: ${error.message}`
-                }]);
-            });
+            },
+            // Error handling
+            error: function (xhr, status, error) {
+                // Reload the table to revert changes
+                table.ajax.reload(toggleSpinner(spinner), false);
+                // display message
+                let errorMessage = `
+                                    An error occurred while deleting order ${orderId}:
+                                    ${xhr.responseJSON.detail}
+                                    ` || 'An error occurred while deleting the order item.';
+                displayMessage(errorMessage, 'error');
+            }
+        });
     };
 
     // initialize tooltips
@@ -377,14 +438,10 @@ $(document).ready(function () {
 
     // ************** SECTION B: EVENT LISTENERS & HANDLERS *****************************************************************
 
-    //   Handle status dropdowns change colouring dynamically
-    // Initial styling on page load
-    updateStatusStyle();
-
     // add event listener that handles first delete button that will trigger the modal
     document.addEventListener("click", (event) => {
         // get delete button as reference point. Allow clicking on icon inside
-        let deleteBtn = event.target.closest('.delete-order-btn')
+        let deleteBtn = event.target.closest('.delete-order-btn');
         if (deleteBtn) {
             // get orderId from the button value
             let orderId = deleteBtn.value;
