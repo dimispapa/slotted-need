@@ -171,3 +171,8 @@ th.not-sortable {
   /* ensure width takes 100% of container */
   width: 100% !important
 }
+
+/* completed filter */
+#filter-completed-label {
+  font-size: 0.8rem;
+}
