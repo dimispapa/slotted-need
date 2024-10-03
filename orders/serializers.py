@@ -122,4 +122,4 @@ class OrderSerializer(ModelSerializer):
         model = Order
         fields = ['id', 'client', 'discount', 'deposit', 'order_value',
                   'order_status', 'paid', 'created_on', 'updated_on',
-                  'items']
+                  'items', 'archived']

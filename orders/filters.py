@@ -202,5 +202,6 @@ class OrderFilter(django_filters.FilterSet):
             'deposit',
             'order_value',
             'order_status',
-            'paid'
+            'paid',
+            'archived'
         ]

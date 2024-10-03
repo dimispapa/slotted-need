@@ -45,6 +45,7 @@ class Order(models.Model):
     )
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
+    archived = models.BooleanField(default=False)
 
     def calculate_totals(self):
         """Calculate the total discount and order value based
@@ -138,7 +139,6 @@ class OrderItem(models.Model):
         default=1
     )
     completed = models.BooleanField(default=False)
-    archived = models.BooleanField(default=False)
 
     def calculate_item_value(self):
         # Ensure base_price and discount are converted from None
