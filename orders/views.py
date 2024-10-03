@@ -641,6 +641,9 @@ class OrderViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         # Start with the base queryset
         queryset = super().get_queryset()
+        
+        # Exclude archived orders
+        queryset = queryset.filter(archived=False)
 
         # Get 'order_id' from query parameters
         order_id = self.request.query_params.get('order_id', None)

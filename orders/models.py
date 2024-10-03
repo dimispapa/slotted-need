@@ -140,7 +140,6 @@ class OrderItem(models.Model):
     completed = models.BooleanField(default=False)
     archived = models.BooleanField(default=False)
 
-
     def calculate_item_value(self):
         # Ensure base_price and discount are converted from None
         base_price = self.base_price or Decimal('0.00')
