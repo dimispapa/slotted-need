@@ -138,12 +138,41 @@ class OrderItem(models.Model):
         default=1
     )
 
-    def save(self, *args, **kwargs):
+    completed = models.BooleanField(default=False)
+
+    def calculate_item_value(self):
         # Ensure base_price and discount are converted from None
         base_price = self.base_price or Decimal('0.00')
         discount = self.discount or Decimal('0.00')
         # Automatically calculate item_value before saving
         self.item_value = base_price - discount
+
+    def update_completed(self):
+        """Automatically update the completed and priority level fields
+        based on conditions set on the item_status and its parent's paid
+        fields."""
+        # Get the item status and order's paid status
+        item_status = self.item_status
+        paid = self.order.paid
+        completed = None
+
+        # Delivered and Fully Paid set to completed
+        if item_status == 4 and paid == 2:
+            completed = True
+        else:
+            completed = False
+
+        # Update completed field if it has changed
+        if completed:
+            if self.completed != completed:
+                self.completed = completed
+                # Save the order item
+                super(OrderItem, self).save(update_fields=['completed'])
+
+    def save(self, *args, **kwargs):
+        # call custom methods before saving
+        self.calculate_item_value()
+        self.update_completed()
         super().save(*args, **kwargs)
 
     def __str__(self):
