@@ -41,13 +41,12 @@ class ComponentFinishSerializer(ModelSerializer):
         return f"{obj.component} - {obj.finish_option.name}"
 
 
-class OrderSerializer(ModelSerializer):
+class SummaryOrderSerializer(ModelSerializer):
     client = ClientSerializer(read_only=True)
 
     class Meta:
         model = Order
-        fields = ['id', 'client', 'discount', 'deposit', 'order_value',
-                  'order_status', 'paid', 'created_on', 'updated_on']
+        fields = ['id', 'client', 'order_status', 'paid']
 
 
 class ProductSerializer(ModelSerializer):
@@ -57,7 +56,7 @@ class ProductSerializer(ModelSerializer):
 
 
 class OrderItemSerializer(ModelSerializer):
-    order = OrderSerializer(read_only=True)
+    order = SummaryOrderSerializer(read_only=True)
     product = ProductSerializer(read_only=True)
     option_values = OptionValueSerializer(many=True, read_only=True)
     product_finish = FinishOptionSerializer(read_only=True)
@@ -112,3 +111,14 @@ class OrderItemSerializer(ModelSerializer):
         # Since update_order_status saves the order, no need to save again
 
         return instance
+
+
+class OrderSerializer(ModelSerializer):
+    client = ClientSerializer(read_only=True)
+    items = OrderItemSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Order
+        fields = ['id', 'client', 'discount', 'deposit', 'order_value',
+                  'order_status', 'paid', 'created_on', 'updated_on',
+                  'items']

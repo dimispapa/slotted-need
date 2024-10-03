@@ -26,13 +26,4 @@ urlpatterns = [
     path('api/check-client/', views.check_client, name='check_client'),
     # search_clients API, with client_name as a query parameter set in the view
     path('api/search-clients/', views.search_clients, name='search_clients'),
-    # delete_order API, with order_id as path parameters
-    path('api/delete-order/<int:order_id>/', views.delete_order,
-         name='delete_order'),
-    # get order details API, with order_id as path parameter
-    path('api/<int:order_id>/details/',
-         views.order_details, name='order_details'),
-    # update paid status API
-    path('api/update-paid-status/',
-         views.update_paid_status, name='update_paid_status'),
 ]

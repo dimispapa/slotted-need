@@ -3,20 +3,18 @@ import json
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.exceptions import ValidationError
 from django.contrib import messages
-from django.http import JsonResponse, HttpResponseBadRequest
-from django.views.decorators.http import require_POST, require_GET
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.decorators import method_decorator
 from django.db import transaction
-from django.db.models import Count, Q, Prefetch
+from django.db.models import Count, Q
 from rest_framework import viewsets, permissions, status, response
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from .models import Client, Order, OrderItem, ComponentFinish
-from .decorators import (ajax_login_required_no_redirect,
-                         ajax_admin_required_no_redirect)
 from products.models import (Product, Option, OptionValue, FinishOption,
                              ProductComponent, Component)
 from .forms import OrderForm, OrderItemFormSet
@@ -524,41 +522,6 @@ def search_clients(request):
     return JsonResponse({'error': 'POST method not allowed'}, status=405)
 
 
-@require_POST
-@ajax_login_required_no_redirect
-@ajax_admin_required_no_redirect
-def delete_order(request, order_id):
-
-    # Verify that the request is AJAX
-    if not request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        return HttpResponseBadRequest('Invalid request type.')
-
-    # Get order object or throw a 404 error
-    order = get_object_or_404(Order, id=order_id)
-
-    # Delete the order
-    order.delete()
-    messages.success(request,
-                     f'Order {order_id} deleted successfully.')
-    return JsonResponse(
-        {'success': True,
-         'messages': serialize_messages(request)})
-
-
-# Helper function to serialize messages
-def serialize_messages(request):
-    """
-    Serializes Django messages into a list of dictionaries.
-    Each dictionary contains the message level and the message text.
-    """
-    storage = messages.get_messages(request)
-    return [{
-        'level': message.level,
-        'level_tag': message.level_tag,
-        'message': message.message
-    } for message in storage]
-
-
 # define viewset that feeds the order_items API
 class OrderItemViewSet(viewsets.ModelViewSet):
     """
@@ -616,7 +579,7 @@ class OrderItemViewSet(viewsets.ModelViewSet):
         # Delete the instance
         self.perform_destroy(instance)
 
-        # Perform any post-deletion logic here
+        # Return response
         return response.Response(
             {'success': True,
              'message': f'Order item {id} deleted successfully.'},
@@ -649,86 +612,6 @@ class OrderItemListView(LoginRequiredMixin, TemplateView):
         return context
 
 
-@require_GET
-def order_details(request, order_id):
-    # get order object
-    order = get_object_or_404(Order, id=order_id)
-    # Define Prefetch objects with 'to_attr' to avoid duplicates
-    option_values_prefetch = Prefetch('option_values',
-                                      to_attr='prefetched_option_values')
-    item_component_finishes_prefetch = Prefetch(
-        'item_component_finishes',
-        to_attr='prefetched_item_component_finishes')
-
-    # Get order items as a queryset of model instances
-    order_items_queryset = OrderItem.objects.filter(
-        order=order).select_related(
-        'product', 'product_finish'
-    ).prefetch_related(
-        option_values_prefetch,
-        item_component_finishes_prefetch
-    )
-
-    # Build a list of order items with desired fields
-    order_items = []
-    for item in order_items_queryset:
-        item_data = {
-            'product': item.product.name if item.product else None,
-            'item_value': item.item_value,
-            'option_values':
-                [ov.value for ov in item.prefetched_option_values],
-            'product_finish':
-                item.product_finish.name if item.product_finish else None,
-            'item_component_finishes':
-                [str(icf) for icf in item.prefetched_item_component_finishes],
-            'item_status': item.item_status,
-            'item_status_display': item.get_item_status_display(),
-            'priority_level': item.priority_level,
-            'priority_level_display': item.get_priority_level_display(),
-            'str': str(item),
-        }
-        order_items.append(item_data)
-
-    # fetch client details
-    client = {
-        'name': order.client.client_name,
-        'phone': order.client.client_phone,
-        'email': order.client.client_email
-    }
-    # compile data
-    data = {
-        'order_id': order.id,
-        'paid_status': order.paid,
-        'client': client,
-        'order_items': list(order_items)
-    }
-    return JsonResponse(data)
-
-
-@require_POST
-@ajax_login_required_no_redirect
-@ajax_admin_required_no_redirect
-def update_paid_status(request):
-    # Parse JSON data from request.body
-    try:
-        data = json.loads(request.body)
-    except json.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
-
-    # get order id and paid status from POST request
-    order_id = data.get('order_id')
-    paid_status = data.get('paid_status')
-
-    # fetch order
-    order = get_object_or_404(Order, id=order_id)
-
-    # update paid_status
-    order.paid = paid_status
-    order.save()
-
-    return JsonResponse({'success': True})
-
-
 # define viewset that feeds the order_items API
 class OrderViewSet(viewsets.ModelViewSet):
     """
@@ -752,6 +635,36 @@ class OrderViewSet(viewsets.ModelViewSet):
         'paid'
     ]
     ordering = ['-id']  # Default ordering
+
+    # Define fetching queryset process
+    def get_queryset(self):
+        # Start with the base queryset
+        queryset = super().get_queryset()
+
+        # Get 'order_id' from query parameters
+        order_id = self.request.query_params.get('order_id', None)
+
+        # If 'order_id' is provided, filter the queryset
+        if order_id:
+            queryset = queryset.filter(order__id=order_id)
+
+        # Return the filtered or full queryset
+        return queryset
+
+    # Define deletion (destroy) process
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        # Store instance id before deletion
+        id = instance.id
+        # Delete the instance
+        self.perform_destroy(instance)
+
+        # Return response
+        return response.Response(
+            {'success': True,
+             'message': f'Order {id} deleted successfully.'},
+            status=status.HTTP_200_OK
+        )
 
 
 @method_decorator(staff_member_required, name='dispatch')

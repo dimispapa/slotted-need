@@ -1,5 +1,4 @@
 import {
-    displayMessages,
     displayMessage,
     updateStatusStyle,
     updatePaidStatusStyle,
@@ -8,7 +7,7 @@ import {
     initTooltips,
     generateSelectOptions,
     generateOptionsList,
-    toggleSpinner
+    toggleSpinner,
 
 } from "./utils.js";
 
@@ -248,29 +247,35 @@ $(document).ready(function () {
     // Handle change for item_status
     $('#orderitem-table').on('change', '.item-status', function () {
         // get order item id and new status
-        let orderitemId = $(this).data('id');
+        let orderItemId = $(this).data('id');
         let newStatus = $(this).val();
         // show spinner
-        let spinner = document.getElementById(`item-status-spinner-${orderitemId}`);
+        let spinner = document.getElementById(`item-status-spinner-${orderItemId}`);
         toggleSpinner(spinner);
 
-        // API AJAX patch call to update backend data
+        // API AJAX patch call to update item status in the backend
         $.ajax({
-            url: `/api/order-items/${orderitemId}/`,
+            url: `/api/order-items/${orderItemId}/`,
             type: 'PATCH',
             data: JSON.stringify({
                 'item_status': newStatus
             }),
             contentType: 'application/json',
             success: function (response) {
-                // Reload the table without resetting pagination
-                table.ajax.reload(toggleSpinner(spinner), false);
+                // hide the spinner
+                toggleSpinner(spinner);
             },
+            // Error handling
             error: function (xhr, status, error) {
-                console.error('Error updating item status:', error);
                 // Reload the table to revert changes
                 table.ajax.reload(toggleSpinner(spinner), false);
-            },
+                // display message
+                let errorMessage = `
+                                    Error updating item status for order item ${orderItemId}:
+                                    ${xhr.responseJSON.detail}
+                                    ` || 'An error occurred while deleting the order item.';
+                displayMessage(errorMessage, 'error');
+            }
         });
     });
 
@@ -283,7 +288,7 @@ $(document).ready(function () {
         let spinner = document.getElementById(`priority-status-spinner-${orderitemId}`);
         toggleSpinner(spinner);
 
-        // API AJAX patch call
+        // API AJAX patch call to update priority status
         $.ajax({
             url: `/api/order-items/${orderitemId}/`,
             type: 'PATCH',
@@ -292,18 +297,22 @@ $(document).ready(function () {
             }),
             contentType: 'application/json',
             success: function (response) {
-                // Reload the table without resetting pagination
-                table.ajax.reload(toggleSpinner(spinner), false);
+                // hide spinner
+                toggleSpinner(spinner)
             },
+            // Error handling
             error: function (xhr, status, error) {
-                console.error('Error updating priority level:', error);
                 // Reload the table to revert changes
                 table.ajax.reload(toggleSpinner(spinner), false);
-            },
-
+                // display message
+                let errorMessage = `
+                                    Error updating priority level for order item ${orderItemId}:
+                                    ${xhr.responseJSON.detail}
+                                    ` || 'An error occurred while deleting the order item.';
+                displayMessage(errorMessage, 'error');
+            }
         });
     });
-
 
     // Event delegation for delete buttons within the DataTable
     $('#orderitem-table tbody').on('click', '.delete-order-item-btn, .delete-order-item-btn *', (event) => {
@@ -361,11 +370,6 @@ $(document).ready(function () {
         $.ajax({
             url: `/api/order-items/${orderItemId}/`,
             method: 'DELETE',
-            headers: {
-                'X-CSRFToken': csrftoken,
-                // To identify AJAX request in the backend
-                'X-Requested-With': 'XMLHttpRequest',
-            },
             success: function (response) {
                 // Reload the table to show changes
                 table.ajax.reload(toggleSpinner(spinner), false);
@@ -374,74 +378,19 @@ $(document).ready(function () {
                     displayMessage(response.message, 'success');
                 }
             },
+            // Error handling
             error: function (xhr, status, error) {
                 // Reload the table to revert changes
                 table.ajax.reload(toggleSpinner(spinner), false);
                 // display message
-                let errorMessage = error || 'An error occurred while deleting the order item.';
+                let errorMessage = `
+                                    An error occurred while deleting order item ${orderItemId}:
+                                    ${xhr.responseJSON.detail}
+                                    ` || 'An error occurred while deleting the order item.';
                 displayMessage(errorMessage, 'error');
             }
         });
     };
-
-    // function deleteOrderItem(orderId) {
-    //     // show spinner
-    //     let spinner = document.getElementById('delete-spinner');
-    //     toggleSpinner(spinner);
-    //     // call delete_order API to handle deletion in the backend
-    //     fetch(`/api/delete-order/${orderId}/`, {
-    //             method: 'POST',
-    //             headers: {
-    //                 'X-CSRFToken': csrftoken,
-    //                 // To identify AJAX request in the backend
-    //                 'X-Requested-With': 'XMLHttpRequest',
-    //             }
-    //         })
-    //         .then(response => {
-    //             // handle bad reponse status
-    //             if (!response.ok) {
-    //                 if (response.status === 403) {
-    //                     throw new Error('You do not have permission to delete this order.');
-    //                 } else if (response.status === 404) {
-    //                     throw new Error('Order was not found.');
-    //                 } else {
-    //                     throw new Error('Network response was not ok.');
-    //                 }
-    //             }
-    //             return response.json();
-    //         })
-    //         .then(data => {
-    //             if (data.success) {
-    //                 // get order row element to target for deletion
-    //                 const orderRow = document.getElementById(`order-${orderId}`);
-    //                 // delete row from table to handle deletion in the front-end
-    //                 // (will eliminate the need to redirect page)
-    //                 if (orderRow) {
-    //                     orderRow.remove();
-    //                 }
-    //                 // Display success messages
-    //                 if (data.messages && data.messages.length > 0) {
-    //                     displayMessages(data.messages);
-    //                 }
-    //             } else {
-    //                 // Display error messages
-    //                 if (data.messages && data.messages.length > 0) {
-    //                     displayMessages(data.messages);
-    //                 }
-    //             }
-    //             // hide spinner
-    //             toggleSpinner(spinner);
-    //         })
-    //         // handle other errors
-    //         .catch((error) => {
-    //             console.error(`There was a problem with deleting order ${orderId}:`, error);
-    //             displayMessages([{
-    //                 level: 40,
-    //                 level_tag: 'error',
-    //                 message: `An error occurred: ${error.message}`
-    //             }]);
-    //         });
-    // };
 
     // Function that opens the paid status modal and performs an AJAX call for order details
     function openPaidStatusModal(orderId) {
@@ -454,7 +403,7 @@ $(document).ready(function () {
 
         // Fetch order details via AJAX
         $.ajax({
-            url: `/api/${orderId}/details/`,
+            url: `/api/orders/${orderId}/`,
             method: 'GET',
             success: function (data) {
                 // Populate the modal with order and client details
@@ -475,21 +424,29 @@ $(document).ready(function () {
 
     // Function that populates the paid status modal with order details
     function populatePaidStatusModal(data) {
+        // set modal title label
+        $('#paidStatusModalLabel').html(`Order #${data.id}`)
         // Construct HTML content for the modal
         let clientInfo = `
             <h5>Client Details</h5>
-            <p>Name: ${data.client.name}</p>
-            <p>Phone: ${data.client.phone}</p>
-            <p>Email: ${data.client.email}</p>
+            <p>Name: ${data.client.client_name}</p>
+            <p>Phone: ${data.client.client_phone}</p>
+            <p>Email: ${data.client.client_email}</p>
         `;
 
+        // Define the order items html elements
         let orderItems = '<h5>Order Items</h5><ul>';
-        data.order_items.forEach(item => {
-            orderItems += `<li><strong>${item.str}</strong>
+        data.items.forEach(item => {
+            // create an array of values from the option_value objects array
+            let ovString = item.option_values.map((ov) => ov.value)
+            // create an array of finish option names from the component finishes objects array
+            let icfString = item.item_component_finishes.map((icf) => icf.component + ' - ' + icf.finish_option.name)
+            // create an HTML element with the item details
+            orderItems += `<li><strong>#${item.id} - ${item.product.name}</strong>
             <ul>
-                <li><em>Design:</em> ${item.option_values}</li>
-                <li><em>Product Finish:</em> ${item.product_finish || 'None'}</li>
-                <li><em>Component Finishes:</em> ${item.item_component_finishes}</li>
+                <li>Design: <em>${ovString.join(", ")}</em></li>
+                <li>Product Finish: <em>${item.product_finish || '-'}</em></li>
+                <li>Component Finishes: <em>${icfString.join(", ")}</em></li>
             </ul>
             </li>`;
         });
@@ -498,7 +455,7 @@ $(document).ready(function () {
         // Generate `paid_status` options dynamically
         let paidStatusOptions = '';
         for (let [value, display] of Object.entries(paidStatusChoices)) {
-            paidStatusOptions += `<option value="${value}" ${data.paid_status == value ? 'selected' : ''}>${display}</option>`;
+            paidStatusOptions += `<option value="${value}" ${data.paid == value ? 'selected' : ''}>${display}</option>`;
         }
 
         let paidStatusForm = `
@@ -509,7 +466,7 @@ $(document).ready(function () {
                         ${paidStatusOptions}
                     </select>
                 </div>
-                <input type="hidden" name="order_id" value="${data.order_id}">
+                <input type="hidden" name="order_id" value="${data.id}">
                 <button type="submit" class="btn btn-primary fw-bold">Update Payment Status</button>
             </form>
         `;
@@ -528,38 +485,39 @@ $(document).ready(function () {
         });
     }
 
+    // Function that handles the submission of the paid status modal form
     function submitPaidStatusForm() {
-        let formData = {
-            'order_id': $('#paidStatusForm input[name="order_id"]').val(),
-            'paid_status': $('#paidStatusForm select[name="paid_status"]').val()
-        };
+        // get order id and new status
+        let orderId = $('#paidStatusForm input[name="order_id"]').val();
+        let newStatus = $('#paidStatusForm select[name="paid_status"]').val();
 
+        // API AJAX patch call
         $.ajax({
-            url: `/api/update-paid-status/`,
-            method: 'POST',
-            data: JSON.stringify(formData),
+            url: `/api/orders/${orderId}/`,
+            method: 'PATCH',
+            data: JSON.stringify({
+                'paid': newStatus
+            }),
             contentType: 'application/json',
-            headers: {
-                'X-CSRFToken': csrftoken,
-                // To identify AJAX request in the backend
-                'X-Requested-With': 'XMLHttpRequest',
-            },
             success: function (response) {
-                // Close the modal
-                $('#paidStatusModal').modal('hide');
 
-                // Reload the DataTable to reflect changes
-                $('#orderitem-table').DataTable().ajax.reload(null, false);
+                // Reload the table to show changes, with callback function to hide modal but without resetting pagination
+                table.ajax.reload(function () {
+                        // Close the modal
+                        $('#paidStatusModal').modal('hide');
+                    },
+                    false);
             },
-            error: function (error) {
-                console.error('Error updating payment status:', error);
-                displayMessages([{
-                    level: 40,
-                    level_tag: 'error',
-                    message: `Failed to update payment status: ${error.message}`
-                }]);
+            // Error handling
+            error: function (xhr, status, error) {
+                // display message
+                let errorMessage = `
+                                    Failed to update payment status for order item ${orderId}:
+                                    ${xhr.responseJSON.detail}
+                                    ` || 'Error updating payment status.';
+                displayMessage(errorMessage, 'error');
             }
         });
-    }
+    };
 
-})
+});
