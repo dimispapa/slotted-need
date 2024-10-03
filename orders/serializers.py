@@ -93,11 +93,12 @@ class OrderItemSerializer(ModelSerializer):
             'item_value',
             'item_status',
             'priority_level',
+            'completed'
         ]
         read_only_fields = ['id', 'order', 'product', 'order_id', 'product_id',
                             'option_values', 'product_finish',
                             'option_value_id', 'item_value',
-                            'item_component_finishes',]
+                            'item_component_finishes', 'completed']
 
     # customise update to ensure the related order status is also updated
     def update(self, instance, validated_data):

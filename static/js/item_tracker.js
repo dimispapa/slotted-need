@@ -62,6 +62,7 @@ $(document).ready(function () {
                 d.item_status = $('#filter-item-status').val();
                 d.priority_level = $('#filter-priority-level').val();
                 d.paid_status = $('#filter-paid-status').val();
+                d.exclude_completed = $('#filter-exclude-completed').is(':checked');
 
                 // Ordering parameters
                 // WARNING: "order" is a reserved array name to store sorting instructions
@@ -192,6 +193,7 @@ $(document).ready(function () {
                 name: 'order__paid',
                 className: 'sortable',
                 render: function (data, type, row) {
+                    // for display purposes show the Font Awesome icon
                     if (type === 'display') {
                         // Use global variable passed from context into JS
                         let optionStr = paidStatusChoices[data];
@@ -202,9 +204,23 @@ $(document).ready(function () {
                         </button>
                         `
                     }
+                    // for filtering and sorting, return the underlying data
+                    return data;
+                },
+                type: 'num' // to convert to binary for sorting
+            },
+            // Completed
+            {
+                data: 'completed',
+                className: 'sortable align-middle',
+                render: function (data, type, row) {
+                    if (type === 'display') {
+                        return data === true ? '<p class="text-center mb-0"><i class="fa-solid fa-square-check text-success fs-2 fw-bolder" aria-label="Completed"></i></p>' : ''
+                    }
                     return data;
                 }
             },
+            // Delete Button
             {
                 data: null,
                 orderable: false,
@@ -240,7 +256,8 @@ $(document).ready(function () {
     // Event listeners for filter inputs with debounce
     $('#filter-id, #filter-order, #filter-client, #filter-product, #filter-value-min, ' +
         '#filter-value-max, #filter-item-status, #filter-priority-level, #filter-paid-status, ' +
-        '#filter-design-options, #filter-product-finish, #filter-component-finishes').on('keyup change', debounce(function () {
+        '#filter-design-options, #filter-product-finish, #filter-component-finishes, ' +
+        '#filter-exclude-completed').on('keyup change', debounce(function () {
         table.ajax.reload();
     }, 300));
 

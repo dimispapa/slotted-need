@@ -553,6 +553,7 @@ class OrderItemViewSet(viewsets.ModelViewSet):
         'item_status',
         'priority_level',
         'order__paid',
+        'completed'
     ]
     ordering = ['-priority_level']  # Default ordering
 

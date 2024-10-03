@@ -51,6 +51,10 @@ class OrderItemFilter(django_filters.FilterSet):
         field_name='order__paid',
         choices=Order.PAID_CHOICES)
 
+    exclude_completed = django_filters.BooleanFilter(
+        method='filter_exclude_completed'
+    )
+
     class Meta:
         model = OrderItem
         fields = [
@@ -67,8 +71,20 @@ class OrderItemFilter(django_filters.FilterSet):
             'item_value',
             'item_status',
             'priority_level',
-            'order__paid'
+            'order__paid',
+            'completed'
         ]
+
+    def filter_exclude_completed(self, queryset, name, value):
+        """
+        Exclude items where 'completed' is True if 'exclude_completed' is True.
+        """
+        if value:
+            # Exclude items where 'completed' is True
+            return queryset.exclude(completed=True)
+        else:
+            # Return all items
+            return queryset
 
     def filter_option_values(self, queryset, name, value):
         """

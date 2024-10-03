@@ -332,6 +332,7 @@ export {
     displayMessage,
     updateStatusStyle,
     updateItemStatusStyle,
+    updatePaidStatusStyle,
     debounce,
     ajaxSetupToken,
     initTooltips,
