@@ -181,11 +181,7 @@ $(document).ready(function () {
                     <i class="fa-solid fa-file-arrow-down"></i>
                     </button>`;
 
-                    if (row.order_status === 4 && row.paid === 2) {
-                        return deleteBtn + unArchiveBtn + '</div>';
-                    } else {
-                        return deleteBtn + '</div>';
-                    }
+                    return deleteBtn + unArchiveBtn + '</div>';
                 }
             },
         ],
@@ -404,16 +400,19 @@ $(document).ready(function () {
             $(row).removeClass('table-light opacity-50 shadow-none');
             $(row).addClass('table-danger');
             $(`#exclamation-${data.id}`).removeClass('d-none');
+            $(`#archive-order-btn-${data.id}`).addClass('d-none');
             // Delivered and Fully Paid
         } else if (data.order_status == 4 && data.paid == 2) {
             $(row).removeClass('table-danger');
             $(row).addClass('table-light opacity-50 shadow-none');
             $(`#exclamation-${data.id}`).addClass('d-none');
+            $(`#archive-order-btn-${data.id}`).removeClass('d-none');
             // All other cases
         } else {
             $(row).removeClass('table-light opacity-50 shadow-none');
             $(row).removeClass('table-danger');
             $(`#exclamation-${data.id}`).addClass('d-none');
+            $(`#archive-order-btn-${data.id}`).addClass('d-none');
         }
     };
 
