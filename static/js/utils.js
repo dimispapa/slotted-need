@@ -74,13 +74,10 @@ function displayMessages(messages) {
 };
 
 // Define function that updates statuses bg colour with default parameters set initially
-function updateStatusStyle(
-    itemStatusClass = '.item-status',
-    paidStatusClass = '.paid-status',
-    priorityStatusClass = '.priority-status'
-) {
+function updateStatusStyle() {
+
     // get the elements on initial load
-    let itemStatuses = document.querySelectorAll(itemStatusClass);
+    let itemStatuses = document.querySelectorAll('.item-status');
     // loop through item status elements
     if (itemStatuses && itemStatuses.length > 0) {
         for (let status of itemStatuses) {
@@ -92,7 +89,7 @@ function updateStatusStyle(
     }
 
     // get the elements on initial load
-    let paidStatuses = document.querySelectorAll(paidStatusClass);
+    let paidStatuses = document.querySelectorAll('.paid-status');
     // loop through paid status elements
     if (paidStatuses && paidStatuses.length > 0) {
         for (let status of paidStatuses) {
@@ -104,7 +101,7 @@ function updateStatusStyle(
     }
 
     // get the elements on initial load
-    let priorityStatuses = document.querySelectorAll(priorityStatusClass);
+    let priorityStatuses = document.querySelectorAll('.priority-status');
     // loop through priority status elements
     if (priorityStatuses && priorityStatuses.length > 0) {
         for (let status of priorityStatuses) {
@@ -276,6 +273,11 @@ function formatOrderItems(orderItems) {
                     <select class="form-select-sm fw-bolder text-wrap priority-status" data-id="${item.id}">
                         ${generateSelectOptions(priorityLevelChoices, item.priority_level)}
                     </select>
+                    <span class="text-center inline-spinner-div">
+                        <div class="spinner-border text-primary d-none" role="status" id="priority-status-spinner-${item.id}">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </span>
                 </td>
             </tr>
         `;
@@ -306,20 +308,6 @@ function fetchOrderItems(orderId, callback) {
     });
 };
 
-// Log the expanded rows before reloading the table to expand them post reload again
-function checkExpandedRows(table) {
-    let expandedRows = [];
-
-    table.rows().every(function (rowIdx, tableLoop, rowLoop) {
-        let tr = $(this.node());
-        if (tr.hasClass('shown')) {
-            expandedRows.push(this.data().id);
-        }
-    });
-
-    return expandedRows;
-};
-
 // Show/hide the child rows to show order items of orders
 function toggleChildRow(tr, row) {
     if (row.child.isShown()) {
@@ -343,14 +331,13 @@ export {
     displayMessages,
     displayMessage,
     updateStatusStyle,
-    updatePaidStatusStyle,
+    updateItemStatusStyle,
     debounce,
     ajaxSetupToken,
     initTooltips,
     generateSelectOptions,
     generateOptionsList,
     toggleSpinner,
-    checkExpandedRows,
     toggleChildRow,
     fetchOrderItems
 };
