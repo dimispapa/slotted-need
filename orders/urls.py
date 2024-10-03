@@ -2,7 +2,7 @@ from . import views
 from django.urls import path
 
 urlpatterns = [
-    # ****** URL template section ***********
+    # ****** TEMPLATE section ***********
     # render the home.html template dashboard
     path('', views.home, name='home'),
     # renders create_order.html template
@@ -13,6 +13,9 @@ urlpatterns = [
     # render order_items.html template list view with filters
     path('order-item-tracker/', views.OrderItemListView.as_view(),
          name='order_item_tracker'),
+    # renders orders.html template
+    path('order-archive/', views.OrderArchiveListView.as_view(),
+         name="order_archive"),
     # ***** API section ***********
     # get_products API
     path('api/get-products/', views.get_products, name='get_products'),

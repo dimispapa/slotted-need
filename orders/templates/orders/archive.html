@@ -60,7 +60,7 @@
             <div class="text-center align-baseline mb-2" data-toggle="tooltip" data-html="true"
               title="The order status is set automatically as it reflects the underlying status of its items"
               aria-label="Info on filter tooltip">
-              <i class="fa-solid fa-circle-info text-primary fs-4 fw-bolder"></i>
+              <i class="fa-solid fa-circle-info btn-secondary fs-4 fw-bolder"></i>
             </div>
             {% include 'orders/partials/dropdown.html' with options=order_status_choices selected="" class="filter-order-status form-select" id="filter-order-status" %}
           </th>
@@ -107,21 +107,21 @@
 </div>
 
 <!-- Archive confirmation modal -->
-<div class="modal fade" id="ArchiveOrderConfirmationModal" data-bs-backdrop="static" data-bs-keyboard="false"
-  tabindex="-1" aria-labelledby="ArchiveOrderConfirmationModal" aria-hidden="true">
+<div class="modal fade" id="UnArchiveOrderConfirmationModal" data-bs-backdrop="static" data-bs-keyboard="false"
+  tabindex="-1" aria-labelledby="UnArchiveOrderConfirmationModal" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="ArchiveOrderConfirmationModalLabel">Confirm Archive Action</h1>
+        <h1 class="modal-title fs-5" id="UnArchiveOrderConfirmationModalLabel">Confirm Move Out of Archive</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p>Are you sure you want to archive this order? This action can be reversed by accessing the "Archive" view.</p>
+        <p>Are you sure you want to move this order out of Archive to active Orders? This action can be reversed by accessing the "Order Tracker" view.</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-        <button type="button" class="btn btn-warning" id="confirm-archive-order-btn" data-bs-dismiss="modal">Yes
-          Archive</button>
+        <button type="button" class="btn btn-warning" id="confirm-un-archive-order-btn" data-bs-dismiss="modal">Yes
+          Un-Archive</button>
       </div>
     </div>
   </div>
@@ -132,5 +132,5 @@
 <!-- Include the partial that defines JS variables using DTL -->
 {% include 'orders/partials/js_var_orders.html' %}
 <!-- External JS logic -->
-<script type="module" src="{% static 'js/order_tracker.js' %}"></script>
+<script type="module" src="{% static 'js/order_archive.js' %}"></script>
 {% endblock %}

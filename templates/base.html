@@ -3,6 +3,7 @@
 {% url 'create_order' as add_order_url %}
 {% url 'order_tracker' as order_tracker_url %}
 {% url 'order_item_tracker' as order_item_tracker_url %}
+{% url 'order_archive' as order_archive_url %}
 
 
 <!DOCTYPE html>
@@ -69,6 +70,11 @@
               <li>
                 <a class="dropdown-item {% if request.path == order_item_tracker_url %}active-dropdown-item"
                 aria-current="true{% endif %}" href="{% url 'order_item_tracker' %}"><i class="fa-solid fa-table-list"></i> Item Tracker</a>
+              </li>
+              <!-- Order Archive -->
+              <li>
+                <a class="dropdown-item {% if request.path == order_archive_url %}active-dropdown-item"
+                aria-current="true{% endif %}" href="{% url 'order_archive' %}"><i class="fa-regular fa-folder-open"></i> Order Archive</a>
               </li>
             </ul>
           </li>

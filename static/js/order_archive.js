@@ -17,9 +17,9 @@ $(document).ready(function () {
     const deleteModalElement = document.getElementById('DeleteOrderConfirmationModal');
     const deleteModal = new bootstrap.Modal(document.getElementById('DeleteOrderConfirmationModal'));
     const confirmDeleteBtn = document.getElementById("confirm-delete-order-btn");
-    const archiveModalElement = document.getElementById('ArchiveOrderConfirmationModal');
-    const archiveModal = new bootstrap.Modal(document.getElementById('ArchiveOrderConfirmationModal'));
-    const confirmArchiveBtn = document.getElementById("confirm-archive-order-btn");
+    const unArchiveModalElement = document.getElementById('UnArchiveOrderConfirmationModal');
+    const unArchiveModal = new bootstrap.Modal(document.getElementById('UnArchiveOrderConfirmationModal'));
+    const confirmUnArchiveBtn = document.getElementById("confirm-un-archive-order-btn");
     const csrftoken = document.querySelector("meta[name='csrf-token']").content;
     const pageSize = 25;
 
@@ -49,7 +49,7 @@ $(document).ready(function () {
             type: 'GET',
             data: function (d) {
                 // Map DataTables parameters to API query parameters
-
+                d.archived = true;
                 // Calculate page number and page size
                 let start = parseInt(d.start) || 0;
                 let length = parseInt(d.length) || pageSize;
@@ -175,14 +175,14 @@ $(document).ready(function () {
                         <i class="fa-solid fa-trash"></i>
                         </button>
                     `;
-                    let archiveBtn = `
-                    <button class="btn btn-sm btn-secondary archive-order-btn ms-1 ms-md-2"
-                    id="archive-order-btn-${row.id}" value="${row.id}" aria-label="Archive order">
-                    <i class="fa-regular fa-folder-open"></i>
+                    let unArchiveBtn = `
+                    <button class="btn btn-sm btn-warning un-archive-order-btn ms-1 ms-md-2"
+                    id="un-archive-order-btn-${row.id}" value="${row.id}" aria-label="Un-archive order">
+                    <i class="fa-solid fa-file-arrow-down"></i>
                     </button>`;
 
                     if (row.order_status === 4 && row.paid === 2) {
-                        return deleteBtn + archiveBtn + '</div>';
+                        return deleteBtn + unArchiveBtn + '</div>';
                     } else {
                         return deleteBtn + '</div>';
                     }
@@ -450,14 +450,14 @@ $(document).ready(function () {
     };
 
     // Function that archives an order
-    function archiveOrder(orderId) {
+    function unArchiveOrder(orderId) {
         // show spinner
         let spinner = document.getElementById('action-spinner');
         toggleSpinner(spinner);
 
-        // API archive call for action
+        // API unarchive call for action
         $.ajax({
-            url: `/api/orders/${orderId}/archive/`,
+            url: `/api/orders/${orderId}/unarchive/`,
             method: 'POST',
             success: function (response) {
                 // Reload the table to show changes
@@ -473,9 +473,9 @@ $(document).ready(function () {
                 table.ajax.reload(toggleSpinner(spinner), false);
                 // display message
                 let errorMessage = `
-                                    An error occurred while archiving order ${orderId}:
+                                    An error occurred while un-archiving order ${orderId}:
                                     ${xhr.responseJSON.detail}
-                                    ` || 'An error occurred while archiving the order.';
+                                    ` || 'An error occurred while un-archiving the order.';
                 displayMessage(errorMessage, 'error');
             }
         });
@@ -515,26 +515,26 @@ $(document).ready(function () {
     // add event listener that handles first archive button that will trigger the modal
     document.addEventListener("click", (event) => {
         // get delete button as reference point. Allow clicking on icon inside
-        let archiveBtn = event.target.closest('.archive-order-btn');
-        if (archiveBtn) {
+        let unArchiveBtn = event.target.closest('.un-archive-order-btn');
+        if (unArchiveBtn) {
             // get orderId from the button value
-            let orderId = archiveBtn.value;
+            let orderId = unArchiveBtn.value;
             // Set orderId as attribute for the modal to be used for front-end deletion
-            archiveModalElement.setAttribute('data-order-id', orderId);
+            unArchiveModalElement.setAttribute('data-order-id', orderId);
             // show the confirmation delete modal
-            archiveModal.show();
+            unArchiveModal.show();
         }
     });
 
     // add event listener on confirm delete button that will handle the deletion
-    confirmArchiveBtn.addEventListener('click', () => {
+    confirmUnArchiveBtn.addEventListener('click', () => {
         // Get order ID from modal attribute
-        let orderId = archiveModalElement.getAttribute('data-order-id');
+        let orderId = unArchiveModalElement.getAttribute('data-order-id');
         if (orderId) {
             // Delete item
-            archiveOrder(orderId);
+            unArchiveOrder(orderId);
             // Clear the data attribute
-            archiveModalElement.removeAttribute('data-order-id');
+            unArchiveModalElement.removeAttribute('data-order-id');
         }
     });
 

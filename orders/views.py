@@ -12,6 +12,7 @@ from django.utils.decorators import method_decorator
 from django.db import transaction
 from django.db.models import Count, Q
 from rest_framework import viewsets, permissions, status, response
+from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from .models import Client, Order, OrderItem, ComponentFinish
@@ -641,19 +642,27 @@ class OrderViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         # Start with the base queryset
         queryset = super().get_queryset()
-        
-        # Exclude archived orders
-        queryset = queryset.filter(archived=False)
 
-        # Get 'order_id' from query parameters
+        # Check if accessing a specific object (detail view)
+        if self.kwargs.get('pk') is not None:
+            # Include all orders when accessing a specific object
+            return queryset
+
+        # Get query parameters if any
         order_id = self.request.query_params.get('order_id', None)
+        show_archived = True if self.request.query_params.get(
+            'archived', False) else False
 
-        # If 'order_id' is provided, filter the queryset
+        # If 'show_archived' is provided, return the archived queryset
+        if show_archived:
+            return queryset.filter(archived=True)
+
+        # If 'order_id' is provided, return the filtered queryset
         if order_id:
-            queryset = queryset.filter(order__id=order_id)
+            return queryset.filter(order__id=order_id)
 
-        # Return the filtered or full queryset
-        return queryset
+        # Default to return the non-archived queryset
+        return queryset.filter(archived=False)
 
     # Define deletion (destroy) process
     def destroy(self, request, *args, **kwargs):
@@ -666,9 +675,29 @@ class OrderViewSet(viewsets.ModelViewSet):
         # Return response
         return response.Response(
             {'success': True,
-             'message': f'Order {id} deleted successfully.'},
+             'message': f'Order {id} deleted.'},
             status=status.HTTP_200_OK
         )
+
+    # Create a custom actions that responds to POST requests and
+    # is performed on a single object
+    @action(detail=True, methods=['post'])
+    def archive(self, request, pk=None):
+        order = self.get_object()
+        order.archived = True
+        order.save()
+        return response.Response({'success': True,
+                                  'message': f'Order {order.id} archived.'},
+                                 status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'])
+    def unarchive(self, request, pk=None):
+        order = self.get_object()
+        order.archived = False
+        order.save()
+        return response.Response({'success': True,
+                                  'message': f'Order {order.id} un-archived.'},
+                                 status=status.HTTP_200_OK)
 
 
 @method_decorator(staff_member_required, name='dispatch')
@@ -678,6 +707,31 @@ class OrderListView(LoginRequiredMixin, TemplateView):
     Only accessible to authenticated users.
     """
     template_name = 'orders/orders.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Extract choices from the Order model
+        context['order_status_choices'] = Order.STATUS_CHOICES
+        context['item_status_choices'] = OrderItem.STATUS_CHOICES
+        context['paid_status_choices'] = Order.PAID_CHOICES
+        context['priority_level_choices'] = OrderItem.PRIORITY_CHOICES
+
+        # Serialize choices to JSON for JavaScript
+        context['order_status_choices_json'] = json.dumps(
+            context['order_status_choices'])
+        context['item_status_choices_json'] = json.dumps(
+            context['item_status_choices'])
+        context['paid_status_choices_json'] = json.dumps(
+            context['paid_status_choices'])
+        context['priority_level_choices_json'] = json.dumps(
+            context['priority_level_choices'])
+
+        return context
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class OrderArchiveListView(LoginRequiredMixin, TemplateView):
+    template_name = 'orders/archive.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
