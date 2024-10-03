@@ -137,8 +137,9 @@ class OrderItem(models.Model):
         choices=PRIORITY_CHOICES,
         default=1
     )
-
     completed = models.BooleanField(default=False)
+    archived = models.BooleanField(default=False)
+
 
     def calculate_item_value(self):
         # Ensure base_price and discount are converted from None
