@@ -25,6 +25,7 @@ urlpatterns = [
     path('api/', include(router.urls)),
     # Frontend views
     path('', include('orders.urls'), name='orders-urls'),
-    # DRF login/logout views
+    # DRF Authentication
     path('api-auth/', include('rest_framework.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
