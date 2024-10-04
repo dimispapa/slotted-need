@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from orders.apis import router
-from .views import UserListView, UserCreateView
+from .views import UserListView, UserCreateView, UserUpdateView
 
 urlpatterns = [
     # Admin site
@@ -32,4 +32,5 @@ urlpatterns = [
     # User access management
     path('users/', UserListView.as_view(), name='user_list'),
     path('users/add/', UserCreateView.as_view(), name='user_add'),
+    path('users/edit/<int:pk>/', UserUpdateView.as_view(), name='user_edit'),
 ]

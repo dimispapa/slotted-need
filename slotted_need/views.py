@@ -3,8 +3,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
-from django.views.generic import ListView, CreateView
-from .forms import CustomUserCreationForm
+from django.views.generic import ListView, CreateView, UpdateView
+from .forms import CustomUserCreationForm, CustomUserChangeForm
 
 
 class AdminUserRequiredMixin(UserPassesTestMixin):
@@ -35,4 +35,24 @@ class UserCreateView(LoginRequiredMixin, AdminUserRequiredMixin, CreateView):
     def form_valid(self, form):
         response = super().form_valid(form)
         messages.success(self.request, 'User added successfully.')
+        return response
+
+
+class UserUpdateView(LoginRequiredMixin, AdminUserRequiredMixin, UpdateView):
+    model = User
+    form_class = CustomUserChangeForm
+    template_name = 'users/user_form.html'
+    success_url = reverse_lazy('user_list')
+    extra_context = {'title': 'Edit User'}
+
+    def dispatch(self, request, *args, **kwargs):
+        user = self.get_object()
+        if user.is_superuser and not request.user.is_superuser:
+            messages.error(request, 'You cannot edit this user.')
+            return redirect('user_list')
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, 'User updated successfully.')
         return response

@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.forms import (UserCreationForm
                                        as DjangoUserCreationForm,
+                                       UserChangeForm
+                                       as DjangoUserChangeForm
                                        )
 
 
@@ -28,3 +30,19 @@ class CustomUserCreationForm(DjangoUserCreationForm):
             user.save()
             user.groups.set(self.cleaned_data['groups'])
         return user
+
+
+class CustomUserChangeForm(DjangoUserChangeForm):
+    password = None  # Hide password field
+    email = forms.EmailField(required=True)
+    is_staff = forms.BooleanField(required=False, label='Admin Status')
+    groups = forms.ModelMultipleChoiceField(
+        queryset=Group.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        label='Groups'
+    )
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'is_active', 'is_staff', 'groups')
