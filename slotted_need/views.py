@@ -1,8 +1,10 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
+from django.urls import reverse_lazy
 from django.shortcuts import redirect
-from django.views.generic import ListView
+from django.views.generic import ListView, CreateView
+from .forms import CustomUserCreationForm
 
 
 class AdminUserRequiredMixin(UserPassesTestMixin):
@@ -21,3 +23,16 @@ class UserListView(LoginRequiredMixin, AdminUserRequiredMixin, ListView):
     model = User
     template_name = 'users/user_list.html'
     context_object_name = 'users'
+
+
+class UserCreateView(LoginRequiredMixin, AdminUserRequiredMixin, CreateView):
+    model = User
+    form_class = CustomUserCreationForm
+    template_name = 'users/user_form.html'
+    success_url = reverse_lazy('user_list')
+    extra_context = {'title': 'Add User'}
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, 'User added successfully.')
+        return response
