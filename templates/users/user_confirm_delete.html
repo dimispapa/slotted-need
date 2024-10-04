@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="container mt-2 mt-md-4 mb-2 mb-md-4">
-    <h1 class="display-6 mb-2 mb-md-4"><i class="fa-solid fa-user-xmark"></i> Delete User</h1>
+    <h1 class="display-6 mb-2 mb-md-4"><i class="fa-solid fa-user-xmark text-primary"></i> Delete User</h1>
     <p>Are you sure you want to delete {{ object.username }}?</p>
     <form method="post">
         {% csrf_token %}
