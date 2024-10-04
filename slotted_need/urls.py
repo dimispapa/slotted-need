@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from orders.apis import router
+from .views import UserListView
 
 urlpatterns = [
     # Admin site
@@ -28,4 +29,6 @@ urlpatterns = [
     # DRF Authentication
     path('api-auth/', include('rest_framework.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
+    # User access management
+    path('users/', UserListView.as_view(), name='user_list'),
 ]
