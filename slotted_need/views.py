@@ -3,7 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
-from django.views.generic import ListView, CreateView, UpdateView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 
 
@@ -56,3 +56,20 @@ class UserUpdateView(LoginRequiredMixin, AdminUserRequiredMixin, UpdateView):
         response = super().form_valid(form)
         messages.success(self.request, 'User updated successfully.')
         return response
+
+
+class UserDeleteView(LoginRequiredMixin, AdminUserRequiredMixin, DeleteView):
+    model = User
+    template_name = 'users/user_confirm_delete.html'
+    success_url = reverse_lazy('user_list')
+
+    def dispatch(self, request, *args, **kwargs):
+        user = self.get_object()
+        if user.is_superuser or user == request.user:
+            messages.error(request, 'You cannot delete this user.')
+            return redirect('user_list')
+        return super().dispatch(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, 'User deleted successfully.')
+        return super().delete(request, *args, **kwargs)

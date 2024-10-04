@@ -21,9 +21,9 @@
             <td>{{ user.is_active }}</td>
             <td>{{ user.is_staff }}</td>
             <td>
-                <a href="#">Edit</a>
+                <a href="{% url 'user_edit' user.pk %}">Edit</a>
                 {% if not user.is_superuser and user != request.user %}
-                | <a href="#">Delete</a>
+                | <a href="{% url 'user_delete' user.pk %}">Delete</a>
                 {% endif %}
             </td>
         </tr>
