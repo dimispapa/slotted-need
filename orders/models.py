@@ -1,5 +1,6 @@
 from decimal import Decimal
 from django.db import models
+from django.db.models import Case, When, Value, BooleanField
 from django.core.validators import MinValueValidator
 from products.models import Product, OptionValue, FinishOption, Component
 
@@ -94,8 +95,26 @@ class Order(models.Model):
         # Only execute custom methods after the object has been saved
         # and has a primary key
         if self.pk:
+            # calculate order totals
             self.calculate_totals()
+            # Check if 'paid' status has changed
+            old_paid = Order.objects.get(pk=self.pk).paid
+        else:
+            old_paid = None
+
+        # save Order object
         super().save(*args, **kwargs)
+
+        # If 'paid' status has changed, update related OrderItems
+        # by evaluating if it meets the conditions to update 'completed' field
+        if old_paid != self.paid:
+            self.items.all().update(
+                completed=Case(
+                    When(item_status=4, then=Value(self.paid == 2)),
+                    default=Value(False),
+                    output_field=BooleanField(),
+                )
+            )
 
     def __str__(self):
         return (f"Order #{self.id} by {self.client.client_name} "
@@ -154,7 +173,6 @@ class OrderItem(models.Model):
         # Get the item status and order's paid status
         item_status = self.item_status
         paid = self.order.paid
-        completed = None
 
         # Delivered and Fully Paid set to completed
         if item_status == 4 and paid == 2:
@@ -163,11 +181,8 @@ class OrderItem(models.Model):
             completed = False
 
         # Update completed field if it has changed
-        if completed:
-            if self.completed != completed:
-                self.completed = completed
-                # Save the order item
-                super(OrderItem, self).save(update_fields=['completed'])
+        if self.completed != completed:
+            self.completed = completed
 
     def save(self, *args, **kwargs):
         # call custom methods before saving
