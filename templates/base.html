@@ -85,7 +85,7 @@
           {% if user.is_staff or user.is_superuser %}
           <!-- Admin -->
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'admin:index' %}"><i class="fa-solid fa-gears"></i> Config</a>
+            <a class="nav-link" href="{% url 'admin:index' %}"><i class="fa-solid fa-gears"></i> Configuration</a>
           </li>
           <!-- Admin Access Management Link -->
           <li class="nav-item {% if request.path == user_list %}active" aria-current="page{% endif %}">
