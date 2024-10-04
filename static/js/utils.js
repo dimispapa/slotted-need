@@ -116,8 +116,8 @@ function updateStatusStyle() {
 function updateItemStatusStyle(status) {
     // remove existing style classes
     status.classList.remove('bg-pending', 'bg-warning', 'bg-success', 'bg-secondary', 'text-dark', 'text-light');
-    // get status value differently depending if it's a select or badge element
-    let statusValue = (status.tagName == 'SPAN') ? status.getAttribute('data-value') : status.value;
+    // get status value differently depending if it's a select or different element
+    let statusValue = (status.tagName == 'SELECT') ? status.value : status.getAttribute('data-value');
 
     // Not Started
     if (statusValue == 1) {
@@ -137,7 +137,8 @@ function updateItemStatusStyle(status) {
 function updatePaidStatusStyle(status) {
     // Set boostrap class prefix dynamically based on element type and also get status value integer
     let bsTag = (status.tagName == 'BUTTON') ? 'btn' : 'bg';
-    let statusValue = (status.tagName == 'BUTTON') ? status.getAttribute('data-value') : status.value;
+    // get status value differently depending if it's a select or different element
+    let statusValue = (status.tagName == 'SELECT') ? status.value : status.getAttribute('data-value');
     // remove existing style classes
     status.classList.remove(`${bsTag}-danger`, `${bsTag}-secondary`, 'text-light');
 
@@ -153,6 +154,8 @@ function updatePaidStatusStyle(status) {
 function updatePriorityStatusStyle(status) {
     // remove existing style classes
     status.classList.remove('bg-danger', 'bg-light', 'bg-warning', 'text-dark', 'text-light');
+    // get status value differently depending if it's a select or different element
+    let statusValue = (status.tagName == 'SELECT') ? status.value : status.getAttribute('data-value');
 
     // Low priority
     if (status.value == 1) {
@@ -246,6 +249,7 @@ function formatOrderItems(orderItems) {
                     <th>Item Value</th>
                     <th>Item Status</th>
                     <th>Priority Level</th>
+                    <th>Completed</th>
                 </tr>
             </thead>
             <tbody>`;
@@ -279,6 +283,48 @@ function formatOrderItems(orderItems) {
                         </div>
                     </span>
                 </td>
+                <td>
+                    ${item.completed === true ? '<p class="text-center mb-0"><i class="fa-solid fa-square-check text-success fs-2 fw-bolder" aria-label="Completed"></i></p>' : ''}
+                </td>
+            </tr>
+        `;
+    });
+
+    html += '</tbody></table>';
+    return html;
+};
+
+// Function that formats the order item data into html tr and td elements
+function formatOrderItemsArchive(orderItems) {
+    let html = '<table class="table table-sm table-hover table-bordered border-primary">';
+    html += `
+            <thead>
+                <tr>
+                    <th>Item ID</th>
+                    <th>Product</th>
+                    <th>Design Options</th>
+                    <th>Product Finish</th>
+                    <th>Component Finishes</th>
+                    <th>Item Value</th>
+                    <th>Item Status</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+    orderItems.forEach(function (item) {
+        html += `
+            <tr>
+                <td>${item.id}</td>
+                <td>${item.product.name}</td>
+                <td>${generateOptionsList('option_values', item.option_values)}</td>
+                <td>${item.product_finish ? item.product_finish : '-'}</td>
+                <td>${generateOptionsList('component_finishes', item.item_component_finishes)}</td>
+                <td>€${item.item_value}</td>
+                <td>
+                    <span class="badge align-middle item-status" id="order-status-badge-${item.id}"
+                    data-id="${item.id}" data-value="${item.item_status}">${itemStatusChoices[item.item_status]}
+                    </span>
+                </td>
             </tr>
         `;
     });
@@ -288,7 +334,7 @@ function formatOrderItems(orderItems) {
 };
 
 // Function that uses the order_items API to fetch item details for an order
-function fetchOrderItems(orderId, callback) {
+function fetchOrderItems(orderId, archive, callback) {
     $.ajax({
         url: `/api/order-items/?order_id=${orderId}`,
         method: 'GET',
@@ -296,9 +342,15 @@ function fetchOrderItems(orderId, callback) {
             // store item data in a variable
             let orderItems = data.results || data;
             // format item data into html elements
-            let orderItemsHtml = formatOrderItems(orderItems);
-            // call the callback function to add and show order items
-            callback(orderItemsHtml);
+            if (archive) {
+                let orderItemsHtml = formatOrderItemsArchive(orderItems);
+                // call the callback function to add and show order items
+                callback(orderItemsHtml);
+            } else {
+                let orderItemsHtml = formatOrderItems(orderItems);
+                // call the callback function to add and show order items
+                callback(orderItemsHtml);               
+            }
         },
         error: function (xhr, status, error) {
             console.error('Error fetching order items:', xhr.responseText);
@@ -309,7 +361,7 @@ function fetchOrderItems(orderId, callback) {
 };
 
 // Show/hide the child rows to show order items of orders
-function toggleChildRow(tr, row) {
+function toggleChildRow(tr, row, archive) {
     if (row.child.isShown()) {
         // Close the child row
         row.child.hide();
@@ -318,7 +370,7 @@ function toggleChildRow(tr, row) {
         // Open the child row
         // Fetch order items via AJAX
         let orderId = row.data().id;
-        fetchOrderItems(orderId, function (orderItemsHtml) {
+        fetchOrderItems(orderId, archive, function (orderItemsHtml) {
             // callback function to add and show row child with order items
             row.child(orderItemsHtml).show();
             tr.addClass('shown');

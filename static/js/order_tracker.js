@@ -542,7 +542,7 @@ $(document).ready(function () {
         let tr = $(this).closest('tr');
         let row = table.row(tr);
 
-        toggleChildRow(tr, row);
+        toggleChildRow(tr, row, false);
     });
 
 });

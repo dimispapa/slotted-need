@@ -1,11 +1,9 @@
 import {
     displayMessage,
     updateStatusStyle,
-    updateItemStatusStyle,
     ajaxSetupToken,
     debounce,
     initTooltips,
-    generateSelectOptions,
     toggleChildRow,
     toggleSpinner,
 
@@ -48,8 +46,9 @@ $(document).ready(function () {
             url: '/api/orders/',
             type: 'GET',
             data: function (d) {
-                // Map DataTables parameters to API query parameters
+                // Filter queryset for archived orders using query parameter 
                 d.archived = true;
+
                 // Calculate page number and page size
                 let start = parseInt(d.start) || 0;
                 let length = parseInt(d.length) || pageSize;
@@ -133,10 +132,11 @@ $(document).ready(function () {
                 data: 'order_status',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        // render the order status HTML
-                        let orderStatusDiv = '<div>';
-                        orderStatusDiv += renderOrderStatus(row.id, data, row.paid);
-                        return orderStatusDiv += '</div>';
+                        // Use global variable passed from context into JS to map the badge value into string
+                        return `
+                        <span class="badge align-middle item-status" id="order-status-badge-${row.id}"
+                        data-id="${row.id}" data-value="${data}">${orderStatusChoices[data]}
+                        </span>`;
                     }
                     return data;
                 }
@@ -145,18 +145,11 @@ $(document).ready(function () {
                 data: 'paid',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        let select = `<select class="form-select-sm paid-status fw-bolder text-wrap" data-id="${row.id}">`;
-                        // Use global variable passed from context into JS and generate select options
-                        let options = generateSelectOptions(paidStatusChoices, data);
-                        select += options;
-                        select += '</select>';
-                        select += `
-                            <span class="text-center inline-spinner-div">
-                                <div class="spinner-border text-primary d-none" role="status" id="paid-status-spinner-${row.id}">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </span>`
-                        return select;
+                        // Use global variable passed from context into JS to map the badge value into string
+                        return `
+                        <span class="badge align-middle paid-status" id="paid-status-badge-${row.id}"
+                        data-id="${row.id}" data-value="${data}">${paidStatusChoices[data]}</span>
+                        `;
                     }
                     return data;
                 }
@@ -193,18 +186,6 @@ $(document).ready(function () {
         drawCallback: function (settings) {
             // update status styles
             updateStatusStyle();
-            // get the rows from the API
-            let rows = this.api().rows()
-            // Iterate through the rows
-            rows.every(function (rowIdx, tableLoop, rowLoop) {
-                // get the row data
-                let data = this.data();
-                // Find the DataTable row
-                let row = $(`#order-${data.id}`);
-                // update row styles
-                updateRowStyle(row, data);
-            })
-
         },
     });
 
@@ -221,200 +202,6 @@ $(document).ready(function () {
         // apply filters
         table.ajax.reload();
     }, 300));
-
-    // Handle change for paid_status and update the backend with AJAX call
-    $('#orders-table').on('change', '.paid-status', function () {
-        // get order id and new status
-        let orderId = $(this).data('id');
-        let newStatus = $(this).val();
-
-        // show spinner
-        let spinner = document.getElementById(`paid-status-spinner-${orderId}`);
-        toggleSpinner(spinner);
-
-        // API AJAX patch call
-        $.ajax({
-            url: `/api/orders/${orderId}/`,
-            type: 'PATCH',
-            data: JSON.stringify({
-                'paid': newStatus
-            }),
-            contentType: 'application/json',
-            success: function (response) {
-                // hide the spinner on completion
-                toggleSpinner(spinner);
-                // Get order details
-                let orderData = response;
-                // Find the DataTable row
-                let row = $(`#order-${orderId}`)
-                // Refresh the row styles
-                updateRowStyle(row, orderData);
-            },
-            error: function (xhr, status, error) {
-                console.error('Error updating paid status:', error);
-                // Reload the table to revert changes
-                table.ajax.reload(toggleSpinner(spinner), false);
-            },
-        });
-    });
-
-    // Handle change for item_status and update the backend with AJAX call
-    $('#orders-table').on('change', '.item-status', function () {
-        // get order item id and new status
-        let orderitemId = $(this).data('id');
-        let newStatus = $(this).val();
-
-        // show spinner
-        let spinner = document.getElementById(`item-status-spinner-${orderitemId}`);
-        toggleSpinner(spinner);
-
-        // API AJAX patch call
-        $.ajax({
-            url: `/api/order-items/${orderitemId}/`,
-            type: 'PATCH',
-            data: JSON.stringify({
-                'item_status': newStatus
-            }),
-            contentType: 'application/json',
-            success: function (response) {
-                // Get order details
-                let orderData = response.order;
-                // Find the DataTable row
-                let row = $(`#order-${orderData.id}`)
-                // get the new order status badge html
-                let orderStatusBadgeHTML = renderOrderStatus(orderData.id, orderData.order_status, orderData.paid);
-                // Update the badge
-                let orderStatusBadge = $(`#order-status-badge-${orderData.id}`);
-                let orderStatusDiv = document.createElement('div');
-                orderStatusDiv.innerHTML = orderStatusBadgeHTML;
-                orderStatusBadge.replaceWith(orderStatusDiv);
-                // get the new badge element
-                let newOrderStatusBadge = $(`#order-status-badge-${orderData.id}`);
-                // Refresh badge status styles
-                updateItemStatusStyle(newOrderStatusBadge[0]);
-                // Refresh the row styles
-                updateRowStyle(row, orderData);
-
-                // hide the spinner on completion
-                toggleSpinner(spinner);
-            },
-            error: function (xhr, status, error) {
-                console.error('Error updating paid status:', error);
-                // Reload the table to revert changes
-                table.ajax.reload(toggleSpinner(spinner), false);
-            },
-        });
-    });
-
-    // Handle change for item_status and update the backend with AJAX call
-    $('#orders-table').on('change', '.priority-status', function () {
-        // get order item id and new status
-        let orderitemId = $(this).data('id');
-        let newStatus = $(this).val();
-
-        // show spinner
-        let spinner = document.getElementById(`priority-status-spinner-${orderitemId}`);
-        toggleSpinner(spinner);
-
-        // API AJAX patch call
-        $.ajax({
-            url: `/api/order-items/${orderitemId}/`,
-            type: 'PATCH',
-            data: JSON.stringify({
-                'priority_level': newStatus
-            }),
-            contentType: 'application/json',
-            success: function (response) {
-                // hide the spinner on completion
-                toggleSpinner(spinner);
-            },
-            error: function (xhr, status, error) {
-                console.error('Error updating paid status:', error);
-                // Reload the table to revert changes
-                table.ajax.reload(toggleSpinner(spinner), false);
-            },
-        });
-    });
-
-    // Handle change for paid_status and update the backend with AJAX call
-    $('#orders-table').on('change', '.paid-status', function () {
-        // get order id and new status
-        let orderId = $(this).data('id');
-        let newStatus = $(this).val();
-
-        // show spinner
-        let spinner = document.getElementById(`paid-status-spinner-${orderId}`);
-        toggleSpinner(spinner);
-
-        // API AJAX patch call
-        $.ajax({
-            url: `/api/orders/${orderId}/`,
-            type: 'PATCH',
-            data: JSON.stringify({
-                'paid': newStatus
-            }),
-            contentType: 'application/json',
-            success: function (response) {
-                // hide the spinner on completion
-                toggleSpinner(spinner);
-                // Get order details
-                let orderData = response;
-                // Find the DataTable row
-                let row = $(`#order-${orderId}`)
-                // Refresh the row styles
-                updateRowStyle(row, orderData);
-            },
-            error: function (xhr, status, error) {
-                console.error('Error updating paid status:', error);
-                // Reload the table to revert changes
-                table.ajax.reload(toggleSpinner(spinner), false);
-            },
-        });
-    });
-
-    // Function that renders the order status
-    function renderOrderStatus(orderId, orderStatus) {
-
-        // Use global variable passed from context into JS to map the badge value into string
-        let badge = `
-        <span class="badge position-relative align-middle item-status" id="order-status-badge-${orderId}"
-        data-id="${orderId}" data-value="${orderStatus}">${orderStatusChoices[orderStatus]}
-        `;
-        // create exclamation badge to show when order is delivered but unpaid
-        let exclamation = `
-        <span id="exclamation-${orderId}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-            <i class="fa-solid fa-exclamation fs-6"></i>
-            <span class="visually-hidden">Alert: delivered but unpaid </span>
-        </span>               
-        `;
-
-        return badge + exclamation + '</span>';
-
-    };
-
-    // Function that styles the row based on status
-    function updateRowStyle(row, data) {
-
-        // Delivered and Not Paid
-        if (data.order_status == 4 && data.paid == 1) {
-            $(row).removeClass('table-light opacity-50 shadow-none');
-            $(row).addClass('table-danger');
-            $(`#exclamation-${data.id}`).removeClass('d-none');
-            $(`#archive-order-btn-${data.id}`).addClass('d-none');
-            // Delivered and Fully Paid
-        } else if (data.order_status == 4 && data.paid == 2) {
-            $(row).removeClass('table-danger');
-            $(row).addClass('table-light opacity-50 shadow-none');
-            $(`#exclamation-${data.id}`).addClass('d-none');
-            $(`#archive-order-btn-${data.id}`).removeClass('d-none');
-            // All other cases
-        } else {
-            $(row).removeClass('table-light opacity-50 shadow-none');
-            $(row).removeClass('table-danger');
-            $(`#exclamation-${data.id}`).addClass('d-none');
-            $(`#archive-order-btn-${data.id}`).addClass('d-none');
-        }
-    };
 
     // Function that deletes an order
     function deleteOrder(orderId) {
@@ -542,7 +329,7 @@ $(document).ready(function () {
         let tr = $(this).closest('tr');
         let row = table.row(tr);
 
-        toggleChildRow(tr, row);
+        toggleChildRow(tr, row, true);
     });
 
 });
