@@ -176,3 +176,10 @@ th.not-sortable {
 #filter-completed-label {
   font-size: 0.8rem;
 }
+
+
+
+/* Home dashboard */
+.input-group-text {
+  font-size: smaller;
+}

@@ -12,15 +12,36 @@
 {% block content %}
 <div class="container-fluid">
   <div class="row">
-    <div class="col-12 col-md-6 border">
+    <div class="col-12 col-md-4 border">
       <!-- Product Revenue Chart -->
       <canvas id="productRevenueChart" class="p-1"></canvas>
+      <!-- Product Revenue amount filter -->
+      <div class="input-group mb-1">
+        <span class="input-group-text">Revenue min</span>
+        <span class="input-group-text">€</span>
+        <input type="number" name="filter_prod_rev_min" id="filter-prod-rev-min" class="form-control form-control-sm">
+        <span class="input-group-text">Revenue max</span>
+        <span class="input-group-text">€</span>
+        <input type="number" name="filter_prod_rev_max" id="filter-prod-rev-max" class="form-control form-control-sm">
+      </div>
+      <!-- Product Date created filter -->
+      <div class="input-group mb-1">
+        <span class="input-group-text">Date from</span>
+        <input type="date" name="filter_prod_date_from" id="filter-prod-date_from" class="form-control form-control-sm">
+        <span class="input-group-text">Date to</span>
+        <input type="date" name="filter_prod_date_to" id="filter-prod-date_to" class="form-control form-control-sm">
+      </div>
+      <!-- Filter buttons -->
+      <div class="text-center mb-1">
+        <button id="apply-prod-rev-filters" class="btn btn-sm btn-success">Apply Filters</button>
+        <button id="clear-prod-rev-filters" class="btn btn-sm btn-danger">Clear Filters</button>
+      </div>
     </div>
-    <div class="col-12 col-md-6 border">
+    <div class="col-12 col-md-4 border">
       <!-- Debtors Chart -->
       <canvas id="debtorsChart" class="p-1"></canvas>
     </div>
-    <div class="col-12 col-md-6 border">
+    <div class="col-12 col-md-4 border">
       <!-- Order Items Chart -->
       <canvas id="orderItemStatusChart" class="p-1"></canvas>
     </div>
