@@ -9,6 +9,7 @@ class ProdRevChartDataSerializer(serializers.Serializer):
 class DebtorChartDataSerializer(serializers.Serializer):
     labels = serializers.ListField(child=serializers.CharField())
     values = serializers.ListField(child=serializers.FloatField())
+    total = serializers.FloatField()
 
 
 class ItemsStatusDataSerializer(serializers.Serializer):

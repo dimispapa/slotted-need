@@ -111,8 +111,10 @@ class DebtorBalancesAPIView(APIView):
         serializer = DebtorChartDataSerializer(data={
             'labels': debtor_names,
             'values': debtor_values,
+            'total': sum(debtor_values)
         })
-
+        print(serializer)
+ 
         # Validate data
         if serializer.is_valid():
             return Response(serializer.data,

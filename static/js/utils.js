@@ -379,6 +379,18 @@ function toggleChildRow(tr, row, archive) {
     }
 };
 
+// Function that formats a number into a string with thousand separator commas
+function formatWithThousandsSeparator(num) {
+    let numAsString = num.toString();
+    let characters = numAsString.split("").reverse();
+    let parts = [];
+    for (let i = 0; i < characters.length; i += 3) {
+      let part = characters.slice(i, i + 3).reverse().join("");
+      parts.unshift(part);
+    }
+    return parts.join(",");
+  }
+
 export {
     displayMessages,
     displayMessage,
@@ -392,5 +404,6 @@ export {
     generateOptionsList,
     toggleSpinner,
     toggleChildRow,
-    fetchOrderItems
+    fetchOrderItems,
+    formatWithThousandsSeparator
 };

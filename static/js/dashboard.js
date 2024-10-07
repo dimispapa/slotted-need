@@ -1,6 +1,7 @@
 import {
     ajaxSetupToken,
-    displayMessage
+    displayMessage,
+    formatWithThousandsSeparator
 } from "./utils.js";
 
 $(document).ready(function () {
@@ -72,13 +73,14 @@ $(document).ready(function () {
                         maintainAspectRatio: true
                     }
                 });
+
             },
             // Error handling
             error: function (xhr, status, error) {
                 // display message
                 let errorMessage = `
                                     Error fetching revenue data:
-                                    ${xhr.status} error - ${error}
+                                    error ${xhr.status} - ${error}: ${xhr.responseText ? xhr.responseText : ''}
                                     `;
                 displayMessage(errorMessage, 'error');
             }
@@ -180,13 +182,18 @@ $(document).ready(function () {
                         maintainAspectRatio: true
                     }
                 });
+
+                // Update Total amount owed
+                let totalAmountOwed = formatWithThousandsSeparator(data.total);
+                $('#total-debtor-bal').val(totalAmountOwed);
             },
             // Error handling
             error: function (xhr, status, error) {
+                debugger;
                 // display message
                 let errorMessage = `
-                                    Error fetching revenue data:
-                                    ${xhr.status} error - ${error}
+                                    Error fetching debtor data:
+                                    error ${xhr.status} - ${error}: ${xhr.responseText ? xhr.responseText : ''}
                                     `;
                 displayMessage(errorMessage, 'error');
             }
@@ -245,7 +252,7 @@ $(document).ready(function () {
             // display message
             let errorMessage = `
                                 Error fetching item status data:
-                                ${xhr.status} error - ${error}
+                                error ${xhr.status} - ${error}: ${xhr.responseText ? xhr.responseText : ''}
                                 `;
             displayMessage(errorMessage, 'error');
         }
