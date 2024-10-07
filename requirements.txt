@@ -2,6 +2,7 @@ asgiref==3.8.1
 crispy-bootstrap5==2024.2
 dj-database-url==0.5.0
 Django==5.1
+django-chartjs==2.3.0
 django-crispy-forms==2.3
 django-filter==24.3
 django-nested-admin==4.1.1

@@ -1,8 +1,16 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<!-- Chart JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js"></script>
+{% endblock %}
+
+<!-- Main content -->
 {% block content %}
-  <div class="container">
-    <div class="row">
-      <p>This is the "home.html" content</p>
-    </div>
+<div class="container">
+  <div class="row">
+    <canvas id="revenueChart"></canvas>
   </div>
+</div>
 {% endblock %}

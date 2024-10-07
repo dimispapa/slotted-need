@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'nested_admin',
     'rest_framework',
     'django_filters',
+    'chartjs',
     # project apps
     'products',
     'orders',
