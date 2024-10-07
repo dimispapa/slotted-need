@@ -113,8 +113,7 @@ class DebtorBalancesAPIView(APIView):
             'values': debtor_values,
             'total': sum(debtor_values)
         })
-        print(serializer)
- 
+
         # Validate data
         if serializer.is_valid():
             return Response(serializer.data,
@@ -157,7 +156,5 @@ class ItemStatusAPIView(APIView):
         if serializer.is_valid():
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            # Log serializer errors for debugging
-            print(serializer.errors)
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
