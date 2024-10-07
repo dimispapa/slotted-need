@@ -12,6 +12,23 @@
 {% block content %}
 <div class="container-fluid">
   <div class="row">
+    <!-- DEBTORS -->
+    <div class="col-12 col-md-4 border">
+      <!-- Debtors Chart -->
+      <canvas id="debtorsChart" class="p-1"></canvas>
+      <div class="input-group mt-2 mt-md-4">
+        <span class="input-group-text fs-6 bg-primary text-light">Total Owed by Clients</span>
+        <span class="input-group-text fs-6">€</span>
+        <input type="text" name="total_debtor_bal" class="form-control form-control-lg" id="total-debtor-bal"
+          aria-label="readonly" readonly disabled>
+      </div>
+    </div>
+    <!-- ORDER ITEM STATUS -->
+    <div class="col-12 col-md-4 border">
+      <!-- Order Item Status Chart -->
+      <canvas id="orderItemStatusChart" class="p-1"></canvas>
+    </div>
+    <!-- PRODUCT REVENUE -->
     <div class="col-12 col-md-4 border">
       <!-- Product Revenue Chart -->
       <canvas id="productRevenueChart" class="p-1"></canvas>
@@ -36,19 +53,6 @@
         <button id="apply-prod-rev-filters" class="btn btn-sm btn-success">Apply Filters</button>
         <button id="clear-prod-rev-filters" class="btn btn-sm btn-danger">Clear Filters</button>
       </div>
-    </div>
-    <div class="col-12 col-md-4 border">
-      <!-- Debtors Chart -->
-      <canvas id="debtorsChart" class="p-1"></canvas>
-      <div class="input-group mt-2 mt-md-4">
-        <span class="input-group-text fs-6 bg-primary text-light">Total Owed by Clients</span>
-        <span class="input-group-text fs-6">€</span>
-        <input type="text" name="total_debtor_bal" class="form-control form-control-lg" id="total-debtor-bal" aria-label="readonly" readonly disabled>
-      </div>
-    </div>
-    <div class="col-12 col-md-4 border">
-      <!-- Order Items Chart -->
-      <canvas id="orderItemStatusChart" class="p-1"></canvas>
     </div>
   </div>
 </div>
