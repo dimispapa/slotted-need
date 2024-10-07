@@ -12,9 +12,17 @@
 {% block content %}
 <div class="container-fluid">
   <div class="row">
-    <div class="col-12 col-md-4">
-      <!-- Revenue Chart -->
-      <canvas id="productRevenueChart"></canvas>
+    <div class="col-12 col-md-6 border">
+      <!-- Product Revenue Chart -->
+      <canvas id="productRevenueChart" class="p-1"></canvas>
+    </div>
+    <div class="col-12 col-md-6 border">
+      <!-- Debtors Chart -->
+      <canvas id="debtorsChart" class="p-1"></canvas>
+    </div>
+    <div class="col-12 col-md-6 border">
+      <!-- Order Items Chart -->
+      <canvas id="orderItemStatusChart" class="p-1"></canvas>
     </div>
   </div>
 </div>

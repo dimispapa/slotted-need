@@ -17,7 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from .apis import router
-from .views import home, RevenueDataAPIView
+from .views import (home, ProductRevenueDataAPIView, DebtorBalancesAPIView,
+                    ItemStatusAPIView)
 
 urlpatterns = [
     # render the home.html template dashboard
@@ -26,8 +27,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # API endpoints
     path('api/', include(router.urls)),
-    path('api/product-revenue-data/', RevenueDataAPIView.as_view(),
-         name='revenue_data_api'),
+    path('api/product-revenue-data/', ProductRevenueDataAPIView.as_view()),
+    path('api/debtors-data/', DebtorBalancesAPIView.as_view()),
+    path('api/item-status-data/', ItemStatusAPIView.as_view()),
     # Frontend views
     path('orders/', include('orders.urls'), name='orders-urls'),
     path('users/', include('users.urls'), name='users-urls'),
