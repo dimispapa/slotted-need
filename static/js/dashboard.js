@@ -116,10 +116,10 @@ $(document).ready(function () {
     // Handle Clear Product Revenue Filters Button Click
     $('#clear-prod-rev-filters').on('click', function () {
         // Clear filter values
-        revenueMin = $('#filter-prod-rev-min').val('');
-        revenueMax = $('#filter-prod-rev-max').val('');
-        dateFrom = $('#filter-prod-date-from').val('');
-        dateTo = $('#filter-prod-date-to').val('');
+        $('#filter-prod-rev-min').val('');
+        $('#filter-prod-rev-max').val('');
+        $('#filter-prod-date-from').val('');
+        $('#filter-prod-date-to').val('');
 
         // Fetch and render chart without filters
         RenderProdRevChart();
