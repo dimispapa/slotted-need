@@ -1,8 +1,9 @@
+import datetime
 from django.views.generic import TemplateView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from django.db.models import Sum, Count, DecimalField
+from django.db.models import Sum, Count, Q, DecimalField
 from django.db.models.functions import Coalesce
 from products.models import Product
 from orders.models import Client, OrderItem
@@ -19,25 +20,71 @@ class home(TemplateView):
 # The API view that provides the data for the revenue chart in JSON format
 class ProductRevenueDataAPIView(APIView):
     def get(self, request, format=None):
-        # Calculate total revenue per product using reverse relationship
+
+        # Step 1: Extract Query Parameters
+        revenue_min = request.query_params.get('revenue_min', None)
+        revenue_max = request.query_params.get('revenue_max', None)
+        date_from = request.query_params.get('date_from', None)
+        date_to = request.query_params.get('date_to', None)
+
+        # Step 2: Initialize Filters
+        filters = Q()
+        date_filters = Q()
+
+        # Step 3: Apply Revenue Filters
+        try:
+            if revenue_min is not None:
+                revenue_min = float(revenue_min)
+                filters &= Q(total_revenue__gte=revenue_min)
+            if revenue_max is not None:
+                revenue_max = float(revenue_max)
+                filters &= Q(total_revenue__lte=revenue_max)
+        except ValueError:
+            return Response(
+                {"error":
+                    "Invalid revenue_min or revenue_max. Must be numeric."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Step 4: Apply Date Range Filters
+        try:
+            if date_from:
+                date_from_parsed = datetime.strptime(date_from, '%Y-%m-%d')
+                date_filters &= Q(
+                    order_items__order__created_on__gte=date_from_parsed)
+            if date_to:
+                date_to_parsed = datetime.strptime(date_to, '%Y-%m-%d')
+                date_filters &= Q(
+                    order_items__order__created_on__lte=date_to_parsed)
+        except ValueError:
+            return Response(
+                {"error":
+                    "Invalid date_from or date_to."
+                    " Expected format: YYYY-MM-DD."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Step 5: Fetch and Annotate Products to calculate revenue per product
         products = Product.objects.annotate(
             total_revenue=Coalesce(
-                Sum('order_items__item_value'), 0,
+                Sum('order_items__item_value',
+                    filter=date_filters),
+                0,
                 output_field=DecimalField()
             )
-        ).order_by('-total_revenue')
+        ).filter(filters).order_by('-total_revenue')
 
-        # Prepare data
+        # Step 6: Prepare data
         product_names = [product.name for product in products]
         revenue_values = [float(product.total_revenue) for product in products]
 
-        # Serialize data
+        # Step 7: Serialize data
         serializer = ProdRevChartDataSerializer(data={
             'labels': product_names,
             'values': revenue_values,
         })
 
-        # Validate data
+        # Step 8: Validate and return data
         if serializer.is_valid():
             return Response(serializer.data,
                             status=status.HTTP_200_OK)
