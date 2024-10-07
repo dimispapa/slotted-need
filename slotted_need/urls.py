@@ -16,16 +16,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from orders.apis import router
-from .views import home
+from .apis import router
+from .views import home, RevenueDataAPIView
 
 urlpatterns = [
     # render the home.html template dashboard
-    path('', home, name='home'),
+    path('', home.as_view(), name='home'),
     # Admin site
     path('admin/', admin.site.urls),
     # API endpoints
     path('api/', include(router.urls)),
+    path('api/product-revenue-data/', RevenueDataAPIView.as_view(),
+         name='revenue_data_api'),
     # Frontend views
     path('orders/', include('orders.urls'), name='orders-urls'),
     path('users/', include('users.urls'), name='users-urls'),
