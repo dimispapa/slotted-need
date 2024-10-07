@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // fetch data from API endpoint by passing the query client name input
         if (query.length > 0) {
-            const fetchUrl = `/api/search-clients/?q=${encodeURIComponent(query)}`; // Safely encode query
+            const fetchUrl = `/orders/api/search-clients/?q=${encodeURIComponent(query)}`; // Safely encode query
             fetch(fetchUrl)
                 .then(response => {
                     // error handling

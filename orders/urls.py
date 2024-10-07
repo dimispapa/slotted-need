@@ -3,8 +3,6 @@ from django.urls import path
 
 urlpatterns = [
     # ****** TEMPLATE section ***********
-    # render the home.html template dashboard
-    path('', views.home, name='home'),
     # renders create_order.html template
     path('create-order/', views.create_order, name="create_order"),
     # renders orders.html template

@@ -17,22 +17,19 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from orders.apis import router
-from .views import UserListView, UserCreateView, UserUpdateView, UserDeleteView
+from .views import home
 
 urlpatterns = [
+    # render the home.html template dashboard
+    path('', home, name='home'),
     # Admin site
     path('admin/', admin.site.urls),
     # API endpoints
     path('api/', include(router.urls)),
     # Frontend views
-    path('', include('orders.urls'), name='orders-urls'),
+    path('orders/', include('orders.urls'), name='orders-urls'),
+    path('users/', include('users.urls'), name='users-urls'),
     # DRF Authentication
     path('api-auth/', include('rest_framework.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
-    # User access management
-    path('users/', UserListView.as_view(), name='user_list'),
-    path('users/add/', UserCreateView.as_view(), name='user_add'),
-    path('users/edit/<int:pk>/', UserUpdateView.as_view(), name='user_edit'),
-    path('users/delete/<int:pk>/', UserDeleteView.as_view(),
-         name='user_delete'),
 ]

@@ -54,8 +54,10 @@ class Order(models.Model):
         # Ensure there are items before trying to calculate totals
         items = self.items.all()
         if items.exists():  # Only calculate if there are items
-            self.discount = sum((item.discount) for item in items)
-            self.order_value = sum(item.item_value for item in items)
+            self.discount = sum(item.discount for item in items
+                                if item.discount)
+            self.order_value = sum(item.item_value for item in items
+                                   if item.item_value)
 
     def update_order_status(self):
         """Automatically derive the order status based on conditions

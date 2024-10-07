@@ -23,11 +23,6 @@ from .filters import OrderItemFilter, OrderFilter
 from .serializers import OrderItemSerializer, OrderSerializer
 
 
-# View that renders the home template
-def home(request):
-    return render(request, 'home.html')
-
-
 @require_POST
 # API view to check for client and return matches if any
 def check_client(request):
