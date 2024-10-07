@@ -117,7 +117,7 @@ $(document).ready(function () {
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Amounts owed by Client'
+                            text: 'Amounts Owed by Client'
                         },
                         legend: {
                             display: false
