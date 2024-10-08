@@ -30,7 +30,6 @@ class ProductRevenueDataAPIView(APIView):
 
         # Step 2: Initialize Filters
         filters = Q()
-        date_filters = Q()
 
         # Step 3: Apply Revenue Filters
         try:
@@ -51,11 +50,11 @@ class ProductRevenueDataAPIView(APIView):
         try:
             if date_from:
                 date_from_parsed = datetime.strptime(date_from, '%Y-%m-%d')
-                date_filters &= Q(
+                filters &= Q(
                     order_items__order__created_on__gte=date_from_parsed)
             if date_to:
                 date_to_parsed = datetime.strptime(date_to, '%Y-%m-%d')
-                date_filters &= Q(
+                filters &= Q(
                     order_items__order__created_on__lte=date_to_parsed)
         except ValueError:
             return Response(
@@ -68,8 +67,7 @@ class ProductRevenueDataAPIView(APIView):
         # Step 5: Fetch and Annotate Products to calculate revenue per product
         products = Product.objects.annotate(
             total_revenue=Coalesce(
-                Sum('order_items__item_value',
-                    filter=date_filters),
+                Sum('order_items__item_value'),
                 0,
                 output_field=DecimalField()
             )

@@ -20,9 +20,7 @@ $(document).ready(function () {
             type: 'GET',
             data: filters,
             dataType: 'json',
-            success: function (response) {
-                // get data
-                let data = response;
+            success: function (data) {
                 // get product revenue chart element
                 let ctx = document.getElementById('productRevenueChart').getContext('2d');
 
@@ -135,9 +133,7 @@ $(document).ready(function () {
             type: 'GET',
             data: filters,
             dataType: 'json',
-            success: function (response) {
-                // get data
-                let data = response;
+            success: function (data) {
                 // get product revenue chart element
                 let ctx = document.getElementById('debtorsChart').getContext('2d');
                 // initialize chartjs chart
@@ -205,7 +201,6 @@ $(document).ready(function () {
         type: 'GET',
         dataType: 'json',
         success: function (data) {
-            debugger;
             let ctx = document.getElementById('orderItemStatusChart').getContext('2d');
             let orderItemsStatusChart = new Chart(ctx, {
                 type: 'bar',
