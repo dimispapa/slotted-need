@@ -6,6 +6,7 @@ from rest_framework import status
 from django.db.models import Sum, Count, Q, DecimalField
 from django.db.models.functions import Coalesce
 from products.models import Product
+from django.contrib.auth.mixins import LoginRequiredMixin
 from orders.models import Client, OrderItem
 from .serializers import (ProdRevChartDataSerializer,
                           DebtorChartDataSerializer,
@@ -15,7 +16,7 @@ from .utils import generate_unique_rgba_colors
 
 
 # Template View that renders the home template
-class home(TemplateView):
+class home(LoginRequiredMixin, TemplateView):
     template_name = 'home.html'
 
 
