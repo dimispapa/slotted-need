@@ -126,21 +126,20 @@ class DebtorBalancesAPIView(APIView):
 
 class ItemStatusAPIView(APIView):
     def get(self, request, format=None):
-        # Filter out OrderItems belonging to archived Orders
+        # Fetch OrderItems filtering out archived orders
         order_items = OrderItem.objects.filter(order__archived=False)
         # Fetch products list
         products = Product.objects.all()
-        print('Products:', products)
+
         # Aggregate counts by item_status
         status_counts = list(
             order_items.values(
                 'item_status', 'product__name').order_by(
                     'item_status').annotate(
                         count=Count('id')))
-        print('Status counts', status_counts)
+
         # Pull the mapping with status codes to human-readable labels
         status_mapping = OrderItem.STATUS_CHOICES
-
         # Get the item status labels
         labels = [label for label in status_mapping.values()]
         # Initialize empty datasets list
@@ -175,8 +174,12 @@ class ItemStatusAPIView(APIView):
         serializer = ItemsStatusDataSerializer(data={
             'labels': labels,
             'datasets': datasets,
+            'total_items': int(sum(
+                [sum(dataset['data'])for dataset in datasets]
+            ))
         })
-        print(serializer)
+
+        # Validate and return response
         if serializer.is_valid():
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:

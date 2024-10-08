@@ -205,17 +205,21 @@ $(document).ready(function () {
         type: 'GET',
         dataType: 'json',
         success: function (data) {
+            debugger;
             let ctx = document.getElementById('orderItemStatusChart').getContext('2d');
             let orderItemsStatusChart = new Chart(ctx, {
                 type: 'bar',
-                data: data,
+                data: {
+                    labels: data.labels,
+                    datasets: data.datasets
+                },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false, // Allows the chart to fill the container
+                    maintainAspectRatio: true,
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Open Order Items by Status'
+                            text: 'Open Items by Status'
                         },
                         legend: {
                             display: true,
@@ -247,6 +251,10 @@ $(document).ready(function () {
                     },
                 }
             });
+
+            // Update Total Items display input
+            let totalItems = formatWithThousandsSeparator(data.total_items);
+            $('#total-open-items').val(totalItems);
         },
         // Error handling
         error: function (xhr, status, error) {

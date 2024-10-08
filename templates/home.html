@@ -16,10 +16,11 @@
     <div class="col-12 col-md-4 border">
       <!-- Debtors Chart -->
       <canvas id="debtorsChart" class="p-1"></canvas>
+      <!-- Total Owed by Clients -->
       <div class="input-group mt-2 mt-md-4">
         <span class="input-group-text fs-6 fs-md-5 bg-primary text-light">Total Owed by Clients</span>
         <span class="input-group-text fs-6 fs-md-5">€</span>
-        <input type="text" name="total_debtor_bal" class="form-control form-control-lg" id="total-debtor-bal"
+        <input type="text" name="total_debtor_bal" class="form-control" id="total-debtor-bal"
           aria-label="readonly" readonly disabled>
       </div>
     </div>
@@ -27,6 +28,13 @@
     <div class="col-12 col-md-4 border">
       <!-- Order Item Status Chart -->
       <canvas id="orderItemStatusChart" class="p-1"></canvas>
+      <!-- Total Open Items -->
+      <div class="input-group mt-2 mt-md-4">
+        <span class="input-group-text fs-6 fs-md-5 bg-primary text-light">Total Open Items (not completed)</span>
+        <span class="input-group-text fs-6 fs-md-5">Count</span>
+        <input type="text" name="total_open_items" class="form-control" id="total-open-items"
+          aria-label="readonly" readonly disabled>
+      </div>
     </div>
     <!-- PRODUCT REVENUE -->
     <div class="col-12 col-md-4 border">

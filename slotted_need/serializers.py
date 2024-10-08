@@ -23,3 +23,4 @@ class DebtorChartDataSerializer(serializers.Serializer):
 class ItemsStatusDataSerializer(serializers.Serializer):
     labels = serializers.ListField(child=serializers.CharField())
     datasets = serializers.ListField(child=ChartDatasetSerializer())
+    total_items = serializers.IntegerField()
