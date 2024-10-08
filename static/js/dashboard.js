@@ -195,75 +195,130 @@ $(document).ready(function () {
         });
     };
 
-    // API AJAX call to fetch order items status data and initialize the doughnut chart
-    $.ajax({
-        url: '/api/item-status-data/',
-        type: 'GET',
-        dataType: 'json',
-        success: function (data) {
-            let ctx = document.getElementById('orderItemStatusChart').getContext('2d');
-            let orderItemsStatusChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: data.labels,
-                    datasets: data.datasets
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Open Items by Status'
-                        },
-                        legend: {
-                            display: true,
-                            position: 'top',
-                        },
-                        tooltip: {
-                            enabled: true
-                        }
+    // Function to fetch and render the Item Status by Product chart
+    function RenderItemStatusProductChart(filters = {}) {
+        // API AJAX call to fetch order items status data and initialize the doughnut chart
+        $.ajax({
+            url: '/api/item-status-product-data/',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                let ctx = document.getElementById('orderItemStatusProductChart').getContext('2d');
+                let orderItemsStatusChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: data.datasets
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            stacked: true,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
                             title: {
-                                display: false,
-                                text: 'Count of Items'
+                                display: true,
+                                text: 'Open Items by Status'
                             },
-                            ticks: {
-                                stepSize: 1
+                            legend: {
+                                display: true,
+                                position: 'top',
+                            },
+                            tooltip: {
+                                enabled: true
                             }
                         },
-                        x: {
-                            stacked: true,
-                            title: {
-                                display: false,
-                                text: 'Item Status'
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                stacked: true,
+                                title: {
+                                    display: false,
+                                    text: 'Count of Items'
+                                },
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            },
+                            x: {
+                                stacked: true,
+                                title: {
+                                    display: false,
+                                    text: 'Item Status'
+                                }
                             }
-                        }
-                    },
-                }
-            });
+                        },
+                    }
+                });
 
-            // Update Total Items display input
-            let totalItems = formatWithThousandsSeparator(data.total_items);
-            $('#total-open-items').val(totalItems);
-        },
-        // Error handling
-        error: function (xhr, status, error) {
-            // display message
-            let errorMessage = `
-                                Error fetching item status data:
-                                error ${xhr.status} - ${error}: ${xhr.responseText ? xhr.responseText : ''}
-                                `;
-            displayMessage(errorMessage, 'error');
-        }
-    });
+                // Update Total Items display input
+                let totalItems = formatWithThousandsSeparator(data.total_items);
+                $('#total-open-items').val(totalItems);
+            },
+            // Error handling
+            error: function (xhr, status, error) {
+                // display message
+                let errorMessage = `
+                                    Error fetching item status data:
+                                    error ${xhr.status} - ${error}: ${xhr.responseText ? xhr.responseText : ''}
+                                    `;
+                displayMessage(errorMessage, 'error');
+            }
+        });
+    };
+
+    // Function to fetch and render the Item Status by Product chart
+    function RenderItemStatusConfigChart(filters = {}) {
+        // API AJAX call to fetch order items status data and initialize the doughnut chart
+        $.ajax({
+            url: '/api/item-status-config-data/',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                let ctx = document.getElementById('orderItemStatusConfigChart').getContext('2d');
+                let orderItemsStatusChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Configuration Count',
+                            data: data.values,
+                            backgroundColor: data.colors,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Pending Items by Configuration'
+                            },
+                            legend: {
+                                display: true,
+                                position: 'top',
+                            },
+                            tooltip: {
+                                enabled: true
+                            }
+                        },
+                    }
+                });
+            },
+            // Error handling
+            error: function (xhr, status, error) {
+                // display message
+                let errorMessage = `
+                                    Error fetching item status data:
+                                    error ${xhr.status} - ${error}: ${xhr.responseText ? xhr.responseText : ''}
+                                    `;
+                displayMessage(errorMessage, 'error');
+            }
+        });
+    };
 
     // initial load
     RenderProdRevChart();
     RenderDebtorsChart();
+    RenderItemStatusProductChart();
+    RenderItemStatusConfigChart();
 
 });

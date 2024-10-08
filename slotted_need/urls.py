@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from .apis import router
 from .views import (home, ProductRevenueDataAPIView, DebtorBalancesAPIView,
-                    ItemStatusAPIView)
+                    ItemStatusProductAPIView, ItemStatusConfigAPIView)
 
 urlpatterns = [
     # render the home.html template dashboard
@@ -29,7 +29,8 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('api/product-revenue-data/', ProductRevenueDataAPIView.as_view()),
     path('api/debtors-data/', DebtorBalancesAPIView.as_view()),
-    path('api/item-status-data/', ItemStatusAPIView.as_view()),
+    path('api/item-status-product-data/', ItemStatusProductAPIView.as_view()),
+    path('api/item-status-config-data/', ItemStatusConfigAPIView.as_view()),
     # Frontend views
     path('orders/', include('orders.urls'), name='orders-urls'),
     path('users/', include('users.urls'), name='users-urls'),

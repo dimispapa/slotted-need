@@ -9,7 +9,8 @@ from products.models import Product
 from orders.models import Client, OrderItem
 from .serializers import (ProdRevChartDataSerializer,
                           DebtorChartDataSerializer,
-                          ItemsStatusDataSerializer)
+                          ItemStatusProdDataSerializer,
+                          ItemStatusConfigChartDataSerializer)
 from .utils import generate_unique_rgba_colors
 
 
@@ -122,7 +123,7 @@ class DebtorBalancesAPIView(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
 
-class ItemStatusAPIView(APIView):
+class ItemStatusProductAPIView(APIView):
     def get(self, request, format=None):
         # Fetch OrderItems filtering out archived orders
         order_items = OrderItem.objects.filter(order__archived=False)
@@ -169,12 +170,57 @@ class ItemStatusAPIView(APIView):
             datasets.append(dataset)
 
         # Serialize the data
-        serializer = ItemsStatusDataSerializer(data={
+        serializer = ItemStatusProdDataSerializer(data={
             'labels': labels,
             'datasets': datasets,
             'total_items': int(sum(
                 [sum(dataset['data'])for dataset in datasets]
             ))
+        })
+
+        # Validate and return response
+        if serializer.is_valid():
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+
+
+class ItemStatusConfigAPIView(APIView):
+    def get(self, request, format=None):
+        # Fetch OrderItems filtering out made, delivered and archived orders
+        order_items = OrderItem.objects.filter(
+            order__archived=False).exclude(
+                item_status__in=[3, 4]).select_related(
+                    'product').prefetch_related(
+                        'option_values', 'item_component_finishes').order_by(
+                            'id')
+
+        # Aggregate item counts by their unique configuration combo
+        config_counts = {}
+        for item in order_items:
+            # fetch the item's configuration property
+            config = item.unique_configuration
+            # pass the config to the counter dict and increment by 1
+            config_counts[config] = config_counts.get(config, 0) + 1
+
+        # Sort the config_counts dict by descending on count
+        sorted_config_counts = dict(sorted(config_counts.items(),
+                                           key=lambda x: x[1],
+                                           reverse=True))
+
+        # Get the item status labels
+        labels = [label for label in sorted_config_counts.keys()]
+        # Get values of config
+        values = [count for count in sorted_config_counts.values()]
+        # Create list of background colors
+        colors = generate_unique_rgba_colors(len(labels))
+
+        # Serialize the data
+        serializer = ItemStatusConfigChartDataSerializer(data={
+            'labels': labels,
+            'values': values,
+            'colors': colors
         })
 
         # Validate and return response

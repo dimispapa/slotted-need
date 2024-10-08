@@ -20,7 +20,13 @@ class DebtorChartDataSerializer(serializers.Serializer):
     total = serializers.FloatField()
 
 
-class ItemsStatusDataSerializer(serializers.Serializer):
+class ItemStatusProdDataSerializer(serializers.Serializer):
     labels = serializers.ListField(child=serializers.CharField())
     datasets = serializers.ListField(child=ChartDatasetSerializer())
     total_items = serializers.IntegerField()
+
+
+class ItemStatusConfigChartDataSerializer(serializers.Serializer):
+    labels = serializers.ListField(child=serializers.CharField())
+    values = serializers.ListField(child=serializers.IntegerField())
+    colors = serializers.ListField(child=serializers.CharField())
