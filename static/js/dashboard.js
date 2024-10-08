@@ -205,7 +205,6 @@ $(document).ready(function () {
         type: 'GET',
         dataType: 'json',
         success: function (data) {
-            debugger;
             let ctx = document.getElementById('orderItemStatusChart').getContext('2d');
             let orderItemsStatusChart = new Chart(ctx, {
                 type: 'bar',
