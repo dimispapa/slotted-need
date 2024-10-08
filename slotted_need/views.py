@@ -10,6 +10,7 @@ from orders.models import Client, OrderItem
 from .serializers import (ProdRevChartDataSerializer,
                           DebtorChartDataSerializer,
                           ItemsStatusDataSerializer)
+from .utils import generate_unique_rgba_colors
 
 
 # Template View that renders the home template
@@ -127,32 +128,55 @@ class ItemStatusAPIView(APIView):
     def get(self, request, format=None):
         # Filter out OrderItems belonging to archived Orders
         order_items = OrderItem.objects.filter(order__archived=False)
-
+        # Fetch products list
+        products = Product.objects.all()
+        print('Products:', products)
         # Aggregate counts by item_status
-        status_counts = order_items.values(
-            'item_status').annotate(count=Count('id'))
-
+        status_counts = list(
+            order_items.values(
+                'item_status', 'product__name').order_by(
+                    'item_status').annotate(
+                        count=Count('id')))
+        print('Status counts', status_counts)
         # Pull the mapping with status codes to human-readable labels
         status_mapping = OrderItem.STATUS_CHOICES
 
-        # Initialize counts with zero for all statuses
-        labels = []
-        values = []
+        # Get the item status labels
+        labels = [label for label in status_mapping.values()]
+        # Initialize empty datasets list
+        datasets = []
+        # Get unique rgba colors list using util function
+        colors = generate_unique_rgba_colors(len(products), border_color=True)
 
         # Ensure all statuses are represented, even with zero counts
-        for status_code, status_label in status_mapping.items():
-            labels.append(status_label)
-            # Find if this status exists in the aggregated data
-            matching = next((item for item in status_counts
-                             if item['item_status'] == status_code), None)
-            values.append(matching['count'] if matching else 0)
+        for idx, product in enumerate(products):
+            count_data = []
+            # Ensure all statuses are represented, even with zero counts
+            for status_code in status_mapping.keys():
+                # Find if this status exists in the aggregated data
+                matching = next((item for item in status_counts
+                                if item['product__name'] == product.name
+                                and item['item_status'] == status_code),
+                                None)
+                count_data.append(matching['count'] if matching else 0)
+
+            bg_color, bd_color = colors[idx]
+
+            dataset = {
+                'label': product.name,
+                'data': count_data,
+                'backgroundColor': bg_color,
+                'borderColor': bd_color,
+                'borderWidth': 1
+            }
+            datasets.append(dataset)
 
         # Serialize the data
         serializer = ItemsStatusDataSerializer(data={
             'labels': labels,
-            'values': values,
+            'datasets': datasets,
         })
-
+        print(serializer)
         if serializer.is_valid():
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
