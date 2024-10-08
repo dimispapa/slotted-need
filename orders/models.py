@@ -202,6 +202,38 @@ class OrderItem(models.Model):
         # Update the order's status after deleting the item
         order.update_order_status()
 
+    # define a property method that generates unique configuration string
+    @property
+    def unique_configuration(self):
+        """
+        Generates a unique concatenated string representing the combination of
+        Product name, Option Values, Product Finish, and Component Finishes.
+        """
+        product_name = self.product.name
+        product_finish = self.product_finish
+
+        # Retrieve and sort option values
+        option_values = sorted(
+            self.option_values.values_list('value', flat=True)
+        )
+        option_values_str = (', '.join(option_values)
+                             if option_values else 'None')
+
+        # Retrieve and sort component finishes
+        component_finishes = sorted(
+            self.item_component_finishes.values_list('finish_option__name',
+                                                     flat=True)
+        )
+        component_finishes_str = ', '.join(
+            component_finishes) if component_finishes else 'None'
+
+        # Concatenate all parts into a single string
+        unique_config = (f"Product: {product_name} | "
+                         f"Design Options: {option_values_str} | "
+                         f"Product Finish: {product_finish} | "
+                         f"Component Finishes: {component_finishes_str}")
+        return unique_config
+
 
 class ComponentFinish(models.Model):
     order_item = models.ForeignKey(OrderItem,
