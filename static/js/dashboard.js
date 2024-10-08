@@ -189,7 +189,6 @@ $(document).ready(function () {
             },
             // Error handling
             error: function (xhr, status, error) {
-                debugger;
                 // display message
                 let errorMessage = `
                                     Error fetching debtor data:
@@ -206,35 +205,18 @@ $(document).ready(function () {
         type: 'GET',
         dataType: 'json',
         success: function (data) {
+            debugger;
             let ctx = document.getElementById('orderItemStatusChart').getContext('2d');
             let orderItemsStatusChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: data.labels, // e.g., ['Not Started', 'In Progress', ...]
-                    datasets: [{
-                        data: data.values, // e.g., [10, 5, 15, 20]
-                        backgroundColor: [
-                            '#e3ff2c', // Not Started
-                            'rgb(255 193 7)', // In Progress
-                            'rgb(25 135 84)', // Made
-                            'rgb(108 117 125)' // Delivered
-                        ],
-                        borderColor: [
-                            '#e3ff2c',
-                            'rgb(255 193 7)',
-                            'rgb(25 135 84)',
-                            'rgb(108 117 125)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
+                type: 'bar',
+                data: data,
                 options: {
                     responsive: true,
                     maintainAspectRatio: false, // Allows the chart to fill the container
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Order Items by Status'
+                            text: 'Open Order Items by Status'
                         },
                         legend: {
                             display: true,
@@ -243,7 +225,27 @@ $(document).ready(function () {
                         tooltip: {
                             enabled: true
                         }
-                    }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            stacked: true,
+                            title: {
+                                display: false,
+                                text: 'Count of Items'
+                            },
+                            ticks: {
+                                stepSize: 1
+                            }
+                        },
+                        x: {
+                            stacked: true,
+                            title: {
+                                display: false,
+                                text: 'Item Status'
+                            }
+                        }
+                    },
                 }
             });
         },
