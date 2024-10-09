@@ -19,6 +19,7 @@ $(document).ready(function () {
     const confirmDeleteBtn = document.getElementById("confirm-delete-order-item-btn");
     const csrftoken = document.querySelector("meta[name='csrf-token']").content;
     const pageSize = 25;
+    const params = new URLSearchParams(window.location.search);
 
     // Setup AJAX to include CSRF token
     ajaxSetupToken(csrftoken);
@@ -63,6 +64,9 @@ $(document).ready(function () {
                 d.priority_level = $('#filter-priority-level').val();
                 d.paid_status = $('#filter-paid-status').val();
                 d.exclude_completed = $('#filter-exclude-completed').is(':checked');
+
+                // get filter type param if query parameter exists
+                d.filter_type = params.get('filter_type');
 
                 // Ordering parameters
                 // WARNING: "order" is a reserved array name to store sorting instructions

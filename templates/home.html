@@ -77,7 +77,10 @@
     </div>
     <!-- ORDER ITEMS DATA TABLE - FILTERED -->
     <div class="col-12 col-md-6 border">
-      <h1 class="display-6 mb-2 mb-md-4 text-center border-top border-bottom"><i class="fa-solid fa-circle-exclamation text-danger"></i> Items requiring attention</h1>
+      <h1 class="display-6 mb-2 mb-md-4 text-center border-top border-bottom"><i
+          class="fa-solid fa-circle-exclamation text-danger"></i> Items requiring attention</h1>
+      <p class="text-center"><a class="btn btn-primary" href="{% url 'order_item_tracker' %}?filter_type=home_dashboard" role="button" target="_blank">Edit
+          Items</a></p>
       <!-- Filtering and DataTable -->
       <table id="orderitem-home-table" class="display table table-bordered table-responsive table-striped">
         <thead>

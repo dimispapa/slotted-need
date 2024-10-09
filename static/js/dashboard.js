@@ -3,8 +3,8 @@ import {
     displayMessage,
     formatWithThousandsSeparator,
     generateOptionsList,
-    generateSelectOptions,
-    updateStatusStyle
+    updateStatusStyle,
+    getQueryParams
 } from "./utils.js";
 
 $(document).ready(function () {

@@ -158,13 +158,13 @@ function updatePriorityStatusStyle(status) {
     let statusValue = (status.tagName == 'SELECT') ? status.value : status.getAttribute('data-value');
 
     // Low priority
-    if (statusValue  == 1) {
+    if (statusValue == 1) {
         status.classList.add('bg-light', 'text-dark');
         // Medium priority
-    } else if (statusValue  == 2) {
+    } else if (statusValue == 2) {
         status.classList.add('bg-warning', 'text-dark');
         // High priority
-    } else if (statusValue  == 3) {
+    } else if (statusValue == 3) {
         status.classList.add('bg-danger', 'text-light');
     }
 };
@@ -349,7 +349,7 @@ function fetchOrderItems(orderId, archive, callback) {
             } else {
                 let orderItemsHtml = formatOrderItems(orderItems);
                 // call the callback function to add and show order items
-                callback(orderItemsHtml);               
+                callback(orderItemsHtml);
             }
         },
         error: function (xhr, status, error) {
@@ -385,11 +385,11 @@ function formatWithThousandsSeparator(num) {
     let characters = numAsString.split("").reverse();
     let parts = [];
     for (let i = 0; i < characters.length; i += 3) {
-      let part = characters.slice(i, i + 3).reverse().join("");
-      parts.unshift(part);
+        let part = characters.slice(i, i + 3).reverse().join("");
+        parts.unshift(part);
     }
     return parts.join(",");
-  }
+};
 
 export {
     displayMessages,
