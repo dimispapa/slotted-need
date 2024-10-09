@@ -158,13 +158,13 @@ function updatePriorityStatusStyle(status) {
     let statusValue = (status.tagName == 'SELECT') ? status.value : status.getAttribute('data-value');
 
     // Low priority
-    if (status.value == 1) {
+    if (statusValue  == 1) {
         status.classList.add('bg-light', 'text-dark');
         // Medium priority
-    } else if (status.value == 2) {
+    } else if (statusValue  == 2) {
         status.classList.add('bg-warning', 'text-dark');
         // High priority
-    } else if (status.value == 3) {
+    } else if (statusValue  == 3) {
         status.classList.add('bg-danger', 'text-light');
     }
 };
