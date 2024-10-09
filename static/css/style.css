@@ -183,3 +183,11 @@ th.not-sortable {
 .input-group-text {
   font-size: smaller;
 }
+
+/* Order item table */
+#orderitem-home-table {
+  /* set font-size */
+  font-size: 10px;
+  /* ensure width takes 100% of container */
+  width: 100% !important
+}
