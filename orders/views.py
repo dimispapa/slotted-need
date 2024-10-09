@@ -558,12 +558,22 @@ class OrderItemViewSet(viewsets.ModelViewSet):
         # Start with the base queryset
         queryset = super().get_queryset()
 
-        # Get 'order_id' from query parameters
+        # Get query parameters if any
         order_id = self.request.query_params.get('order_id', None)
+        filter_type = self.request.query_params.get('filter_type', None)
 
         # If 'order_id' is provided, filter the queryset
         if order_id:
             queryset = queryset.filter(order__id=order_id)
+
+        # If filter type is provided, filter the queryset
+        if filter_type == 'home_dashboard':
+            # Apply specific filters:
+            # Fully Paid but Not Started OR Delivered but Not Paid
+            queryset = queryset.filter(
+                Q(order__paid=2, item_status=1) |
+                Q(order__paid=1, item_status=4)
+            )
 
         # Return the filtered or full queryset
         return queryset

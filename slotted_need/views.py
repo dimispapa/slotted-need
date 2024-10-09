@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 from django.views.generic import TemplateView
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -7,7 +8,7 @@ from django.db.models import Sum, Count, Q, DecimalField
 from django.db.models.functions import Coalesce
 from products.models import Product
 from django.contrib.auth.mixins import LoginRequiredMixin
-from orders.models import Client, OrderItem
+from orders.models import Client, OrderItem, Order
 from .serializers import (ProdRevChartDataSerializer,
                           DebtorChartDataSerializer,
                           ItemStatusProdDataSerializer,
@@ -18,6 +19,22 @@ from .utils import generate_unique_rgba_colors
 # Template View that renders the home template
 class home(LoginRequiredMixin, TemplateView):
     template_name = 'home.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Extract choices from the OrderItem model
+        context['item_status_choices'] = OrderItem.STATUS_CHOICES
+        context['priority_level_choices'] = OrderItem.PRIORITY_CHOICES
+        context['paid_status_choices'] = Order.PAID_CHOICES
+
+        # Serialize choices to JSON for JavaScript
+        context['item_status_choices_json'] = json.dumps(
+            context['item_status_choices'])
+        context['priority_level_choices_json'] = json.dumps(
+            context['priority_level_choices'])
+        context['paid_status_choices_json'] = json.dumps(
+            context['paid_status_choices'])
+        return context
 
 
 # The API view that provides the data for the revenue chart in JSON format

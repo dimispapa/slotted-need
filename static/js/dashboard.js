@@ -1,13 +1,16 @@
 import {
     ajaxSetupToken,
     displayMessage,
-    formatWithThousandsSeparator
+    formatWithThousandsSeparator,
+    generateOptionsList,
+    generateSelectOptions
 } from "./utils.js";
 
 $(document).ready(function () {
 
     // Define constants
     const csrftoken = document.querySelector("meta[name='csrf-token']").content;
+    const pageSize = 25;
 
     // Setup AJAX to include CSRF token
     ajaxSetupToken(csrftoken);
@@ -314,6 +317,192 @@ $(document).ready(function () {
             }
         });
     };
+
+    // Initialize DataTable with AJAX source and server-side processing
+    let table = $('#orderitem-home-table').DataTable({
+        serverSide: true, // Enable server-side processing
+        processing: true, // Enables processing animation
+        orderCellsTop: true, // Place sorting icons to top row
+        fixedHeader: true, // Fix the header when scrolling
+        searching: false, // Disable global search as using column filters
+        scrollY: '60vh', // Enable vertical scrolling
+        scrollX: true, // Enable horizontal scrolling
+        responsive: true, // Enable responsive layout for smaller screens
+        pageLength: pageSize,
+        ajax: {
+            url: '/api/order-items/',
+            type: 'GET',
+            data: function (d) {
+                // Map DataTables parameters to API query parameters
+
+                // Calculate page number and page size
+                let start = parseInt(d.start) || 0;
+                let length = parseInt(d.length) || pageSize;
+                let page = Math.floor(start / length) + 1;
+
+                // Assign page and page size
+                d.page = page;
+                d.length = length;
+
+                // Append filter_type parameter
+                d.filter_type = 'home_dashboard';
+
+                // Ordering parameters
+                // WARNING: "order" is a reserved array name to store sorting instructions
+                // Avoid using the "order" attribute to store other data that can cause conflicts.
+                if (d.order && d.order.length > 0) {
+                    let orderColumnIndex = d.order[0].column;
+                    let orderDir = d.order[0].dir;
+                    let orderColumn = d.columns[orderColumnIndex];
+                    d.ordering = (orderDir === 'desc' ? '-' : '') + (orderColumn.name ? orderColumn.name : orderColumn.data);
+                }
+
+                return d;
+            },
+            dataSrc: function (json) {
+                // Map API response to DataTables expected format
+                json.recordsTotal = json.count;
+                json.recordsFiltered = json.count;
+                return json.results;
+            },
+        },
+        columns: [{
+                data: 'id',
+                className: 'sortable'
+            },
+            {
+                data: 'order.id',
+                name: 'order__id',
+                className: 'sortable'
+            },
+            {
+                data: 'order.client.client_name',
+                name: 'order__client__client_name',
+                className: 'sortable'
+            },
+            {
+                data: 'product.name',
+                name: 'product__name',
+                className: 'sortable'
+            },
+            {
+                data: 'option_values',
+                orderable: false, // Disable ordering,
+                className: 'not-sortable p2',
+                render: function (data, type, row) {
+                    if (type === 'display') {
+                        let list = generateOptionsList('option_values', data);
+                        return list;
+                    }
+                    return data;
+                }
+            },
+            {
+                data: 'product_finish',
+                name: 'product_finish__name',
+                className: 'sortable',
+                render: function (data, type, row) {
+                    if (type === 'display') {
+                        return data ? data.name : '-';
+                    }
+                    return data;
+                }
+            },
+            {
+                data: 'item_component_finishes',
+                orderable: false, // Disable ordering
+                className: 'not-sortable p2',
+                render: function (data, type, row) {
+                    if (type === 'display') {
+                        let list = generateOptionsList('component_finishes', data);
+                        return list;
+                    }
+                    return data;
+                }
+            },
+            {
+                data: 'item_value',
+                className: 'sortable',
+                render: $.fn.dataTable.render.number(',', '.', 0, '€')
+            },
+            { // Item Status
+                data: 'item_status',
+                className: 'sortable',
+                render: function (data, type, row) {
+                    if (type === 'display') {
+                        let select = `<select class="form-select-sm item-status fw-bolder text-wrap" data-id="${row.id}">`;
+                        // Use global variable passed from context into JS and generate select options
+                        let options = generateSelectOptions(itemStatusChoices, data);
+                        select += options;
+                        select += '</select>';
+                        // Add a spinner
+                        select += `
+                        <span class="text-center inline-spinner-div">
+                            <div class="spinner-border text-primary d-none" role="status" id="item-status-spinner-${row.id}">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </span>
+                        `;
+                        return select;
+                    }
+                    return data;
+                }
+            },
+            { // Priority Level Status
+                data: 'priority_level',
+                className: 'sortable',
+                render: function (data, type, row) {
+                    if (type === 'display') {
+                        let select = '<select class="form-select-sm priority-status fw-bolder text-wrap" data-id="' + row.id + '">';
+                        // Use global variable passed from context into JS and generate select options
+                        let options = generateSelectOptions(priorityLevelChoices, data);
+                        select += options;
+                        select += '</select>';
+                        // Add a spinner
+                        select += `
+                        <span class="text-center inline-spinner-div">
+                            <div class="spinner-border text-primary d-none" role="status" id="priority-status-spinner-${row.id}">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </span>
+                        `;
+                        return select;
+                    }
+                    return data;
+                }
+            },
+            { // Paid Status
+                data: 'order.paid',
+                name: 'order__paid',
+                className: 'sortable',
+                render: function (data, type, row) {
+                    // for display purposes show the Font Awesome icon
+                    if (type === 'display') {
+                        // Use global variable passed from context into JS
+                        let optionStr = paidStatusChoices[data];
+                        return `
+                        <button class="btn btn-sm fw-bolder text-wrap paid-status"
+                        data-order-id="${row.order.id}" data-value="${data}">
+                        ${optionStr}
+                        </button>
+                        `
+                    }
+                    // for filtering and sorting, return the underlying data
+                    return data;
+                },
+                type: 'num' // to convert to binary for sorting
+            },
+        ],
+        // Default ordering by priority_level descending
+        order: [
+            [9, 'desc']
+        ],
+        // Callback after every draw (initial load and subsequent updates)
+        drawCallback: function (settings) {
+            // update status styles
+            updateStatusStyle();
+        },
+    });
 
     // initial load
     RenderProdRevChart();
