@@ -4,7 +4,6 @@ import {
     formatWithThousandsSeparator,
     generateOptionsList,
     updateStatusStyle,
-    getQueryParams
 } from "./utils.js";
 
 $(document).ready(function () {
