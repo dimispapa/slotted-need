@@ -376,20 +376,14 @@ $(document).ready(function () {
                 className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        let select = `<select class="form-select-sm item-status fw-bolder text-wrap" data-id="${row.id}">`;
                         // Use global variable passed from context into JS and generate select options
-                        let options = generateSelectOptions(itemStatusChoices, data);
-                        select += options;
-                        select += '</select>';
-                        // Add a spinner
-                        select += `
-                        <span class="text-center inline-spinner-div">
-                            <div class="spinner-border text-primary d-none" role="status" id="item-status-spinner-${row.id}">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
+                        let optionStr = itemStatusChoices[data];
+                        return `
+                        <span class="badge fw-bolder text-wrap item-status"
+                        data-order-id="${row.order.id}" data-value="${data}">
+                        ${optionStr}
                         </span>
-                        `;
-                        return select;
+                        `
                     }
                     return data;
                 }
@@ -399,20 +393,14 @@ $(document).ready(function () {
                 className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        let select = '<select class="form-select-sm priority-status fw-bolder text-wrap" data-id="' + row.id + '">';
                         // Use global variable passed from context into JS and generate select options
-                        let options = generateSelectOptions(priorityLevelChoices, data);
-                        select += options;
-                        select += '</select>';
-                        // Add a spinner
-                        select += `
-                        <span class="text-center inline-spinner-div">
-                            <div class="spinner-border text-primary d-none" role="status" id="priority-status-spinner-${row.id}">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
+                        let optionStr = priorityLevelChoices[data];
+                        return `
+                        <span class="badge fw-bolder text-wrap priority-status"
+                        data-order-id="${row.order.id}" data-value="${data}">
+                        ${optionStr}
                         </span>
-                        `;
-                        return select;
+                        `
                     }
                     return data;
                 }
@@ -427,10 +415,10 @@ $(document).ready(function () {
                         // Use global variable passed from context into JS
                         let optionStr = paidStatusChoices[data];
                         return `
-                        <button class="btn btn-sm fw-bolder text-wrap paid-status"
+                        <span class="badge fw-bolder text-wrap paid-status"
                         data-order-id="${row.order.id}" data-value="${data}">
                         ${optionStr}
-                        </button>
+                        </span>
                         `
                     }
                     // for filtering and sorting, return the underlying data
