@@ -3,7 +3,8 @@ import {
     displayMessage,
     formatWithThousandsSeparator,
     generateOptionsList,
-    generateSelectOptions
+    generateSelectOptions,
+    updateStatusStyle
 } from "./utils.js";
 
 $(document).ready(function () {
@@ -370,61 +371,6 @@ $(document).ready(function () {
                 data: 'id',
                 className: 'sortable'
             },
-            {
-                data: 'order.id',
-                name: 'order__id',
-                className: 'sortable'
-            },
-            {
-                data: 'order.client.client_name',
-                name: 'order__client__client_name',
-                className: 'sortable'
-            },
-            {
-                data: 'product.name',
-                name: 'product__name',
-                className: 'sortable'
-            },
-            {
-                data: 'option_values',
-                orderable: false, // Disable ordering,
-                className: 'not-sortable p2',
-                render: function (data, type, row) {
-                    if (type === 'display') {
-                        let list = generateOptionsList('option_values', data);
-                        return list;
-                    }
-                    return data;
-                }
-            },
-            {
-                data: 'product_finish',
-                name: 'product_finish__name',
-                className: 'sortable',
-                render: function (data, type, row) {
-                    if (type === 'display') {
-                        return data ? data.name : '-';
-                    }
-                    return data;
-                }
-            },
-            {
-                data: 'item_component_finishes',
-                orderable: false, // Disable ordering
-                className: 'not-sortable p2',
-                render: function (data, type, row) {
-                    if (type === 'display') {
-                        let list = generateOptionsList('component_finishes', data);
-                        return list;
-                    }
-                    return data;
-                }
-            },
-            {
-                data: 'item_value',
-                className: 'sortable',
-                render: $.fn.dataTable.render.number(',', '.', 0, '€')
-            },
             { // Item Status
                 data: 'item_status',
                 className: 'sortable',
@@ -492,6 +438,61 @@ $(document).ready(function () {
                 },
                 type: 'num' // to convert to binary for sorting
             },
+            {
+                data: 'order.id',
+                name: 'order__id',
+                className: 'sortable'
+            },
+            {
+                data: 'order.client.client_name',
+                name: 'order__client__client_name',
+                className: 'sortable'
+            },
+            {
+                data: 'product.name',
+                name: 'product__name',
+                className: 'sortable'
+            },
+            {
+                data: 'option_values',
+                orderable: false, // Disable ordering,
+                className: 'not-sortable p2',
+                render: function (data, type, row) {
+                    if (type === 'display') {
+                        let list = generateOptionsList('option_values', data);
+                        return list;
+                    }
+                    return data;
+                }
+            },
+            {
+                data: 'product_finish',
+                name: 'product_finish__name',
+                className: 'sortable',
+                render: function (data, type, row) {
+                    if (type === 'display') {
+                        return data ? data.name : '-';
+                    }
+                    return data;
+                }
+            },
+            {
+                data: 'item_component_finishes',
+                orderable: false, // Disable ordering
+                className: 'not-sortable p2',
+                render: function (data, type, row) {
+                    if (type === 'display') {
+                        let list = generateOptionsList('component_finishes', data);
+                        return list;
+                    }
+                    return data;
+                }
+            },
+            {
+                data: 'item_value',
+                className: 'sortable',
+                render: $.fn.dataTable.render.number(',', '.', 0, '€')
+            },
         ],
         // Default ordering by priority_level descending
         order: [
@@ -504,7 +505,13 @@ $(document).ready(function () {
         },
     });
 
-    // initial load
+    // Prevent triggering sorting when a user clicks in any of the inputs.
+    // Sorting should apply when the user clicks any of the column headers
+    $('#orderitem-home-table').on('click mousedown touchstart', 'input, select, button', function (e) {
+        e.stopPropagation();
+    });
+
+    // initial charts load
     RenderProdRevChart();
     RenderDebtorsChart();
     RenderItemStatusProductChart();

@@ -35,7 +35,7 @@
       <canvas id="orderItemStatusProductChart" class="p-1"></canvas>
       <!-- Total Open Items -->
       <div class="input-group mt-2 mt-md-4">
-        <span class="input-group-text fs-6 fs-md-5 bg-primary text-light">Total Open Items (not completed)</span>
+        <span class="input-group-text fs-6 fs-md-5 bg-primary text-light">Total Open Items</span>
         <span class="input-group-text fs-6 fs-md-5">Count</span>
         <input type="text" name="total_open_items" class="form-control" id="total-open-items" aria-label="readonly"
           readonly disabled>
@@ -75,12 +75,17 @@
       <!-- Order Item Status Chart -->
       <canvas id="orderItemStatusConfigChart" class="p-1"></canvas>
     </div>
+    <!-- ORDER ITEMS DATA TABLE - FILTERED -->
     <div class="col-12 col-md-6 border">
+      <h1 class="display-6 mb-2 mb-md-4 text-center border-top border-bottom"><i class="fa-solid fa-circle-exclamation text-danger"></i> Items requiring attention</h1>
       <!-- Filtering and DataTable -->
       <table id="orderitem-home-table" class="display table table-bordered table-responsive table-striped">
         <thead>
           <tr>
             <th>Item ID</th>
+            <th>Item Status</th>
+            <th>Priority Level</th>
+            <th>Payment Status</th>
             <th>Order ID</th>
             <th>Client Name</th>
             <th>Product</th>
@@ -88,9 +93,6 @@
             <th>Product Finish</th>
             <th>Component Finishes</th>
             <th>Value</th>
-            <th>Item Status</th>
-            <th>Priority Level</th>
-            <th>Payment Status</th>
           </tr>
         </thead>
         <tbody>
