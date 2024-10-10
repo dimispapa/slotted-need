@@ -198,3 +198,10 @@ th.not-sortable {
   font-weight: bold;
   color: dimgray;
 }
+
+/* for larger screens limit the width of the metric banners */
+@media (min-width: 768px) {
+  .metric-banner {
+    max-width: 60%;
+  }
+}
