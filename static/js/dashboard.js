@@ -337,7 +337,7 @@ $(document).ready(function () {
         orderCellsTop: true, // Place sorting icons to top row
         fixedHeader: true, // Fix the header when scrolling
         searching: false, // Disable global search as using column filters
-        scrollY: '60vh', // Enable vertical scrolling
+        scrollY: '30vh', // Enable vertical scrolling
         scrollX: true, // Enable horizontal scrolling
         responsive: true, // Enable responsive layout for smaller screens
         pageLength: pageSize,
