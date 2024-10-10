@@ -64,10 +64,13 @@ $(document).ready(function () {
                         plugins: {
                             title: {
                                 display: true,
-                                text: 'Revenue by Product'
+                                text: 'Revenue by Product',
+                                font: {
+                                    size: 20
+                                }
                             },
                             legend: {
-                                display: false
+                                display: false,
                             }
                         },
                         responsive: true,
@@ -171,7 +174,10 @@ $(document).ready(function () {
                         plugins: {
                             title: {
                                 display: true,
-                                text: 'Amounts Owed by Client'
+                                text: 'Amounts Owed by Client',
+                                font: {
+                                    size: 20
+                                }
                             },
                             legend: {
                                 display: false
@@ -219,7 +225,10 @@ $(document).ready(function () {
                         plugins: {
                             title: {
                                 display: true,
-                                text: 'Open Items by Status'
+                                text: 'Open Items by Status',
+                                font: {
+                                    size: 20
+                                }
                             },
                             legend: {
                                 display: true,
@@ -293,7 +302,10 @@ $(document).ready(function () {
                         plugins: {
                             title: {
                                 display: true,
-                                text: 'Pending Items by Configuration'
+                                text: 'Pending Items by Configuration',
+                                font: {
+                                    size: 20
+                                }
                             },
                             legend: {
                                 display: true,
