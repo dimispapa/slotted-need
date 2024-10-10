@@ -220,18 +220,20 @@ class OrderItem(models.Model):
                              if option_values else 'None')
 
         # Retrieve and sort component finishes
-        component_finishes = sorted(
+        finishes = sorted(
             self.item_component_finishes.values_list('finish_option__name',
                                                      flat=True)
         )
-        component_finishes_str = ', '.join(
-            component_finishes) if component_finishes else 'None'
+        # add product finish to start of list if not None
+        if product_finish:
+            finishes.insert(0, product_finish)
+        # create finishes string
+        finishes_str = ', '.join(finishes) if finishes else ''
 
         # Concatenate all parts into a single string
-        unique_config = (f"Product: {product_name} | "
-                         f"Design Options: {option_values_str} | "
-                         f"Product Finish: {product_finish} | "
-                         f"Component Finishes: {component_finishes_str}")
+        unique_config = (f"{product_name} | "
+                         f"{option_values_str} | "
+                         f"{finishes_str}")
         return unique_config
 
 
