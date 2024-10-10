@@ -27,7 +27,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # API endpoints
     path('api/', include(router.urls)),
-    path('api/product-revenue-data/', ProductRevenueDataAPIView.as_view()),
+    path('api/product-revenue-data/', ProductRevenueDataAPIView.as_view(),
+         name='product_revenue_data'),
     path('api/debtors-data/', DebtorBalancesAPIView.as_view()),
     path('api/item-status-product-data/', ItemStatusProductAPIView.as_view()),
     path('api/item-status-config-data/', ItemStatusConfigAPIView.as_view()),
