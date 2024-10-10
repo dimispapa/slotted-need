@@ -391,6 +391,24 @@ function formatWithThousandsSeparator(num) {
     return parts.join(",");
 };
 
+// Function that clear filters on the DataTable
+function clearDataTableFilters(table) {
+    debugger;
+    // get input elements and clear the values
+    let inputs = $('#filter-row th input.form-control');
+    for (let input of inputs) {
+        input.value = '';
+    };
+    // get select elements and clear the values
+    let selects = $('#filter-row th select');
+    for (let select of selects) {
+        select.value = 'All';
+    };
+    debugger;
+    // Reload the table
+    table.ajax.reload();
+};
+
 export {
     displayMessages,
     displayMessage,
@@ -405,5 +423,6 @@ export {
     toggleSpinner,
     toggleChildRow,
     fetchOrderItems,
-    formatWithThousandsSeparator
+    formatWithThousandsSeparator,
+    clearDataTableFilters
 };

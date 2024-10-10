@@ -13,7 +13,13 @@
 
 {% block content %}
 <div id="order-tracker-container" class="container-fluid mt-2 mt-md-4">
-  <h1 class="display-6 mb-2 mb-md-4 text-center border-top border-bottom"><i class="fa-solid fa-list-check text-primary"></i> Order Tracker</h1>
+  <!-- Heading -->
+  <h1 class="display-6 mb-2 mb-md-4 text-center border-top border-bottom"><i
+      class="fa-solid fa-list-check text-primary"></i> Order Tracker</h1>
+  <!-- Clear filters button -->
+  <div class="text-center">
+    <button id="clear-filters-btn" class="btn btn-danger">Clear Filters</button>
+  </div>
   <div class="table-responsive order mb-3 table-container">
     <!-- Orders table -->
     <table id="orders-table" class="table shadow table-hover">
@@ -30,7 +36,7 @@
           <th>Payment Status</th>
           <th></th>
         </tr>
-        <tr class="filter-row">
+        <tr id="filter-row">
           <th>
             <!-- Empty header for dropdown toggle column -->
           </th>

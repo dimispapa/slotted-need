@@ -8,6 +8,7 @@ import {
     generateSelectOptions,
     toggleChildRow,
     toggleSpinner,
+    clearDataTableFilters
 
 } from './utils.js'
 
@@ -370,6 +371,12 @@ $(document).ready(function () {
                 table.ajax.reload(toggleSpinner(spinner), false);
             },
         });
+    });
+
+    // Add event listener for clicks on clear filter btn
+    $('#clear-filters-btn').on('click', function () {
+        // clear filters on front-end and reload table
+        clearDataTableFilters(table);
     });
 
     // Function that renders the order status

@@ -8,6 +8,7 @@ import {
     generateSelectOptions,
     generateOptionsList,
     toggleSpinner,
+    clearDataTableFilters
 
 } from "./utils.js";
 
@@ -441,6 +442,14 @@ $(document).ready(function () {
     $('#orderitem-table tbody').on('click', '.paid-status', function () {
         let orderId = $(this).data('order-id');
         openPaidStatusModal(orderId);
+    });
+
+    // Add event listener for clicks on clear filter btn
+    $('#clear-filters-btn').on('click', function () {
+        // clear query parameter to effectively remove all filters in back-end
+        params.delete('filter_type');
+        // clear filters on front-end and reload table
+        clearDataTableFilters(table);
     });
 
     // Function that populates the paid status modal with order details
