@@ -18,7 +18,7 @@
   <!-- 1ST ROW -->
   <div class="row">
     <!-- DEBTORS -->
-    <div class="col-12 col-md-4 border p-1">
+    <div class="col-12 col-md-4 border pb-3">
       <!-- Debtors Chart -->
       <canvas id="debtorsChart"></canvas>
       <!-- Total Owed by Clients -->
@@ -30,7 +30,7 @@
       </div>
     </div>
     <!-- ORDER ITEM STATUS BY PRODUCT -->
-    <div class="col-12 col-md-4 border p-1">
+    <div class="col-12 col-md-4 border pb-3">
       <!-- Order Item Status Chart -->
       <canvas id="orderItemStatusProductChart"></canvas>
       <!-- Total Open Items -->
@@ -42,7 +42,7 @@
       </div>
     </div>
     <!-- PRODUCT REVENUE -->
-    <div class="col-12 col-md-4 border p-1">
+    <div class="col-12 col-md-4 border pb-3">
       <!-- Product Revenue Chart -->
       <canvas id="productRevenueChart"></canvas>
       <!-- Product Revenue amount filter -->
@@ -71,12 +71,12 @@
   <!-- 2ND ROW -->
   <div class="row pb-sm-4">
     <!-- ORDER ITEM STATUS BY FINISH -->
-    <div class="col-12 col-md-6 border p-1">
+    <div class="col-12 col-md-6 border pb-3">
       <!-- Order Item Status Chart -->
       <canvas id="orderItemStatusConfigChart"></canvas>
     </div>
     <!-- ORDER ITEMS DATA TABLE - FILTERED -->
-    <div class="col-12 col-md-6 border">
+    <div class="col-12 col-md-6 border pb-3">
       <h1 class="display-6 mt-1 mt-md-2 text-center" id="orderitem-home-table-title"><i
           class="fa-solid fa-circle-exclamation text-danger"></i> Items requiring attention</h1>
       <p class="text-center"><a class="btn btn-sm btn-primary" href="{% url 'order_item_tracker' %}?filter_type=home_dashboard"
