@@ -302,7 +302,7 @@ $(document).ready(function () {
                         plugins: {
                             title: {
                                 display: true,
-                                text: 'Pending Items by Configuration',
+                                text: 'Open Items by Configuration',
                                 font: {
                                     size: 20
                                 }

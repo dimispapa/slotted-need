@@ -143,8 +143,8 @@ class DebtorBalancesAPIView(APIView):
 
 class ItemStatusProductAPIView(APIView):
     def get(self, request, format=None):
-        # Fetch OrderItems filtering out archived orders
-        order_items = OrderItem.objects.filter(order__archived=False)
+        # Fetch OrderItems filtering out completed orders
+        order_items = OrderItem.objects.filter(completed=False)
         # Fetch products list
         products = Product.objects.all()
 
@@ -208,11 +208,10 @@ class ItemStatusConfigAPIView(APIView):
     def get(self, request, format=None):
         # Fetch OrderItems filtering out made, delivered and archived orders
         order_items = OrderItem.objects.filter(
-            order__archived=False).exclude(
-                item_status__in=[3, 4]).select_related(
-                    'product').prefetch_related(
-                        'option_values', 'item_component_finishes').order_by(
-                            'id')
+            completed=False).select_related(
+            'product').prefetch_related(
+            'option_values', 'item_component_finishes').order_by(
+            'id')
 
         # Aggregate item counts by their unique configuration combo
         config_counts = {}
