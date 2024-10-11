@@ -22,15 +22,15 @@
                 <td>{{ user.is_active }}</td>
                 <td>{{ user.is_staff }}</td>
                 <td>
-                    <a href="{% url 'user_edit' user.pk %}">Edit</a>
+                    <a href="{% url 'user_edit' user.pk %}" class="btn btn-warning">Edit</a>
                     {% if not user.is_superuser and user != request.user %}
-                    | <a href="{% url 'user_delete' user.pk %}">Delete</a>
+                    <a href="{% url 'user_delete' user.pk %}" class="btn btn-danger">Delete</a>
                     {% endif %}
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-    <a href="{% url 'user_add' %}">Add New User</a>
+    <a href="{% url 'user_add' %}" class="btn btn-primary">Add New User</a>
 </div>
 {% endblock %}

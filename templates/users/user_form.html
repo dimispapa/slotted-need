@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 <div class="container mt-2 mt-md-4 mb-2 mb-md-4">
@@ -26,9 +27,9 @@
         </div>
         {% endif %}
 
-        {{ form.as_p }}
-        <button type="submit">Save</button>
-        <a href="{% url 'user_list' %}">Cancel</a>
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{% url 'user_list' %}" class="btn btn-secondary">Cancel</a>
     </form>
 </div>
 {% endblock %}
