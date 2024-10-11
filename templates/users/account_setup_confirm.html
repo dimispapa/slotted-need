@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+  <h2>Set up your account</h2>
+  <p>Please set your password below. Your username is your email.</p>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Set Password</button>
+  </form>
+{% endblock %}

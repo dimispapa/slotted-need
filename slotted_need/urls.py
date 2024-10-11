@@ -36,8 +36,8 @@ urlpatterns = [
     path('api/item-status-config-data/', ItemStatusConfigAPIView.as_view(),
          name='item_status_config_data'),
     # Frontend views
-    path('orders/', include('orders.urls'), name='orders-urls'),
-    path('users/', include('users.urls'), name='users-urls'),
+    path('orders/', include('orders.urls')),
+    path('users/', include('users.urls')),
     # DRF Authentication
     path('api-auth/', include('rest_framework.urls')),
     path('accounts/', include('django.contrib.auth.urls')),

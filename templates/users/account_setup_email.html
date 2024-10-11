@@ -1,0 +1,14 @@
+{% autoescape off %}
+Hi {{ user.email }},
+
+You have been invited to set up your account on {{ site_name }}.
+
+Please click the link below to set your username and password:
+
+{{ protocol }}://{{ domain }}{% url 'set_password_confirm' uidb64=uid token=token %}
+
+If you didn't request this, please ignore this email.
+
+Thanks,
+The {{ site_name }} Team
+{% endautoescape %}

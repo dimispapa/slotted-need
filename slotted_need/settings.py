@@ -53,6 +53,11 @@ INSTALLED_APPS = [
     'orders',
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+
 # Crispy bootstrap5 templates
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
@@ -139,6 +144,15 @@ AUTH_PASSWORD_VALIDATORS = [
 # Login/Logout redirect
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'login'
+
+# Email configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_KEY")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_EMAIL")
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/

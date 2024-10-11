@@ -4,6 +4,7 @@ crispy-bootstrap5==2024.2
 cycler==0.12.1
 dj-database-url==0.5.0
 Django==5.1
+django-allauth==65.0.2
 django-crispy-forms==2.3
 django-filter==24.3
 django-nested-admin==4.1.1
