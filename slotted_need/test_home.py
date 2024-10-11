@@ -16,6 +16,7 @@ class TestHomeView(TestCase):
     """
 
     def setUp(self):
+        self.url_name = 'home'
         # Create a superuser / admin
         self.user = baker.make(User, is_staff=True, is_superuser=True)
         self.user.set_password('testpass')
@@ -28,7 +29,7 @@ class TestHomeView(TestCase):
         """
         Test for the home view rendering correctly for an admin
         """
-        response = self.client.get(reverse('home'))
+        response = self.client.get(reverse(self.url_name))
 
         # check that the response is 200 OK
         self.assertEqual(response.status_code, 200,
@@ -68,7 +69,7 @@ class TestHomeView(TestCase):
         self.client.login(username=self.user_nonadmin.username,
                           password='testpass')
 
-        response = self.client.get(reverse('home'))
+        response = self.client.get(reverse(self.url_name))
 
         # check for non 200 status code
         self.assertNotEqual(response.status_code, 200,
@@ -81,6 +82,7 @@ class TestProductRevenueDataAPI(TestCase):
     """
 
     def setUp(self):
+        self.api_name = 'product_revenue_data'
         # Create a superuser / admin
         self.user = baker.make(User, is_staff=True, is_superuser=True)
         self.user.set_password('testpass')
@@ -106,7 +108,6 @@ class TestProductRevenueDataAPI(TestCase):
         matches the product and order item instances of the order
         """
         # make an API request
-        self.api_name = 'product_revenue_data'
         response = self.client.get(reverse(self.api_name))
         # check for 200 status code
         self.assertEqual(response.status_code, 200)
@@ -149,6 +150,7 @@ class TestDebtorBalancesAPI(TestCase):
     """
 
     def setUp(self):
+        self.api_name = 'debtors_balances_data'
         # Create a superuser / admin
         self.user = baker.make(User, is_staff=True, is_superuser=True)
         self.user.set_password('testpass')
@@ -185,7 +187,6 @@ class TestDebtorBalancesAPI(TestCase):
         matches the order object instances
         """
         # make an API request
-        self.api_name = 'debtors_balances_data'
         response = self.client.get(reverse(self.api_name))
         # check for 200 status code
         self.assertEqual(response.status_code, 200)
@@ -237,6 +238,7 @@ class TestItemStatusProductAPI(TestCase):
     """
 
     def setUp(self):
+        self.api_name = 'item_status_product_data'
         # Create a superuser / admin
         self.user = baker.make(User, is_staff=True, is_superuser=True)
         self.user.set_password('testpass')
@@ -257,7 +259,6 @@ class TestItemStatusProductAPI(TestCase):
         matches the order item object instances
         """
         # make an API request
-        self.api_name = 'item_status_product_data'
         response = self.client.get(reverse(self.api_name))
         # check for 200 status code
         self.assertEqual(response.status_code, 200)
