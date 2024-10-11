@@ -1,14 +1,31 @@
 from django import forms
-from django.contrib.auth.models import User, Group
-from django.contrib.auth.forms import UserChangeForm, PasswordResetForm
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import (UserChangeForm, PasswordResetForm)
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
 
 class CustomUserCreationForm(forms.ModelForm):
-    email = forms.EmailField(required=True)
-    email2 = forms.EmailField(label='Confirm Email', required=True)
-    is_staff = forms.BooleanField(required=False, label='Admin User')
+    email = forms.EmailField(
+        label='Email',
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter email address',
+        })
+    )
+    email2 = forms.EmailField(
+        label='Confirm Email',
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Confirm email address',
+        })
+    )
+    is_staff = forms.BooleanField(required=False, label='Admin User',
+                                  help_text=('Designates whether the user can '
+                                             'log into the admin site and '
+                                             'access privileged areas'),)
 
     class Meta:
         model = User
@@ -44,21 +61,17 @@ class CustomUserCreationForm(forms.ModelForm):
 
 class CustomUserChangeForm(UserChangeForm):
     password = None  # Hide password field
-    email = forms.EmailField(required=True)
-    is_staff = forms.BooleanField(required=False, label='Admin Status')
-    groups = forms.ModelMultipleChoiceField(
-        queryset=Group.objects.all(),
-        required=False,
-        widget=forms.CheckboxSelectMultiple,
-        label='Groups'
-    )
+    is_staff = forms.BooleanField(required=False, label='Admin User',
+                                  help_text=('Designates whether the user can '
+                                             'log into the admin site and '
+                                             'access privileged areas'),)
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'is_active', 'is_staff', 'groups')
+        fields = ('username', 'email', 'is_active', 'is_staff')
 
 
-class CustomPasswordResetForm(PasswordResetForm):
+class CustomPasswordSetupForm(PasswordResetForm):
     def get_users(self, email):
         email = email.strip().lower()
         UserModel = get_user_model()

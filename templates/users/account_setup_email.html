@@ -5,7 +5,7 @@ You have been invited to set up your account on {{ site_name }}.
 
 Please click the link below to set your username and password:
 
-{{ protocol }}://{{ domain }}{% url 'set_password_confirm' uidb64=uid token=token %}
+{{ protocol }}://{{ domain }}{% url 'user_reset_password' uidb64=uid token=token %}
 
 If you didn't request this, please ignore this email.
 

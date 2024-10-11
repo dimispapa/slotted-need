@@ -19,6 +19,7 @@ from django.urls import path, include
 from .apis import router
 from .views import (HomeView, ProductRevenueDataAPIView, DebtorBalancesAPIView,
                     ItemStatusProductAPIView, ItemStatusConfigAPIView)
+from users.views import CustomLoginView
 
 urlpatterns = [
     # render the home.html template dashboard
@@ -40,5 +41,6 @@ urlpatterns = [
     path('users/', include('users.urls')),
     # DRF Authentication
     path('api-auth/', include('rest_framework.urls')),
+    path('accounts/login/', CustomLoginView.as_view(), name='login'),
     path('accounts/', include('django.contrib.auth.urls')),
 ]

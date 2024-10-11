@@ -1,14 +1,13 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.views import PasswordResetConfirmView
+from django.contrib.auth.views import (PasswordResetConfirmView, LoginView)
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.core.mail import send_mail
-from django.http import HttpResponse
+from django.contrib.auth.forms import PasswordResetForm
 from .forms import (CustomUserCreationForm, CustomUserChangeForm,
-                    CustomPasswordResetForm)
+                    CustomPasswordSetupForm,)
 
 
 class AdminUserRequiredMixin(UserPassesTestMixin):
@@ -21,6 +20,46 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
         messages.error(self.request,
                        'You do not have permission to access this page.')
         return redirect('login')
+
+
+class CustomLoginView(LoginView):
+    template_name = 'registration/login.html'
+    # authentication_form = CustomAuthenticationForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['password_reset_form'] = PasswordResetForm()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if 'login_form' in request.POST:
+            return super().post(request, *args, **kwargs)
+        elif 'password_reset_form' in request.POST:
+            # Process password reset form
+            password_reset_form = PasswordResetForm(request.POST)
+            if password_reset_form.is_valid():
+                password_reset_form.save(
+                    request=request,
+                    use_https=request.is_secure(),
+                    email_template_name='users/password_reset_email.html',
+                    subject_template_name='users/password_reset_subject.txt',
+                    from_email='dpapakyriacou14@gmail.com',
+                )
+                messages.success(request,
+                                 'An email has been sent with instructions to '
+                                 'reset your password.')
+            else:
+                messages.error(request, 'Please enter a valid email address.')
+
+        # Re-instantiate the forms for rendering
+        context = self.get_context_data()
+        if not password_reset_form.is_valid():
+            context['password_reset_form'] = password_reset_form     
+            return self.render_to_response(context)
+
+        else:
+            # Unknown form submitted
+            return self.get(request, *args, **kwargs)
 
 
 class UserListView(LoginRequiredMixin, AdminUserRequiredMixin, ListView):
@@ -42,7 +81,7 @@ class UserCreateView(LoginRequiredMixin, AdminUserRequiredMixin, CreateView):
 
         # Send password reset email
         email = form.cleaned_data['email']
-        reset_form = CustomPasswordResetForm({'email': email})
+        reset_form = CustomPasswordSetupForm({'email': email})
         if reset_form.is_valid():
             try:
                 reset_form.save(
@@ -107,7 +146,7 @@ class UserDeleteView(LoginRequiredMixin, AdminUserRequiredMixin, DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
-class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+class CustomPasswordSetupConfirmView(PasswordResetConfirmView):
     template_name = 'users/account_setup_confirm.html'
     success_url = reverse_lazy('login')
 
@@ -121,10 +160,15 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
         return response
 
 
-def test_email(request):
-    subject = 'Test Email from Django using SendGrid'
-    message = 'This is a test email sent using SendGrid SMTP.'
-    from_email = 'dpapakyriacou14@gmail.com'
-    recipient_list = ['dpapakyriacou14@gmail.com']
-    send_mail(subject, message, from_email, recipient_list)
-    return HttpResponse('Test email sent!')
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'users/user_password_reset.html'
+    success_url = reverse_lazy('login')
+
+    def form_valid(self, form):
+        # Save the new password
+        response = super().form_valid(form)
+        # Add a success message
+        messages.success(
+            self.request,
+            'Your password has been reset successfully. You can now log in.')
+        return response
