@@ -118,6 +118,8 @@ class ProductRevenueDataAPIView(APIView):
 
 
 class DebtorBalancesAPIView(APIView):
+    permission_classes = [IsAdminUser]
+
     def get(self, request, format=None):
         # Calculate total debtor balance per client using reverse relationship
         debtors = Client.objects.filter(orders__paid=1).annotate(
@@ -148,6 +150,8 @@ class DebtorBalancesAPIView(APIView):
 
 
 class ItemStatusProductAPIView(APIView):
+    permission_classes = [IsAdminUser]
+
     def get(self, request, format=None):
         # Fetch OrderItems filtering out completed orders
         order_items = OrderItem.objects.filter(completed=False)
@@ -211,6 +215,8 @@ class ItemStatusProductAPIView(APIView):
 
 
 class ItemStatusConfigAPIView(APIView):
+    permission_classes = [IsAdminUser]
+
     def get(self, request, format=None):
         # Fetch OrderItems filtering out made, delivered and archived orders
         order_items = OrderItem.objects.filter(
