@@ -5,9 +5,8 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.contrib.auth.forms import PasswordResetForm
 from .forms import (CustomUserCreationForm, CustomUserChangeForm,
-                    CustomPasswordSetupForm,)
+                    CustomPasswordSetupForm, CustomPasswordResetForm)
 
 
 class AdminUserRequiredMixin(UserPassesTestMixin):
@@ -28,7 +27,7 @@ class CustomLoginView(LoginView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['password_reset_form'] = PasswordResetForm()
+        context['password_reset_form'] = CustomPasswordResetForm()
         return context
 
     def post(self, request, *args, **kwargs):
@@ -36,7 +35,7 @@ class CustomLoginView(LoginView):
             return super().post(request, *args, **kwargs)
         elif 'password_reset_form' in request.POST:
             # Process password reset form
-            password_reset_form = PasswordResetForm(request.POST)
+            password_reset_form = CustomPasswordResetForm(request.POST)
             if password_reset_form.is_valid():
                 password_reset_form.save(
                     request=request,

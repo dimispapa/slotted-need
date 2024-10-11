@@ -12,10 +12,12 @@ urlpatterns = [
     path('edit/<int:pk>/', UserUpdateView.as_view(), name='user_edit'),
     path('delete/<int:pk>/', UserDeleteView.as_view(),
          name='user_delete'),
-    path('setup-password/<uidb64>/<token>/',
-         CustomPasswordSetupConfirmView.as_view(),
-         name='set_password_confirm'),
-    path('password-reset/<uidb64>/<token>/',
+    path('confirm-password-reset/<uidb64>/<token>/',
          CustomPasswordResetConfirmView.as_view(),
-         name='user_reset_password'),
+         name='confirm_password_reset'),
+
+    # Account Setup URLs (used when a new user is created)
+    path('confirm-account-setup/<uidb64>/<token>/',
+         CustomPasswordSetupConfirmView.as_view(),
+         name='account_setup_confirm'),
 ]

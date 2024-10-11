@@ -79,3 +79,22 @@ class CustomPasswordSetupForm(PasswordResetForm):
             email__iexact=email, is_active=True
         )
         return (u for u in active_users)
+
+
+class CustomPasswordResetForm(PasswordResetForm):
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if not User.objects.filter(email__iexact=email,
+                                   is_active=True).exists():
+            raise ValidationError(
+                "No active account found with the given email address.")
+        return email
+
+    def get_users(self, email):
+        """
+        This method returns users matching the given email address.
+        Overriding to ensure only active users are considered.
+        """
+        email = email.strip().lower()
+        return User._default_manager.filter(email__iexact=email,
+                                            is_active=True)
