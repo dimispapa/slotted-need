@@ -217,7 +217,7 @@ class OrderItem(models.Model):
             self.option_values.values_list('value', flat=True)
         )
         option_values_str = (', '.join(option_values)
-                             if option_values else 'None')
+                             if option_values else None)
 
         # Retrieve and sort component finishes
         finishes = sorted(
@@ -228,12 +228,16 @@ class OrderItem(models.Model):
         if product_finish:
             finishes.insert(0, product_finish)
         # create finishes string
-        finishes_str = ', '.join(finishes) if finishes else ''
+        finishes_str = ', '.join(finishes) if finishes else None
 
         # Concatenate all parts into a single string
-        unique_config = (f"{product_name} | "
-                         f"{option_values_str} | "
-                         f"{finishes_str}")
+        unique_config = (
+            f"{product_name}" +
+            (f" | {option_values_str}"
+             if option_values_str else "") +
+            (f" | {finishes_str}"
+             if finishes_str else "")
+        )
         return unique_config
 
 
