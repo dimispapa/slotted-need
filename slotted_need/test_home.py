@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.db.models import Sum, Count, Q, DecimalField
 from django.db.models.functions import Coalesce
+import numbers
 from orders.models import Client as ClientModel, OrderItem
 from .utils import generate_unique_rgba_colors
 from products.models import Product
@@ -303,6 +304,17 @@ class TestItemStatusProductAPI(TestCase):
         expected_labels = sorted([label for label in status_mapping.values()])
         sorted_expected_datasets = sorted(expected_datasets,
                                           key=lambda x: x['label'])
+        # prepare regex pattern for the rgba colour string
+        START = r'^rgba\('
+        END = r'\)$'
+        # regex for integers between 0 and 255:
+        RGB = r'(0|[1-9]\d?|1\d\d|2[0-4]\d|25[0-5])'
+        # regex pattern that matches floats between 0 and 1 inclusive,
+        # allowing for decimal fractions.
+        ALPHA = r'(0(?:\.\d+)?|1(?:\.0+)?)'
+        # putting it all together for full regex pattern
+        RGBA_REGEX = rf"{START}({RGB}),\s*({RGB}),\s*({RGB}),\s*({ALPHA}){END}"
+
         # sort response labels and dataset dicts
         sorted_data_labels = sorted(data['labels'])
         sorted_response_datasets = sorted(data['datasets'],
@@ -310,9 +322,21 @@ class TestItemStatusProductAPI(TestCase):
 
         # Assert if the correct labels and values are in the response
         # that chartjs charts use to render data
-        # assert labels
+        # assert x-axis labels
         self.assertListEqual(expected_labels, sorted_data_labels)
         # loop through dataset dicts and assert values
         for idx, dataset in enumerate(sorted_response_datasets):
+            # assert dataset label
             self.assertEqual(sorted_expected_datasets[idx]['label'],
                              dataset['label'])
+            # assert dataset values
+            self.assertListEqual(sorted(sorted_expected_datasets[idx]['data']),
+                                 sorted(dataset['data']))
+            # assert background color and border color rgba strings
+            self.assertRegex(sorted_expected_datasets[idx]['backgroundColor'],
+                             RGBA_REGEX)
+            self.assertRegex(sorted_expected_datasets[idx]['borderColor'],
+                             RGBA_REGEX)
+            # Check if border width is a number
+            self.assertIsInstance(sorted_expected_datasets[idx]['borderWidth'],
+                                  numbers.Number)
