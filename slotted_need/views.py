@@ -3,9 +3,12 @@ import json
 from django.views.generic import TemplateView
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAdminUser
 from rest_framework import status
 from django.db.models import Sum, Count, Q, DecimalField
 from django.db.models.functions import Coalesce
+from django.contrib.admin.views.decorators import staff_member_required
+from django.utils.decorators import method_decorator
 from products.models import Product
 from django.contrib.auth.mixins import LoginRequiredMixin
 from orders.models import Client, OrderItem, Order
@@ -17,7 +20,8 @@ from .utils import generate_unique_rgba_colors
 
 
 # Template View that renders the home template
-class home(LoginRequiredMixin, TemplateView):
+@method_decorator(staff_member_required, name='dispatch')
+class HomeView(LoginRequiredMixin, TemplateView):
     template_name = 'home.html'
 
     def get_context_data(self, **kwargs):
@@ -39,6 +43,8 @@ class home(LoginRequiredMixin, TemplateView):
 
 # The API view that provides the data for the revenue chart in JSON format
 class ProductRevenueDataAPIView(APIView):
+    permission_classes = [IsAdminUser]
+
     def get(self, request, format=None):
 
         # Step 1: Extract Query Parameters
