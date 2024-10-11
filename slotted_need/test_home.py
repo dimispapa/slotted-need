@@ -60,10 +60,13 @@ class TestHomeView(TestCase):
         Test that a non-admin user cannot access
         """
         # Create a client with non-admin user
-        self.user = baker.make(User, is_staff=False, is_superuser=False)
-        self.user.set_password('testpass')
-        self.user.save()
-        self.client.login(username=self.user.username, password='testpass')
+        self.user_nonadmin = baker.make(User,
+                                        is_staff=False,
+                                        is_superuser=False)
+        self.user_nonadmin.set_password('testpass')
+        self.user_nonadmin.save()
+        self.client.login(username=self.user_nonadmin.username,
+                          password='testpass')
 
         response = self.client.get(reverse('home'))
 
@@ -97,13 +100,14 @@ class TestProductRevenueDataAPI(TestCase):
                                       order=self.order,
                                       )
 
-    def test_product_revenue_data_admin(self):
+    def test_product_revenue_data(self):
         """
         Test if the product revenue data response from the API
         matches the product and order item instances of the order
         """
         # make an API request
-        response = self.client.get(reverse('product_revenue_data'))
+        self.api_name = 'product_revenue_data'
+        response = self.client.get(reverse(self.api_name))
         # check for 200 status code
         self.assertEqual(response.status_code, 200)
         # parse json data
@@ -124,13 +128,16 @@ class TestProductRevenueDataAPI(TestCase):
         that it gets rejected
         """
         # Create a client with non-admin user
-        self.user = baker.make(User, is_staff=False, is_superuser=False)
-        self.user.set_password('testpass')
-        self.user.save()
-        self.client.login(username=self.user.username, password='testpass')
+        self.user_nonadmin = baker.make(User,
+                                        is_staff=False,
+                                        is_superuser=False)
+        self.user_nonadmin.set_password('testpass')
+        self.user_nonadmin.save()
+        self.client.login(username=self.user_nonadmin.username,
+                          password='testpass')
 
         # make an API request
-        response = self.client.get(reverse('product_revenue_data'))
+        response = self.client.get(reverse(self.api_name))
         # check for non 200 status code
         self.assertNotEqual(response.status_code, 200,
                             msg='Anauthorised access allowed')
@@ -172,13 +179,14 @@ class TestDebtorBalancesAPI(TestCase):
                                       order=self.order_paid,
                                       )
 
-    def test_debtor_balances_data_admin(self):
+    def test_debtor_balances_data(self):
         """
         Test if the debtor balances data response from the API
         matches the order object instances
         """
         # make an API request
-        response = self.client.get(reverse('debtors_balances_data'))
+        self.api_name = 'debtors_balances_data'
+        response = self.client.get(reverse(self.api_name))
         # check for 200 status code
         self.assertEqual(response.status_code, 200)
         # parse json data
@@ -208,13 +216,16 @@ class TestDebtorBalancesAPI(TestCase):
         that it gets rejected
         """
         # Create a client with non-admin user
-        self.user = baker.make(User, is_staff=False, is_superuser=False)
-        self.user.set_password('testpass')
-        self.user.save()
-        self.client.login(username=self.user.username, password='testpass')
+        self.user_nonadmin = baker.make(User,
+                                        is_staff=False,
+                                        is_superuser=False)
+        self.user_nonadmin.set_password('testpass')
+        self.user_nonadmin.save()
+        self.client.login(username=self.user_nonadmin.username,
+                          password='testpass')
 
         # make an API request
-        response = self.client.get(reverse('debtors_balances_data'))
+        response = self.client.get(reverse(self.api_name))
         # check for non 200 status code
         self.assertNotEqual(response.status_code, 200,
                             msg='Anauthorised access allowed')
@@ -240,13 +251,14 @@ class TestItemStatusProductAPI(TestCase):
                                       _bulk_create=True
                                       )
 
-    def test_item_status_product_data_admin(self):
+    def test_item_status_product_data(self):
         """
         Test if the item status product data response from the API
         matches the order item object instances
         """
         # make an API request
-        response = self.client.get(reverse('item_status_product_data'))
+        self.api_name = 'item_status_product_data'
+        response = self.client.get(reverse(self.api_name))
         # check for 200 status code
         self.assertEqual(response.status_code, 200)
         # parse json data
@@ -340,3 +352,44 @@ class TestItemStatusProductAPI(TestCase):
             # Check if border width is a number
             self.assertIsInstance(sorted_expected_datasets[idx]['borderWidth'],
                                   numbers.Number)
+
+    def test_item_status_product_data_non_admin(self):
+        """
+        Test a request from a non-admin user to ensure
+        that it gets rejected
+        """
+        # Create a client with non-admin user
+        self.user_nonadmin = baker.make(User,
+                                        is_staff=False,
+                                        is_superuser=False)
+        self.user_nonadmin.set_password('testpass')
+        self.user_nonadmin.save()
+        self.client.login(username=self.user_nonadmin.username,
+                          password='testpass')
+
+        # make an API request
+        response = self.client.get(reverse(self.api_name))
+        # check for non 200 status code
+        self.assertNotEqual(response.status_code, 200,
+                            msg='Anauthorised access allowed')
+
+
+class TestItemStatusConfigAPI(TestCase):
+    """
+    Test case for testing the ItemStatusConfigAPIView
+    """
+
+    def setUp(self):
+        # Create a superuser / admin
+        self.user_nonadmin = baker.make(User, is_staff=True, is_superuser=True)
+        self.user_nonadmin.set_password('testpass')
+        self.user_nonadmin.save()
+        self.client = Client()
+        self.client.login(username=self.user_nonadmin.username,
+                          password='testpass')
+
+        # Create test data
+        self.order_items = baker.make('orders.OrderItem',
+                                      _quantity=10,
+                                      _bulk_create=True
+                                      )
