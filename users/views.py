@@ -5,7 +5,6 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.contrib.auth.forms import SetPasswordForm
 from django.core.mail import send_mail
 from django.http import HttpResponse
 from .forms import (CustomUserCreationForm, CustomUserChangeForm,
