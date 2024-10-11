@@ -7,8 +7,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.admin.views.decorators import staff_member_required
-from django.utils.decorators import method_decorator
+from users.views import AdminUserRequiredMixin
 from django.db import transaction
 from django.db.models import Count, Q
 from rest_framework import viewsets, permissions, status, response
@@ -594,8 +593,9 @@ class OrderItemViewSet(viewsets.ModelViewSet):
         )
 
 
-@method_decorator(staff_member_required, name='dispatch')
-class OrderItemListView(LoginRequiredMixin, TemplateView):
+class OrderItemListView(TemplateView,
+                        LoginRequiredMixin,
+                        AdminUserRequiredMixin):
     """
     Renders the OrderItem management page.
     Only accessible to authenticated users.
@@ -705,8 +705,9 @@ class OrderViewSet(viewsets.ModelViewSet):
                                  status=status.HTTP_200_OK)
 
 
-@method_decorator(staff_member_required, name='dispatch')
-class OrderListView(LoginRequiredMixin, TemplateView):
+class OrderListView(TemplateView,
+                    LoginRequiredMixin,
+                    AdminUserRequiredMixin):
     """
     Renders the Order management page.
     Only accessible to authenticated users.
@@ -734,8 +735,9 @@ class OrderListView(LoginRequiredMixin, TemplateView):
         return context
 
 
-@method_decorator(staff_member_required, name='dispatch')
-class OrderArchiveListView(LoginRequiredMixin, TemplateView):
+class OrderArchiveListView(TemplateView,
+                           LoginRequiredMixin,
+                           AdminUserRequiredMixin):
     template_name = 'orders/archive.html'
 
     def get_context_data(self, **kwargs):

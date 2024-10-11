@@ -7,8 +7,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework import status
 from django.db.models import Sum, Count, Q, DecimalField
 from django.db.models.functions import Coalesce
-from django.contrib.admin.views.decorators import staff_member_required
-from django.utils.decorators import method_decorator
+from users.views import AdminUserRequiredMixin
 from products.models import Product
 from django.contrib.auth.mixins import LoginRequiredMixin
 from orders.models import Client, OrderItem, Order
@@ -20,8 +19,7 @@ from .utils import generate_unique_rgba_colors
 
 
 # Template View that renders the home template
-@method_decorator(staff_member_required, name='dispatch')
-class HomeView(LoginRequiredMixin, TemplateView):
+class HomeView(TemplateView, LoginRequiredMixin, AdminUserRequiredMixin):
     template_name = 'home.html'
 
     def get_context_data(self, **kwargs):
