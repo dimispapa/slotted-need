@@ -17,12 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from .apis import router
-from .views import (home, ProductRevenueDataAPIView, DebtorBalancesAPIView,
+from .views import (HomeView, ProductRevenueDataAPIView, DebtorBalancesAPIView,
                     ItemStatusProductAPIView, ItemStatusConfigAPIView)
 
 urlpatterns = [
     # render the home.html template dashboard
-    path('', home.as_view(), name='home'),
+    path('', HomeView.as_view(), name='home'),
     # Admin site
     path('admin/', admin.site.urls),
     # API endpoints
