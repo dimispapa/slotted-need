@@ -53,7 +53,7 @@ class CustomLoginView(LoginView):
         # Re-instantiate the forms for rendering
         context = self.get_context_data()
         if not password_reset_form.is_valid():
-            context['password_reset_form'] = password_reset_form     
+            context['password_reset_form'] = password_reset_form
             return self.render_to_response(context)
 
         else:
