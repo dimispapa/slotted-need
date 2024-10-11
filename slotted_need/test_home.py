@@ -1,13 +1,23 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
-from django.db.models import Sum, Count, Q, DecimalField
+from django.db.models import Sum, Count, DecimalField
 from django.db.models.functions import Coalesce
 import numbers
 from orders.models import Client as ClientModel, OrderItem
-from .utils import generate_unique_rgba_colors
 from products.models import Product
 from model_bakery import baker
+
+# prepare regex pattern for the rgba colour string
+START = r'^rgba\('
+END = r'\)$'
+# regex for integers between 0 and 255:
+RGB = r'(0|[1-9]\d?|1\d\d|2[0-4]\d|25[0-5])'
+# regex pattern that matches floats between 0 and 1 inclusive,
+# allowing for decimal fractions.
+ALPHA = r'(0(?:\.\d+)?|1(?:\.0+)?)'
+# putting it all together for full regex pattern
+RGBA_REGEX = rf"{START}({RGB}),\s*({RGB}),\s*({RGB}),\s*({ALPHA}){END}"
 
 
 class TestHomeView(TestCase):
@@ -287,8 +297,6 @@ class TestItemStatusProductAPI(TestCase):
         status_mapping = OrderItem.STATUS_CHOICES
         # Initialize empty datasets list
         expected_datasets = []
-        # Get unique rgba colors list using util function
-        colors = generate_unique_rgba_colors(len(products), border_color=True)
 
         # Ensure all statuses are represented, even with zero counts
         for idx, product in enumerate(products):
@@ -302,14 +310,9 @@ class TestItemStatusProductAPI(TestCase):
                                 None)
                 count_data.append(matching['count'] if matching else 0)
 
-            bg_color, bd_color = colors[idx]
-
             expected_dataset = {
                 'label': product.name,
                 'data': count_data,
-                'backgroundColor': bg_color,
-                'borderColor': bd_color,
-                'borderWidth': 1
             }
             expected_datasets.append(expected_dataset)
 
@@ -317,16 +320,6 @@ class TestItemStatusProductAPI(TestCase):
         expected_labels = sorted([label for label in status_mapping.values()])
         sorted_expected_datasets = sorted(expected_datasets,
                                           key=lambda x: x['label'])
-        # prepare regex pattern for the rgba colour string
-        START = r'^rgba\('
-        END = r'\)$'
-        # regex for integers between 0 and 255:
-        RGB = r'(0|[1-9]\d?|1\d\d|2[0-4]\d|25[0-5])'
-        # regex pattern that matches floats between 0 and 1 inclusive,
-        # allowing for decimal fractions.
-        ALPHA = r'(0(?:\.\d+)?|1(?:\.0+)?)'
-        # putting it all together for full regex pattern
-        RGBA_REGEX = rf"{START}({RGB}),\s*({RGB}),\s*({RGB}),\s*({ALPHA}){END}"
 
         # sort response labels and dataset dicts
         sorted_data_labels = sorted(data['labels'])
@@ -346,12 +339,12 @@ class TestItemStatusProductAPI(TestCase):
             self.assertListEqual(sorted(sorted_expected_datasets[idx]['data']),
                                  sorted(dataset['data']))
             # assert background color and border color rgba strings
-            self.assertRegex(sorted_expected_datasets[idx]['backgroundColor'],
+            self.assertRegex(dataset['backgroundColor'],
                              RGBA_REGEX)
-            self.assertRegex(sorted_expected_datasets[idx]['borderColor'],
+            self.assertRegex(dataset['borderColor'],
                              RGBA_REGEX)
             # Check if border width is a number
-            self.assertIsInstance(sorted_expected_datasets[idx]['borderWidth'],
+            self.assertIsInstance(dataset['borderWidth'],
                                   numbers.Number)
 
     def test_item_status_product_data_non_admin(self):
@@ -381,16 +374,90 @@ class TestItemStatusConfigAPI(TestCase):
     """
 
     def setUp(self):
+        self.api_name = 'item_status_config_data'
         # Create a superuser / admin
-        self.user_nonadmin = baker.make(User, is_staff=True, is_superuser=True)
-        self.user_nonadmin.set_password('testpass')
-        self.user_nonadmin.save()
+        self.user = baker.make(User, is_staff=True, is_superuser=True)
+        self.user.set_password('testpass')
+        self.user.save()
         self.client = Client()
-        self.client.login(username=self.user_nonadmin.username,
+        self.client.login(username=self.user.username,
                           password='testpass')
 
         # Create test data
+        self.products = baker.make('products.Product',
+                                   _quantity=4,
+                                   _bulk_create=True)
         self.order_items = baker.make('orders.OrderItem',
-                                      _quantity=10,
+                                      _quantity=20,
                                       _bulk_create=True
                                       )
+
+    def test_item_status_config_data(self):
+        """
+        Test if the item status config data response from the API
+        matches the order item object instances
+        """
+        # make an API request
+        response = self.client.get(reverse(self.api_name))
+        # check for 200 status code
+        self.assertEqual(response.status_code, 200)
+        # parse json data
+        data = response.json()
+
+        # Fetch OrderItems filtering out made, delivered and archived orders
+        order_items = OrderItem.objects.filter(
+            completed=False).select_related(
+            'product').prefetch_related(
+            'option_values', 'item_component_finishes').order_by(
+            'id')
+
+        # Aggregate item counts by their unique configuration combo
+        config_counts = {}
+        for item in order_items:
+            # fetch the item's configuration property
+            config = item.unique_configuration
+            # pass the config to the counter dict and increment by 1
+            config_counts[config] = config_counts.get(config, 0) + 1
+
+        # Sort the config_counts dict by descending on count
+        sorted_config_counts = dict(sorted(config_counts.items(),
+                                           key=lambda x: x[1],
+                                           reverse=True))
+
+        # prepare expected data
+        # Get the item status labels
+        expected_labels = sorted([label.strip() for label
+                                  in sorted_config_counts.keys()])
+        # Get values of config
+        expected_values = sorted([count for count
+                                  in sorted_config_counts.values()])
+
+        # Assert if the correct labels and values are in the response
+        # that chartjs charts use to render data
+        self.assertListEqual(sorted(expected_labels), sorted(data['labels']))
+        self.assertListEqual(sorted(expected_values), sorted(data['values']))
+        for color_rgba in data['colors']:
+            # assert background color rgba string
+            self.assertRegex(color_rgba, RGBA_REGEX)
+        # check that there are no duplicated labels
+        self.assertEqual(len(data['labels']), len(set(data['labels'])))
+
+    def test_item_status_config_non_admin(self):
+        """
+        Test a request from a non-admin user to ensure
+        that it gets rejected
+        """
+        # Create a client with non-admin user
+        self.user_nonadmin = baker.make(User,
+                                        is_staff=False,
+                                        is_superuser=False)
+        self.user_nonadmin.set_password('testpass')
+        self.user_nonadmin.save()
+        self.client.login(username=self.user_nonadmin.username,
+                          password='testpass')
+
+        # make an API request
+        response = self.client.get(reverse(self.api_name))
+        # check for non 200 status code
+        self.assertNotEqual(response.status_code, 200,
+                            msg='Anauthorised access allowed')
