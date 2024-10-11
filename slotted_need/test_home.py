@@ -217,3 +217,102 @@ class TestDebtorBalancesAPI(TestCase):
         # check for non 200 status code
         self.assertNotEqual(response.status_code, 200,
                             msg='Anauthorised access allowed')
+
+
+class TestItemStatusProductAPI(TestCase):
+    """
+    Test case for testing the ItemStatusProductAPIView
+    """
+
+    def setUp(self):
+        # Create a superuser / admin
+        self.user = baker.make(User, is_staff=True, is_superuser=True)
+        self.user.set_password('testpass')
+        self.user.save()
+        self.client = Client()
+        self.client.login(username=self.user.username,
+                          password='testpass')
+
+        # Create test data
+        self.order_items = baker.make('orders.OrderItem',
+                                      _quantity=10,
+                                      _bulk_create=True
+                                      )
+
+    def test_item_status_product_data_admin(self):
+        """
+        Test if the item status product data response from the API
+        matches the order item object instances
+        """
+        # make an API request
+        response = self.client.get(reverse('item_status_product_data'))
+        # check for 200 status code
+        self.assertEqual(response.status_code, 200)
+        # parse json data
+        data = response.json()
+
+        # create the debtors objects based on the same API criteria
+        # Fetch OrderItems filtering out made, delivered and archived orders
+        order_items = OrderItem.objects.filter(
+            completed=False).select_related(
+            'product').prefetch_related(
+            'option_values', 'item_component_finishes').order_by(
+            'id')
+
+        # Fetch products list
+        products = Product.objects.all()
+
+        # Aggregate counts by item_status
+        status_counts = list(
+            order_items.values(
+                'item_status', 'product__name').order_by(
+                    'item_status').annotate(
+                        count=Count('id')))
+
+        # Pull the mapping with status codes to human-readable labels
+        status_mapping = OrderItem.STATUS_CHOICES
+        # Initialize empty datasets list
+        expected_datasets = []
+        # Get unique rgba colors list using util function
+        colors = generate_unique_rgba_colors(len(products), border_color=True)
+
+        # Ensure all statuses are represented, even with zero counts
+        for idx, product in enumerate(products):
+            count_data = []
+            # Ensure all statuses are represented, even with zero counts
+            for status_code in status_mapping.keys():
+                # Find if this status exists in the aggregated data
+                matching = next((item for item in status_counts
+                                if item['product__name'] == product.name
+                                and item['item_status'] == status_code),
+                                None)
+                count_data.append(matching['count'] if matching else 0)
+
+            bg_color, bd_color = colors[idx]
+
+            expected_dataset = {
+                'label': product.name,
+                'data': count_data,
+                'backgroundColor': bg_color,
+                'borderColor': bd_color,
+                'borderWidth': 1
+            }
+            expected_datasets.append(expected_dataset)
+
+        # prepare expected data
+        expected_labels = sorted([label for label in status_mapping.values()])
+        sorted_expected_datasets = sorted(expected_datasets,
+                                          key=lambda x: x['label'])
+        # sort response labels and dataset dicts
+        sorted_data_labels = sorted(data['labels'])
+        sorted_response_datasets = sorted(data['datasets'],
+                                          key=lambda x: x['label'])
+
+        # Assert if the correct labels and values are in the response
+        # that chartjs charts use to render data
+        # assert labels
+        self.assertListEqual(expected_labels, sorted_data_labels)
+        # loop through dataset dicts and assert values
+        for idx, dataset in enumerate(sorted_response_datasets):
+            self.assertEqual(sorted_expected_datasets[idx]['label'],
+                             dataset['label'])
