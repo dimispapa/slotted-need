@@ -63,7 +63,6 @@ def check_client(request):
 
 
 # Function to handle client creation
-@login_required
 def get_update_create_client(action, client_id, cleaned_data):
     # If the user is updating the client details
     if action == 'update_client' and client_id:
