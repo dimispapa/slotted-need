@@ -3,7 +3,8 @@
 {% load crispy_forms_tags %}
 {% block content %}
 <div class="container mt-2 mt-md-4 mb-2 mb-md-4">
-  <h1 class="display-6 mb-2 mb-md-4 text-center border-top border-bottom"><i class="fa-solid fa-pen-to-square text-primary"></i> Create Order</h1>
+  <h1 class="display-6 mb-2 mb-md-4 text-center border-top border-bottom"><i
+      class="fa-solid fa-pen-to-square text-primary"></i> Create Order</h1>
 
   <!-- Form start -->
   <form method="post" id="order-form" action="{% url 'create_order' %}">
@@ -84,9 +85,7 @@
       <div class="col-12 col-md-6">
         {{ order_form.deposit.label_tag }}
         <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">€</span>
-          </div>
+          <span class="input-group-text">€</span>
           {{ order_form.deposit }}
         </div>
       </div>
@@ -94,23 +93,23 @@
       <div class="col-12 col-md-6">
         <label for="order_value">Total order value:</label>
         <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">€</span>
-          </div>
+          <span class="input-group-text">€</span>
           {{ order_form.order_value }}
         </div>
       </div>
     </div>
+</div>
+</div>
 
-    <!-- Order submit button -->
-    <input type="submit" name="submit-btn" value="Submit Order" class="btn btn-primary btn btn-lg btn-primary mb-2 mt-2"
-      id="submit-id-submit">
+<!-- Order submit button -->
+<input type="submit" name="submit-btn" value="Submit Order" class="btn btn-primary btn btn-lg btn-primary mb-2 mt-2"
+  id="submit-id-submit">
 
-    <!-- Hidden fields for client handling -->
-    <input type="hidden" id="client-action" name="client_action" value="">
-    <input type="hidden" id="client-id-input" name="client_id" value="">
+<!-- Hidden fields for client handling -->
+<input type="hidden" id="client-action" name="client_action" value="">
+<input type="hidden" id="client-id-input" name="client_id" value="">
 
-  </form>
+</form>
 </div>
 
 <!-- Hidden template for cloning -->
