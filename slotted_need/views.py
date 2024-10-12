@@ -126,7 +126,7 @@ class ProductRevenueDataAPIView(APIView):
 
 
 class DebtorBalancesAPIView(APIView):
-    permission_classes = []
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
         # Calculate total debtor balance per client using reverse relationship
