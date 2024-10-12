@@ -66,20 +66,15 @@ class TestHomeView(TestCase):
         self.assertContains(response, b'canvas')
         self.assertContains(response, b'orderitem-home-table')
 
-    def test_non_admin_cannot_access(self):
+    def test_non_user_cannot_access(self):
         """
-        Test that a non-admin user cannot access
+        Test a request without logged-in user to ensure
+        that it gets rejected
         """
-        # Create a client with non-admin user
-        self.user_nonadmin = baker.make(User,
-                                        is_staff=False,
-                                        is_superuser=False)
-        self.user_nonadmin.set_password('testpass')
-        self.user_nonadmin.save()
-        self.client.login(username=self.user_nonadmin.username,
-                          password='testpass')
+        # Create a client with no logged in user
+        self.client_loggedout = Client()
 
-        response = self.client.get(reverse(self.url_name))
+        response = self.client_loggedout.get(reverse(self.url_name))
 
         # check for non 200 status code
         self.assertNotEqual(response.status_code, 200,
@@ -133,22 +128,16 @@ class TestProductRevenueDataAPI(TestCase):
         self.assertListEqual(expected_labels, sorted(data['labels']))
         self.assertListEqual(expected_values, sorted(data['values']))
 
-    def test_product_revenue_data_non_admin(self):
+    def test_product_revenue_data_non_user(self):
         """
-        Test a request from a non-admin user to ensure
+        Test a request without logged-in user to ensure
         that it gets rejected
         """
-        # Create a client with non-admin user
-        self.user_nonadmin = baker.make(User,
-                                        is_staff=False,
-                                        is_superuser=False)
-        self.user_nonadmin.set_password('testpass')
-        self.user_nonadmin.save()
-        self.client.login(username=self.user_nonadmin.username,
-                          password='testpass')
+        # Create a client with no logged in user
+        self.client_loggedout = Client()
 
         # make an API request
-        response = self.client.get(reverse(self.api_name))
+        response = self.client_loggedout.get(reverse(self.api_name))
         # check for non 200 status code
         self.assertNotEqual(response.status_code, 200,
                             msg='Anauthorised access allowed')
@@ -221,22 +210,16 @@ class TestDebtorBalancesAPI(TestCase):
         self.assertListEqual(expected_values, sorted(data['values']))
         self.assertEqual(sum(expected_values), data['total'])
 
-    def test_product_revenue_data_non_admin(self):
+    def test_debtor_balances_data_non_user(self):
         """
-        Test a request from a non-admin user to ensure
+        Test a request without logged-in user to ensure
         that it gets rejected
         """
-        # Create a client with non-admin user
-        self.user_nonadmin = baker.make(User,
-                                        is_staff=False,
-                                        is_superuser=False)
-        self.user_nonadmin.set_password('testpass')
-        self.user_nonadmin.save()
-        self.client.login(username=self.user_nonadmin.username,
-                          password='testpass')
+        # Create a client with no logged in user
+        self.client_loggedout = Client()
 
         # make an API request
-        response = self.client.get(reverse(self.api_name))
+        response = self.client_loggedout.get(reverse(self.api_name))
         # check for non 200 status code
         self.assertNotEqual(response.status_code, 200,
                             msg='Anauthorised access allowed')
@@ -347,22 +330,16 @@ class TestItemStatusProductAPI(TestCase):
             self.assertIsInstance(dataset['borderWidth'],
                                   numbers.Number)
 
-    def test_item_status_product_data_non_admin(self):
+    def test_item_status_product_data_non_user(self):
         """
-        Test a request from a non-admin user to ensure
+        Test a request without logged-in user to ensure
         that it gets rejected
         """
-        # Create a client with non-admin user
-        self.user_nonadmin = baker.make(User,
-                                        is_staff=False,
-                                        is_superuser=False)
-        self.user_nonadmin.set_password('testpass')
-        self.user_nonadmin.save()
-        self.client.login(username=self.user_nonadmin.username,
-                          password='testpass')
+        # Create a client with no logged in user
+        self.client_loggedout = Client()
 
         # make an API request
-        response = self.client.get(reverse(self.api_name))
+        response = self.client_loggedout.get(reverse(self.api_name))
         # check for non 200 status code
         self.assertNotEqual(response.status_code, 200,
                             msg='Anauthorised access allowed')
@@ -442,22 +419,16 @@ class TestItemStatusConfigAPI(TestCase):
         # check that there are no duplicated labels
         self.assertEqual(len(data['labels']), len(set(data['labels'])))
 
-    def test_item_status_config_non_admin(self):
+    def test_item_status_config_non_user(self):
         """
-        Test a request from a non-admin user to ensure
+        Test a request without logged-in user to ensure
         that it gets rejected
         """
-        # Create a client with non-admin user
-        self.user_nonadmin = baker.make(User,
-                                        is_staff=False,
-                                        is_superuser=False)
-        self.user_nonadmin.set_password('testpass')
-        self.user_nonadmin.save()
-        self.client.login(username=self.user_nonadmin.username,
-                          password='testpass')
+        # Create a client with no logged in user
+        self.client_loggedout = Client()
 
         # make an API request
-        response = self.client.get(reverse(self.api_name))
+        response = self.client_loggedout.get(reverse(self.api_name))
         # check for non 200 status code
         self.assertNotEqual(response.status_code, 200,
                             msg='Anauthorised access allowed')
