@@ -4,16 +4,17 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.http import JsonResponse
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 from django.views.generic import TemplateView
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from users.views import AdminUserRequiredMixin
 from django.db import transaction
 from django.db.models import Count, Q
 from rest_framework import viewsets, permissions, status, response
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
+from slotted_need.views import BaseLoginRequiredView
 from .models import Client, Order, OrderItem, ComponentFinish
 from products.models import (Product, Option, OptionValue, FinishOption,
                              ProductComponent, Component)
@@ -62,6 +63,7 @@ def check_client(request):
 
 
 # Function to handle client creation
+@login_required
 def get_update_create_client(action, client_id, cleaned_data):
     # If the user is updating the client details
     if action == 'update_client' and client_id:
@@ -91,6 +93,7 @@ def get_update_create_client(action, client_id, cleaned_data):
 
 
 # View to handle the create order form
+@login_required
 def create_order(request):
     if request.method == 'POST':
 
@@ -345,8 +348,8 @@ def copy_order_item(order_item):
 
 
 # *** ORDER LIST VIEW ***
-
 # API view to get the products on initial load of order form
+@login_required
 def get_products(request):
 
     # handle get request by returning product data
@@ -363,6 +366,8 @@ def get_products(request):
 
 
 # API view to the the product data of the selected product in form
+@login_required
+@require_GET
 def get_product_data(request, product_id):
 
     # handle get request by returning product data
@@ -449,6 +454,8 @@ def get_product_data(request, product_id):
 
 # API function to handle the finish options
 # based on the product options selected (associated with components)
+@login_required
+@require_GET
 def get_finishes(request, product_id, option_value_id):
 
     # handle get request by returning product finishes data
@@ -492,6 +499,8 @@ def get_finishes(request, product_id, option_value_id):
 
 
 # API function to deal with the search client query request
+@login_required
+@require_GET
 def search_clients(request):
 
     # handle get request by returning product finishes data
@@ -518,7 +527,7 @@ def search_clients(request):
 
 
 # define viewset that feeds the order_items API
-class OrderItemViewSet(viewsets.ModelViewSet):
+class OrderItemViewSet(viewsets.ModelViewSet, LoginRequiredMixin):
     """
     A ViewSet for viewing and editing OrderItem instances.
     """
@@ -594,8 +603,8 @@ class OrderItemViewSet(viewsets.ModelViewSet):
 
 
 class OrderItemListView(TemplateView,
-                        LoginRequiredMixin,
-                        AdminUserRequiredMixin):
+                        BaseLoginRequiredView,
+                        ):
     """
     Renders the OrderItem management page.
     Only accessible to authenticated users.
@@ -620,7 +629,8 @@ class OrderItemListView(TemplateView,
 
 
 # define viewset that feeds the order_items API
-class OrderViewSet(viewsets.ModelViewSet):
+class OrderViewSet(viewsets.ModelViewSet,
+                   LoginRequiredMixin):
     """
     A ViewSet for viewing and editing Order instances.
     """
@@ -706,8 +716,8 @@ class OrderViewSet(viewsets.ModelViewSet):
 
 
 class OrderListView(TemplateView,
-                    LoginRequiredMixin,
-                    AdminUserRequiredMixin):
+                    BaseLoginRequiredView,
+                    ):
     """
     Renders the Order management page.
     Only accessible to authenticated users.
@@ -736,8 +746,8 @@ class OrderListView(TemplateView,
 
 
 class OrderArchiveListView(TemplateView,
-                           LoginRequiredMixin,
-                           AdminUserRequiredMixin):
+                           BaseLoginRequiredView,
+                           ):
     template_name = 'orders/archive.html'
 
     def get_context_data(self, **kwargs):

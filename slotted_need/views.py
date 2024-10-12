@@ -1,13 +1,12 @@
 from datetime import datetime
 import json
 from django.views.generic import TemplateView
-from rest_framework.views import APIView
+from rest_framework.views import APIView, View
 from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.db.models import Sum, Count, Q, DecimalField
 from django.db.models.functions import Coalesce
-from users.views import AdminUserRequiredMixin
 from products.models import Product
 from django.contrib.auth.mixins import LoginRequiredMixin
 from orders.models import Client, OrderItem, Order
@@ -18,8 +17,19 @@ from .serializers import (ProdRevChartDataSerializer,
 from .utils import generate_unique_rgba_colors
 
 
+class BaseLoginRequiredView(LoginRequiredMixin, View):
+    """
+    A base view that requires users to be logged in.
+    All views inheriting from this must define the 'template_name'.
+    """
+    login_url = 'login'  # Ensure it matches the LOGIN_URL in settings.py
+    redirect_field_name = 'next'
+
+
 # Template View that renders the home template
-class HomeView(TemplateView, LoginRequiredMixin, AdminUserRequiredMixin):
+class HomeView(TemplateView,
+               BaseLoginRequiredView,
+               ):
     template_name = 'home.html'
 
     def get_context_data(self, **kwargs):
@@ -41,7 +51,7 @@ class HomeView(TemplateView, LoginRequiredMixin, AdminUserRequiredMixin):
 
 # The API view that provides the data for the revenue chart in JSON format
 class ProductRevenueDataAPIView(APIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
 
@@ -116,7 +126,7 @@ class ProductRevenueDataAPIView(APIView):
 
 
 class DebtorBalancesAPIView(APIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = []
 
     def get(self, request, format=None):
         # Calculate total debtor balance per client using reverse relationship
@@ -148,7 +158,7 @@ class DebtorBalancesAPIView(APIView):
 
 
 class ItemStatusProductAPIView(APIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
         # Fetch OrderItems filtering out completed orders
@@ -213,7 +223,7 @@ class ItemStatusProductAPIView(APIView):
 
 
 class ItemStatusConfigAPIView(APIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
         # Fetch OrderItems filtering out made, delivered and archived orders
