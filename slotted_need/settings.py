@@ -178,6 +178,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # LOGGING CONFIG
+ADMINS = [("Dimis", "dpapakyriacou14@gmail.com")]
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
