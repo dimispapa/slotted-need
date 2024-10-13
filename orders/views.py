@@ -12,6 +12,7 @@ from django.db import transaction
 from django.db.models import Count, Q
 from rest_framework import viewsets, permissions, status, response
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from slotted_need.views import BaseLoginRequiredView
@@ -525,6 +526,12 @@ def search_clients(request):
     return JsonResponse({'error': 'POST method not allowed'}, status=405)
 
 
+# define pagination class
+class Pagination(PageNumberPagination):
+    page_size_query_param = 'page_size'  # Maps to 'page_size' from DataTables
+    max_page_size = 100  # Limit maximum page size
+
+
 # define viewset that feeds the order_items API
 class OrderItemViewSet(viewsets.ModelViewSet, LoginRequiredMixin):
     """
@@ -542,6 +549,7 @@ class OrderItemViewSet(viewsets.ModelViewSet, LoginRequiredMixin):
     ).all().order_by('-id')
 
     serializer_class = OrderItemSerializer
+    pagination_class = Pagination
     permission_classes = [permissions.IsAuthenticated]
     filterset_class = OrderItemFilter
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,
@@ -635,8 +643,8 @@ class OrderViewSet(viewsets.ModelViewSet,
     """
     # fetch queryset with optimised query for related objects
     queryset = Order.objects.prefetch_related('items').all().order_by('-id')
-
     serializer_class = OrderSerializer
+    pagination_class = Pagination
     permission_classes = [permissions.IsAuthenticated]
     filterset_class = OrderFilter
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,

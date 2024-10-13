@@ -58,7 +58,7 @@ $(document).ready(function () {
 
                 // Assign page and page size
                 d.page = page;
-                d.length = length;
+                d.page_size = length;
 
                 // Filtering parameters based on filters.py
                 d.id = $('#filter-id').val();
