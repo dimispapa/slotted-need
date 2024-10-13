@@ -12,76 +12,80 @@
 {% endblock %}
 
 {% block content %}
-<div id="order-tracker-container" class="container-fluid mt-2 mt-md-4">
-  <h1 class="display-6 mb-2 mb-md-4 text-center border-top border-bottom"><i class="fa-regular fa-folder-open text-primary"></i> Order Archive</h1>
-  <div class="table-responsive order mb-3 table-container">
-    <!-- Orders table -->
-    <table id="orders-table" class="table shadow table-hover">
-      <!-- table headers -->
-      <thead>
-        <tr>
-          <th></th>
-          <th>Order ID</th>
-          <th>Client</th>
-          <th>Discount</th>
-          <th>Deposit</th>
-          <th>Order Value</th>
-          <th>Order Status</th>
-          <th>Payment Status</th>
-          <th></th>
-        </tr>
-        <tr class="filter-row">
-          <th>
-            <!-- Empty header for dropdown toggle column -->
-          </th>
-          <!-- ID filter -->
-          <th><input type="number" class="form-control" id="filter-id" placeholder="Filter" /></th>
-          <!-- Client filter -->
-          <th><input type="text" class="form-control" id="filter-client" placeholder="Filter" /></th>
-          <!-- Discount filter -->
-          <th>
-            <input type="number" class="form-control" id="filter-discount-min" placeholder="Min" />
-            <input type="number" class="form-control" id="filter-discount-max" placeholder="Max" />
-          </th>
-          <!-- Deposit filter -->
-          <th>
-            <input type="number" class="form-control" id="filter-deposit-min" placeholder="Min" />
-            <input type="number" class="form-control" id="filter-deposit-max" placeholder="Max" />
-          </th>
-          <!-- Value filter -->
-          <th>
-            <input type="number" class="form-control" id="filter-value-min" placeholder="Min" />
-            <input type="number" class="form-control" id="filter-value-max" placeholder="Max" />
-          </th>
-          <!-- Order Status filter -->
-          <th>
-            <!-- Tooltip -->
-            <div class="text-center align-baseline mb-2" data-toggle="tooltip" data-html="true"
-              title="The order status is set automatically as it reflects the underlying status of its items"
-              aria-label="Info on filter tooltip">
-              <i class="fa-solid fa-circle-info text-primary fs-4 fw-bolder"></i>
-            </div>
-            {% include 'orders/partials/dropdown.html' with options=order_status_choices selected="" class="filter-order-status form-select" id="filter-order-status" %}
-          </th>
-          <!-- Paid Status filter -->
-          <th>
-            {% include 'orders/partials/dropdown.html' with options=paid_status_choices selected="" class="filter-paid-status form-select" id="filter-paid-status" %}
-          </th>
-          <th>
-            <!-- Action spinner -->
-            <div class="text-center">
-              <div class="spinner-border text-primary m-2 d-none" role="status" id="action-spinner">
-                <span class="visually-hidden">Loading...</span>
-              </div>
-            </div>
-          </th>
-        </tr>
-      </thead>
-      <tbody class="table-secondary">
-        <!-- DataTables will populate the body -->
-      </tbody>
-    </table>
+<div id="order-tracker-container" class="container-fluid mt-2 mt-md-4 table-container">
+  <!-- Heading -->
+  <h1 class="display-6 mb-2 mb-md-4 text-center border-top border-bottom"><i
+      class="fa-regular fa-folder-open text-primary"></i> Order Archive</h1>
+  <!-- Clear filters button -->
+  <div class="text-center">
+    <button id="clear-filters-btn" class="btn btn-danger">Clear Filters</button>
   </div>
+  <!-- Order archive table -->
+  <table id="order-archive-table" class="display table table-bordered table-responsive table-striped">
+    <!-- table headers -->
+    <thead>
+      <tr>
+        <th></th>
+        <th>Order ID</th>
+        <th>Client</th>
+        <th>Discount</th>
+        <th>Deposit</th>
+        <th>Order Value</th>
+        <th>Order Status</th>
+        <th>Payment Status</th>
+        <th></th>
+      </tr>
+      <tr id="filter-row">
+        <th>
+          <!-- Empty header for dropdown toggle column -->
+        </th>
+        <!-- ID filter -->
+        <th><input type="number" class="form-control" id="filter-id" placeholder="Filter" /></th>
+        <!-- Client filter -->
+        <th><input type="text" class="form-control" id="filter-client" placeholder="Filter" /></th>
+        <!-- Discount filter -->
+        <th>
+          <input type="number" class="form-control" id="filter-discount-min" placeholder="Min" />
+          <input type="number" class="form-control" id="filter-discount-max" placeholder="Max" />
+        </th>
+        <!-- Deposit filter -->
+        <th>
+          <input type="number" class="form-control" id="filter-deposit-min" placeholder="Min" />
+          <input type="number" class="form-control" id="filter-deposit-max" placeholder="Max" />
+        </th>
+        <!-- Value filter -->
+        <th>
+          <input type="number" class="form-control" id="filter-value-min" placeholder="Min" />
+          <input type="number" class="form-control" id="filter-value-max" placeholder="Max" />
+        </th>
+        <!-- Order Status filter -->
+        <th>
+          <!-- Tooltip -->
+          <div class="text-center align-baseline mb-2" data-toggle="tooltip" data-html="true"
+            title="The order status is set automatically as it reflects the underlying status of its items"
+            aria-label="Info on filter tooltip">
+            <i class="fa-solid fa-circle-info text-primary fs-4 fw-bolder"></i>
+          </div>
+          {% include 'orders/partials/dropdown.html' with options=order_status_choices selected="" class="filter-order-status form-select" id="filter-order-status" %}
+        </th>
+        <!-- Paid Status filter -->
+        <th>
+          {% include 'orders/partials/dropdown.html' with options=paid_status_choices selected="" class="filter-paid-status form-select" id="filter-paid-status" %}
+        </th>
+        <th>
+          <!-- Action spinner -->
+          <div class="text-center">
+            <div class="spinner-border text-primary m-2 d-none" role="status" id="action-spinner">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        </th>
+      </tr>
+    </thead>
+    <tbody class="table-secondary">
+      <!-- DataTables will populate the body -->
+    </tbody>
+  </table>
 </div>
 
 <!-- Delete confirmation modal -->

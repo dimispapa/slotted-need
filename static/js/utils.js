@@ -393,7 +393,6 @@ function formatWithThousandsSeparator(num) {
 
 // Function that clear filters on the DataTable
 function clearDataTableFilters(table) {
-    debugger;
     // get input elements and clear the values
     let inputs = $('#filter-row th input.form-control');
     for (let input of inputs) {
@@ -404,7 +403,6 @@ function clearDataTableFilters(table) {
     for (let select of selects) {
         select.value = 'All';
     };
-    debugger;
     // Reload the table
     table.ajax.reload();
 };

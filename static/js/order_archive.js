@@ -6,6 +6,7 @@ import {
     initTooltips,
     toggleChildRow,
     toggleSpinner,
+    clearDataTableFilters
 
 } from './utils.js'
 
@@ -27,7 +28,7 @@ $(document).ready(function () {
     // ************** SECTION A: FUNCTION DEFINITIONS ********************************************************************
 
     // Initialize DataTable with AJAX source and server-side processing
-    let table = $('#orders-table').DataTable({
+    let table = $('#order-archive-table').DataTable({
         serverSide: true, // Enable server-side processing
         processing: true, // Enables processing animation
         orderCellsTop: true, // Place sorting icons to top row
@@ -191,7 +192,7 @@ $(document).ready(function () {
 
     // Prevent triggering sorting when a user clicks in any of the inputs.
     // Sorting should apply when the user clicks any of the column headers
-    $('#orderitem-table').on('click mousedown touchstart', 'input, select, button', function (e) {
+    $('#order-archive-table').on('click mousedown touchstart', 'input, select, button', function (e) {
         e.stopPropagation();
     });
 
@@ -325,11 +326,17 @@ $(document).ready(function () {
     });
 
     // add event listener to show/hide the row child with item details
-    $('#orders-table tbody').on('click', 'td.details-control', function () {
+    $('#order-archive-table tbody').on('click', 'td.details-control', function () {
         let tr = $(this).closest('tr');
         let row = table.row(tr);
 
         toggleChildRow(tr, row, true);
+    });
+
+    // Add event listener for clicks on clear filter btn
+    $('#clear-filters-btn').on('click', function () {
+        // clear filters on front-end and reload table
+        clearDataTableFilters(table);
     });
 
 });
