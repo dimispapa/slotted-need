@@ -146,13 +146,16 @@ LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'login'
 
 # Email configuration
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'apikey'
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_KEY")
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_EMAIL")
+if not DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.sendgrid.net'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = 'apikey'
+    EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_KEY")
+    DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_EMAIL")
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -178,7 +181,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # LOGGING CONFIG
-ADMINS = [("Dimis", "dpapakyriacou14@gmail.com")]
+ADMINS = [
+    ("Dimis", "dpapakyriacou14@gmail.com"),
+]
 
 LOGGING = {
     "version": 1,
@@ -204,26 +209,27 @@ LOGGING = {
     },
     "handlers": {
         "console": {
-            "level": os.environ.get("DJANGO_LOG_LEVEL_DEFAULT", "INFO"),
+            "level": "DEBUG",
             "filters": ["require_debug_true"],
             "class": "logging.StreamHandler",
             "formatter": "simple"
         },
+        "file_log": {
+            "level": "WARNING",
+            "filters": ["require_debug_true"],
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, 'logs', 'app.log'),
+            "formatter": "verbose"
+        },
         "mail_admins": {
-            "level": os.environ.get("DJANGO_LOG_LEVEL_MAIL", "WARNING"),
+            "level": "ERROR",
             "class": "django.utils.log.AdminEmailHandler",
             "formatter": "notification"
-        },
-        "file_log": {
-            "level": os.environ.get("DJANGO_LOG_LEVEL_FILE", "WARNING"),
-            "class": "logging.FileHandler",
-            "filename": "error_warning.log",
-            "formatter": "verbose"
         }
     },
     "loggers": {
         "django": {
-            "handlers": ["console",  "mail_admins", "file_log"],
+            "handlers": ["console", "file_log", "mail_admins"],
             "propagate": True
         },
     },
