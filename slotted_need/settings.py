@@ -113,7 +113,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'slotted_need.wsgi.application'
 
-
 # Database
 DATABASES = {
     'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
@@ -177,3 +176,53 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# LOGGING CONFIG
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
+        },
+        "notification": {
+            "format": "{levelname} {asctime}",
+            "style": "{"
+        }
+    },
+    "filters": {
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": os.environ.get("DJANGO_LOG_LEVEL_DEFAULT", "INFO"),
+            "filters": ["require_debug_true"],
+            "class": "logging.StreamHandler",
+            "formatter": "simple"
+        },
+        "mail_admins": {
+            "level": os.environ.get("DJANGO_LOG_LEVEL_MAIL", "WARNING"),
+            "class": "django.utils.log.AdminEmailHandler",
+            "formatter": "notification"
+        },
+        "file_log": {
+            "level": os.environ.get("DJANGO_LOG_LEVEL_FILE", "WARNING"),
+            "class": "logging.FileHandler",
+            "filename": "error_warning.log",
+            "formatter": "verbose"
+        }
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console",  "mail_admins", "file_log"],
+            "propagate": True
+        },
+    },
+}
