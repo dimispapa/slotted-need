@@ -402,3 +402,19 @@ django.template.exceptions.TemplateDoesNotExist: orders/partials/dropdow.html
 ERROR 2024-10-13 13:24:01,669 basehttp 76575 140067719890496 "GET /orders/order-tracker/ HTTP/1.1" 500 187013
 WARNING 2024-10-13 13:24:02,038 log 76575 140067719890496 Not Found: /favicon.ico
 WARNING 2024-10-13 13:24:02,038 basehttp 76575 140067719890496 "GET /favicon.ico HTTP/1.1" 404 4087
+ERROR 2024-10-13 15:02:04,300 log 21459 140540344538688 Internal Server Error: /sentry-debug/
+Traceback (most recent call last):
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/sentry_sdk/integrations/django/views.py", line 90, in sentry_wrapped_callback
+    return callback(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/slotted-need/slotted_need/urls.py", line 26, in trigger_error
+    division_by_zero = 1 / 0
+                       ~~^~~
+ZeroDivisionError: division by zero
+WARNING 2024-10-13 15:02:05,166 log 21459 140540344538688 Not Found: /favicon.ico

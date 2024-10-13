@@ -18,7 +18,7 @@ class SimpleAdminEmailHandler(AdminEmailHandler):
 
         # Create the email subject and message
         subject = f"SLOTTED NEED - {record.levelname} at {asctime}"
-        message = (f"Error level:{record.levelname} detected at {asctime} "
+        message = (f"{record.levelname}: Error detected at {asctime} "
                    "affecting the Slotted Need application\n\n"
                    "Check the Sentry log for full details on this error.")
 

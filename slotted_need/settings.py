@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 import sys
 import dj_database_url
+import sentry_sdk
 if os.path.isfile('env.py'):
     import env
 
@@ -178,7 +179,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# LOGGING CONFIG
+# LOGGING CONFIGURATIONS
 ADMINS = [
     ("Dimis", "dpapakyriacou14@gmail.com"),
 ]
@@ -238,3 +239,15 @@ LOGGING = {
         },
     },
 }
+
+# SENTRY config for production
+sentry_sdk.init(
+    dsn="https://1b05ed7470064c70d9b4fdcced9de681@o4508116014989312.ingest.de.sentry.io/4508116019707984",
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for tracing.
+    traces_sample_rate=1.0,
+    # Set profiles_sample_rate to 1.0 to profile 100%
+    # of sampled transactions.
+    # We recommend adjusting this value in production.
+    profiles_sample_rate=1.0,
+)

@@ -21,6 +21,7 @@ from .views import (HomeView, ProductRevenueDataAPIView, DebtorBalancesAPIView,
                     ItemStatusProductAPIView, ItemStatusConfigAPIView)
 from users.views import CustomLoginView
 
+
 urlpatterns = [
     # render the home.html template dashboard
     path('', HomeView.as_view(), name='home'),
