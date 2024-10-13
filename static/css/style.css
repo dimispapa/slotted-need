@@ -6,25 +6,6 @@
   color: #0d6efd;
 }
 
-/********* General commonly used elements *************/
-/* reduce font-size for smaller viewports */
-@media (max-width: 768px) {
-
-  /* order item tracker */
-  #orderitem-tracker-container,
-  #orderitem-tracker-container input,
-  #orderitem-tracker-container select,
-  /* order tracker */
-  #order-list-form {
-    font-size: 12px;
-  }
-}
-
-.inline-spinner-div {
-  position: absolute;
-  margin-left: 5px;
-}
-
 /*************** CREATE ORDERS PAGE **************************/
 
 /******* CLIENT SEARCH FEATURE */
@@ -138,18 +119,11 @@ of the suggestions div depending on viewport size */
   font-size: inherit;
 }
 
-/* sticky header */
-.sticky-head {
-  position: sticky;
-  top: 0;
-}
-
 /* set max height for scrolling table */
 .table-container {
   overflow: auto;
   max-height: 80vh;
 }
-
 
 /* ORDER ITEM TRACKER */
 /* Custom header styles */
@@ -164,20 +138,26 @@ th.not-sortable {
 }
 
 /* Order item table */
+.dataTables_scrollHeadInner,
+.dataTables_scrollBody table,
 #orderitem-table_wrapper,
-#orders-table_wrapper {
+#orders-table_wrapper,
+#order-archive-table_wrapper,
+#orderitem-home-table_wrapper {
+  width: 100% !important;
+}
+
+#orderitem-table_wrapper,
+#orders-table_wrapper,
+#order-archive-table_wrapper {
   /* set font-size */
   font-size: 14px;
-  /* ensure width takes 100% of container */
-  width: 100% !important
 }
 
 /* completed filter */
 #filter-completed-label {
   font-size: 0.8rem;
 }
-
-
 
 /* Home dashboard */
 .input-group-text {
@@ -188,8 +168,6 @@ th.not-sortable {
 #orderitem-home-table_wrapper {
   /* set font-size */
   font-size: 10px;
-  /* ensure width takes 100% of container */
-  width: 100% !important
 }
 
 #orderitem-home-table-title {
@@ -204,4 +182,23 @@ th.not-sortable {
   .metric-banner {
     max-width: 60%;
   }
+}
+
+/********* General data table styles *************/
+/* reduce font-size for smaller viewports */
+@media (max-width: 768px) {
+
+  /* all tables */
+  .table-container,
+  .table-container input,
+  .table-container select,
+  /* order tracker */
+  #order-list-form {
+    font-size: 12px;
+  }
+}
+
+.inline-spinner-div {
+  position: absolute;
+  margin-left: 5px;
 }
