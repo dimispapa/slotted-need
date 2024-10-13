@@ -227,7 +227,7 @@ LOGGING = {
         "mail_admins": {
             "level": "ERROR",
             # customised AdminEmailHandler
-            "class": ".logging_handlers.SimpleAdminEmailHandler",
+            "class": "slotted_need.logging_handlers.SimpleAdminEmailHandler",
             "formatter": "notification"
         }
     },
