@@ -153,6 +153,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'apikey'
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_KEY")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_EMAIL")
+SERVER_EMAIL = os.environ.get("DEFAULT_EMAIL")
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -181,6 +182,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ADMINS = [
     ("Dimis", "dpapakyriacou14@gmail.com"),
 ]
+
+# Ensure the 'logs' directory exists (only needed for development)
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
+if not os.path.exists(LOG_DIR):
+    os.makedirs(LOG_DIR)
 
 LOGGING = {
     "version": 1,
@@ -215,7 +221,7 @@ LOGGING = {
             "level": "WARNING",
             "filters": ["require_debug_true"],
             "class": "logging.FileHandler",
-            "filename": os.path.join(BASE_DIR, 'logs', 'app.log'),
+            "filename": os.path.join(LOG_DIR, 'app.log'),
             "formatter": "verbose"
         },
         "mail_admins": {
@@ -225,7 +231,7 @@ LOGGING = {
         }
     },
     "loggers": {
-        "django": {
+        "": {
             "handlers": ["console", "file_log", "mail_admins"],
             "propagate": True
         },
