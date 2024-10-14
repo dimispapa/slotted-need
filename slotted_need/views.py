@@ -22,7 +22,7 @@ class BaseLoginRequiredView(LoginRequiredMixin, View):
     A base view that requires users to be logged in.
     All views inheriting from this must define the 'template_name'.
     """
-    login_url = 'login'  # Ensure it matches the LOGIN_URL in settings.py
+    login_url = 'account_login'  # Ensure it matches the LOGIN_URL in settings.py
     redirect_field_name = 'next'
 
 
