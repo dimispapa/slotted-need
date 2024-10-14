@@ -41,8 +41,8 @@ class CustomUserCreationForm(forms.ModelForm):
             raise ValidationError('Email addresses must match.')
 
         # Check if email is already in use
-        # if User.objects.filter(email=email).exists():
-        #     raise ValidationError('A user with that email already exists.')
+        if User.objects.filter(email=email).exists():
+            raise ValidationError('A user with that email already exists.')
 
         return cleaned_data
 
@@ -52,7 +52,6 @@ class CustomUserCreationForm(forms.ModelForm):
         user.username = self.cleaned_data['email']
         # User cannot log in until they set a password
         user.set_unusable_password()
-        user.is_active = True  # Ensure the user is active
         user.is_staff = self.cleaned_data['is_staff']
         if commit:
             user.save()
@@ -73,28 +72,8 @@ class CustomUserChangeForm(UserChangeForm):
 
 class CustomPasswordSetupForm(PasswordResetForm):
     def get_users(self, email):
-        email = email.strip().lower()
         UserModel = get_user_model()
-        active_users = UserModel._default_manager.filter(
-            email__iexact=email, is_active=True
+        inactive_users = UserModel._default_manager.filter(
+            email__iexact=email, is_active=False
         )
-        return (u for u in active_users)
-
-
-class CustomPasswordResetForm(PasswordResetForm):
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if not User.objects.filter(email__iexact=email,
-                                   is_active=True).exists():
-            raise ValidationError(
-                "No active account found with the given email address.")
-        return email
-
-    def get_users(self, email):
-        """
-        This method returns users matching the given email address.
-        Overriding to ensure only active users are considered.
-        """
-        email = email.strip().lower()
-        return User._default_manager.filter(email__iexact=email,
-                                            is_active=True)
+        return (u for u in inactive_users)
