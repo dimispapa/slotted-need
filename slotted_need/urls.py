@@ -42,6 +42,9 @@ urlpatterns = [
     path('users/', include('users.urls')),
     # DRF Authentication
     path('api-auth/', include('rest_framework.urls')),
-    path('accounts/login/', CustomLoginView.as_view(), name='login'),
-    path('accounts/', include('django.contrib.auth.urls')),
+    # path('accounts/login/', CustomLoginView.as_view(), name='login'),
+    # path('accounts/', include('django.contrib.auth.urls')),
+    # all-auth
+    path('accounts/', include('allauth.urls')),
+    path('accounts/', include('allauth.socialaccount.urls')),
 ]
