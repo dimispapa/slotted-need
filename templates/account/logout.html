@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load socialaccount %}
+
+{% block content %}
+<div class="container mt-2 mt-md-4 mb-2 mb-md-4">
+    <h1 class="display-6 mb-2 mb-md-4"><i class="fa-solid fa-right-to-bracket text-primary"></i> Logout</h1>
+    <p>Are you sure you want to sign out?</p>
+    <form method="post" action="{% url 'account_logout' %}">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <!-- <input type="hidden" name="login_form" value="login_form"> -->
+        <button type="submit" class="btn btn-primary">Sign out</button>
+    </form>
+
+</div>
+{% endblock %}

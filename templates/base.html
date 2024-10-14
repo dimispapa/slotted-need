@@ -1,12 +1,12 @@
 {% load static %}
+
 {% url 'home' as home_url %}
 {% url 'create_order' as add_order_url %}
 {% url 'order_tracker' as order_tracker_url %}
 {% url 'order_item_tracker' as order_item_tracker_url %}
 {% url 'order_archive' as order_archive_url %}
-{% url 'login' as login %}
+{% url 'account_login' as login %}
 {% url 'user_list' as user_list %}
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -37,8 +37,8 @@
 <header>
   <nav class="navbar navbar-expand-lg bg-primary fixed-top" data-bs-theme="dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="{% url 'home' %}"><img src="{% static 'favicon/apple-touch-icon-tns.png' %}" width="30"
-          height="24" alt="TNS logo" class="align-text-top"> Slotted Need</a>
+      <a class="navbar-brand" href="{% url 'home' %}"><img src="{% static 'favicon/apple-touch-icon-tns.png' %}"
+          width="30" height="24" alt="TNS logo" class="align-text-top"> Slotted Need</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
         aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation"><span
           class="navbar-toggler-icon"></span></button>
@@ -87,25 +87,22 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'admin:index' %}"><i class="fa-solid fa-gears"></i> Configuration</a>
           </li>
+          {% endif %}
           <!-- Admin Access Management Link -->
           <li class="nav-item {% if request.path == user_list %}active" aria-current="page{% endif %}">
             <a class="nav-link" href="{% url 'user_list' %}"><i class="fa-solid fa-users"></i> User Management</a>
           </li>
-          {% endif %}
           <!-- Logout form (needs a post request) -->
           <li class="nav-item">
-            <form method="post" action="{% url 'logout' %}">
-              {% csrf_token %}
-              <button type="submit" class="nav-link btn btn-link">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
-              </button>
+            <a class="nav-link btn btn-link" href="{% url 'account_logout' %}">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
             </form>
           </li>
           {% else %}
           <!-- Login -->
           <li class="nav-item">
             <a class="nav-link {% if request.path == login %}active" aria-current="page{% endif %}"
-              href="{% url 'login' %}"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+              href="{% url 'account_login' %}"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
           </li>
           {% endif %}
         </ul>

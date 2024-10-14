@@ -11,6 +11,7 @@
                 <th>Email</th>
                 <th>Active</th>
                 <th>Admin</th>
+                <th>Date Joined</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -21,10 +22,19 @@
                 <td>{{ user.email }}</td>
                 <td>{{ user.is_active }}</td>
                 <td>{{ user.is_staff }}</td>
+                <td>{{ user.date_joined }}</td>
                 <td>
-                    <a href="{% url 'user_edit' user.pk %}" class="btn btn-warning">Edit</a>
-                    {% if not user.is_superuser and user != request.user %}
-                    <a href="{% url 'user_delete' user.pk %}" class="btn btn-danger">Delete</a>
+                    {% if request.user.is_staff and not user.is_active %}
+                    <form action="{% url 'resend_invite' user.id %}" method="post" class="mb-1">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-secondary">Resend Invite</button>
+                    </form>
+                    {% endif %}
+                    <!-- allow editing/deleting if the active user is admin (and the user to be deleted is not) -->
+                    <!-- or allow if own active user -->
+                    {% if request.user.is_staff and not user.is_staff or user == request.user %}
+                    <a href="{% url 'user_edit' user.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'user_delete' user.pk %}" class="btn btn-sm btn-danger">Delete</a>
                     {% endif %}
                 </td>
             </tr>
