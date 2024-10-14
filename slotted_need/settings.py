@@ -74,6 +74,10 @@ ACCOUNT_AUTHENTICATION_METHOD = 'username_email' # Allow authentication via user
 ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = False
 ACCOUNT_LOGIN_ON_PASSWORD_RESET = True  # Automatically logs the user in upon successful email confirmation.
 
+# Disable public signups (handled via custom adapter)
+ACCOUNT_ADAPTER = 'Users.adapters.CustomAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'Users.adapters.CustomSocialAccountAdapter'
+
 # Login/Logout redirect
 # LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
