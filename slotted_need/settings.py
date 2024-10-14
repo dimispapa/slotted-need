@@ -49,15 +49,50 @@ INSTALLED_APPS = [
     'nested_admin',
     'rest_framework',
     'django_filters',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.apple',
     # project apps
     'products',
     'orders',
+    'users'
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
+    'django.contrib.auth.backends.ModelBackend',  # Default
+    'allauth.account.auth_backends.AuthenticationBackend',  # Allauth
 ]
 
+# django-allauth settings
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # Options: 'mandatory', 'optional', 'none'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email' # Allow authentication via username or email
+ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = False
+ACCOUNT_LOGIN_ON_PASSWORD_RESET = True  # Automatically logs the user in upon successful email confirmation.
+
+# Login/Logout redirect
+# LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'login'
+
+# Configure social account authentication 3rd party providers
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': os.environ.get('GOOGLE_OAUTH_CLIENT_ID'),
+            'secret': os.environ.get('GOOGLE_OAUTH_SECRET'),
+            'key': ''
+        },
+        'SCOPE': ['email'],
+        'EMAIL_AUTHENTICATION': True,
+        'EMAIL_AUTHENTICATION_AUTO_CONNECT': True
+    },
+    # 'apple': { ... }  # To be configured below
+}
 
 # Crispy bootstrap5 templates
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -92,6 +127,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = 'slotted_need.urls'
@@ -140,11 +176,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
-# Login/Logout redirect
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'home'
-LOGOUT_REDIRECT_URL = 'login'
 
 # Email configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
