@@ -98,6 +98,11 @@ $(document).ready(function () {
                 className: 'sortable'
             },
             {
+                data: 'order.created_on',
+                name: 'order__created_on',
+                className: 'not-sortable'
+            },
+            {
                 data: 'order.client.client_name',
                 name: 'order__client__client_name',
                 className: 'sortable'

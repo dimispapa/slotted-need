@@ -2,6 +2,7 @@ from rest_framework.serializers import (ModelSerializer,
                                         PrimaryKeyRelatedField,
                                         StringRelatedField,
                                         SerializerMethodField,
+                                        DateTimeField
                                         )
 from .models import OrderItem, Order, Product, Client, ComponentFinish
 from products.models import OptionValue, FinishOption
@@ -43,10 +44,11 @@ class ComponentFinishSerializer(ModelSerializer):
 
 class SummaryOrderSerializer(ModelSerializer):
     client = ClientSerializer(read_only=True)
+    created_on = DateTimeField(read_only=True, format="%d-%b-%Y")
 
     class Meta:
         model = Order
-        fields = ['id', 'client', 'order_status', 'paid']
+        fields = ['id', 'client', 'order_status', 'paid', 'created_on']
 
 
 class ProductSerializer(ModelSerializer):
@@ -98,7 +100,8 @@ class OrderItemSerializer(ModelSerializer):
         read_only_fields = ['id', 'order', 'product', 'order_id', 'product_id',
                             'option_values', 'product_finish',
                             'option_value_id', 'item_value',
-                            'item_component_finishes', 'completed']
+                            'item_component_finishes', 'completed',
+                            'order__created_on']
 
     # customise update to ensure the related order status is also updated
     def update(self, instance, validated_data):

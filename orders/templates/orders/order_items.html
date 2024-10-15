@@ -25,6 +25,7 @@
             <tr>
                 <th>Item ID</th>
                 <th>Order ID</th>
+                <th>Order Date</th>
                 <th>Client Name</th>
                 <th>Product</th>
                 <th>Design Options</th>
@@ -40,6 +41,19 @@
             <tr id="filter-row">
                 <th><input type="number" class="form-control" id="filter-id" placeholder="Filter" /></th>
                 <th><input type="number" class="form-control" id="filter-order" placeholder="Filter" /></th>
+                <th>
+                    <!-- Product Date created filter -->
+                    <div class="input-group">
+                        <span class="input-group-text">Date from</span>
+                        <input type="date" name="filter_prod_date_from" id="filter-date-from"
+                            class="form-control form-control-sm">
+                    </div>
+                    <div class="input-group mt-1 mt-md-2">
+                        <span class="input-group-text">Date to</span>
+                        <input type="date" name="filter_prod_date_to" id="filter-date-to"
+                            class="form-control form-control-sm">
+                    </div>
+                </th>
                 <th><input type="text" class="form-control" id="filter-client" placeholder="Filter" /></th>
                 <th><input type="text" class="form-control" id="filter-product" placeholder="Filter" /></th>
                 <th>
@@ -60,8 +74,8 @@
                     <input type="text" class="form-control" id="filter-component-finishes" placeholder="Filter" />
                 </th>
                 <th>
-                    <input type="number" class="form-control" id="filter-value-min" placeholder="Min" />
-                    <input type="number" class="form-control" id="filter-value-max" placeholder="Max" />
+                    <input type="number" class="form-control form-control-sm" id="filter-value-min" placeholder="Min" />
+                    <input type="number" class="form-control form-control-sm mt-1 mt-md-2" id="filter-value-max" placeholder="Max" />
                 </th>
                 <th>
                     {% include 'orders/partials/dropdown.html' with options=item_status_choices selected="" class="filter-item-status form-select" id="filter-item-status" %}

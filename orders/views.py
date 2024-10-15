@@ -558,6 +558,7 @@ class OrderItemViewSet(viewsets.ModelViewSet, LoginRequiredMixin):
         'id',
         'order__id',
         'order__client__client_name',
+        'order__created_on',
         'product__name',
         'product_finish__name',
         'item_value',
