@@ -29,9 +29,10 @@
                         <button type="submit" class="btn btn-sm btn-secondary">Resend Invite</button>
                     </form>
                     {% endif %}
-                    <!-- allow editing/deleting if the active user is admin (and the user to be deleted is not) -->
+                    <!-- allow editing/deleting if the active user is superuser (can delete admin level and below) -->
+                    <!-- allow editing/deleting if the active user is admin (and target user is non-admin non-superuser) -->
                     <!-- or allow if own active user -->
-                    {% if request.user.is_staff and not user.is_staff or user == request.user %}
+                    {% if request.user.is_superuser and not user.is_superuser or request.user.is_staff and not user.is_staff or user == request.user %}
                     <a href="{% url 'user_edit' user.pk %}" class="btn btn-sm btn-warning">Edit</a>
                     <a href="{% url 'user_delete' user.pk %}" class="btn btn-sm btn-danger">Delete</a>
                     {% endif %}
