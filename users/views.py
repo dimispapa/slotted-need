@@ -36,7 +36,7 @@ class UserListView(LoginRequiredMixin, ListView):
 
 
 class UserCreateView(LoginRequiredMixin, AdminUserRequiredMixin, CreateView):
-    # model = User
+    model = User
     form_class = CustomUserCreationForm
     template_name = 'users/user_form.html'
     success_url = reverse_lazy('user_list')
@@ -129,22 +129,44 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('user_list')
     extra_context = {'title': 'Edit User'}
 
-    def dispatch(self, request, *args, **kwargs):
-        user = self.get_object()
-        # check if to allow edit
-        if (request.user.is_superuser or
-            (request.user.is_staff and not user.is_staff) or
-                request.user == user):
-            return super().dispatch(request, *args, **kwargs)
-        # otherwise notify that it is not allowed
-        else:
-            messages.error(request, 'You cannot edit this user.')
-            return redirect('user_list')
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        # Pass the current user to the form
+        kwargs['current_user'] = self.request.user
+        return kwargs
+
+    def test_func(self):
+        """
+        Determine if the current user has permission to update the target user.
+        Superusers can update admins and normal users, except other superusers.
+        Admins can update normal users but not other admins or superusers.
+        Non-admins can only update themselves.
+        """
+        user = self.request.user
+        target_user = self.get_object()
+        # return true or false depending if any of these conditions is met
+        return ((user.is_staff and not target_user.is_staff) or
+                user == target_user or
+                user.is_superuser and not target_user.is_superuser)
 
     def form_valid(self, form):
-        response = super().form_valid(form)
-        messages.success(self.request, 'User updated successfully.')
-        return response
+        """
+        Ensure that non-admin users cannot modify the 'is_staff' field.
+        Even if they manipulate the form data to include 'is_staff',
+        this method will prevent it from being saved.
+        """
+        if not self.request.user.is_staff:
+            # Preserve the original 'is_staff' status
+            form.instance.is_staff = self.get_object().is_staff
+        return super().form_valid(form)
+
+    def handle_no_permission(self):
+        """
+        Handle cases where the user doesn't have permission to access the view.
+        """
+        messages.error(self.request,
+                       'You do not have permission to edit this user.')
+        return redirect('user_list')
 
 
 class UserDeleteView(LoginRequiredMixin, DeleteView):
@@ -152,17 +174,27 @@ class UserDeleteView(LoginRequiredMixin, DeleteView):
     template_name = 'users/user_confirm_delete.html'
     success_url = reverse_lazy('user_list')
 
-    def dispatch(self, request, *args, **kwargs):
-        user = self.get_object()
-        # check if to allow for deletion
-        if (request.user.is_superuser or
-            (request.user.is_staff and not user.is_staff) or
-                request.user == user):
-            return super().dispatch(request, *args, **kwargs)
-        # otherwise notify that it is not allowed
-        else:
-            messages.error(request, 'You cannot delete this user.')
-            return redirect('user_list')
+    def test_func(self):
+        """
+        Determine if the current user has permission to delete the target user.
+        Superusers can delete admins and normal users, except other superusers.
+        Admins can delete normal users but not other admins or superusers.
+        Non-admins can only delete themselves.
+        """
+        user = self.request.user
+        target_user = self.get_object()
+        # return true or false depending if any of these conditions is met
+        return ((user.is_staff and not target_user.is_staff) or
+                user == target_user or
+                user.is_superuser and not target_user.is_superuser)
+
+    def handle_no_permission(self):
+        """
+        Handle cases where the user doesn't have permission to access the view.
+        """
+        messages.error(self.request,
+                       'You do not have permission to delete this user.')
+        return redirect('user_list')
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, 'User deleted successfully.')

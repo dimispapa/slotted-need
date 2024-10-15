@@ -59,6 +59,15 @@ class CustomUserChangeForm(UserChangeForm):
         model = User
         fields = ('username', 'email', 'is_active', 'is_staff')
 
+    def __init__(self, *args, **kwargs):
+        # Expect the current user to be passed in the form's kwargs
+        current_user = kwargs.pop('current_user', None)
+        super(CustomUserChangeForm, self).__init__(*args, **kwargs)
+
+        if current_user and not current_user.is_staff:
+            # Remove the 'is_staff' field for non-admin users
+            self.fields.pop('is_staff', None)
+
 
 class PasswordSetupForm(PasswordResetForm):
     def get_users(self, email):
