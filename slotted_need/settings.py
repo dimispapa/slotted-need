@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     # third party apps
     'crispy_forms',
     'crispy_bootstrap5',
@@ -60,28 +61,34 @@ INSTALLED_APPS = [
     'users'
 ]
 
+if DEBUG:
+    SITE_ID = 1
+else:
+    SITE_ID = 2
+
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # Default
     'allauth.account.auth_backends.AuthenticationBackend',  # Allauth
 ]
 
 # django-allauth settings
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # Options: 'mandatory', 'optional', 'none'
+# Options: 'mandatory', 'optional', 'none'
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_USERNAME_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = 'username_email' # Allow authentication via username or email
+# Allow authentication via username or email
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = False
-ACCOUNT_LOGIN_ON_PASSWORD_RESET = True  # Automatically logs the user in upon successful email confirmation.
+# Automatically logs the user in upon successful email confirmation.
+ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
 
 # Disable public signups (handled via custom adapter)
-ACCOUNT_ADAPTER = 'Users.adapters.CustomAccountAdapter'
-SOCIALACCOUNT_ADAPTER = 'Users.adapters.CustomSocialAccountAdapter'
+ACCOUNT_ALLOW_REGISTRATION = False
+SOCIALACCOUNT_ALLOW_REGISTRATION = False
 
 # Login/Logout redirect
-# LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
-LOGOUT_REDIRECT_URL = 'login'
+LOGOUT_REDIRECT_URL = 'account_login'
 
 # Configure social account authentication 3rd party providers
 SOCIALACCOUNT_PROVIDERS = {
@@ -191,6 +198,9 @@ EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_KEY")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_EMAIL")
 SERVER_EMAIL = os.environ.get("DEFAULT_EMAIL")
 
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -216,7 +226,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # LOGGING CONFIGURATIONS
 ADMINS = [
-    ("Dimis", "dpapakyriacou14@gmail.com"),
+    ("Dimis", os.environ.get("DEFAULT_EMAIL")),
 ]
 
 # Ensure the 'logs' directory exists (only needed for development)
@@ -233,7 +243,7 @@ LOGGING = {
             "style": "{",
         },
         "simple": {
-            "format": "{levelname} {message}",
+            "format": "{asctime} {levelname} {message}",
             "style": "{",
         },
         "notification": {
@@ -267,12 +277,17 @@ LOGGING = {
             "formatter": "notification"
         }
     },
-    "loggers": {
-        "": {
-            "handlers": ["console", "file_log", "mail_admins"],
-            "propagate": True
-        },
+    "root": {
+        "handlers": ["console"],
+        "level": "DEBUG"
     },
+    "loggers": {
+        "slotted_need": {
+            "handlers": ["console", "file_log", "mail_admins"],
+            "propagate": False,
+            "level": "DEBUG"
+        }
+    }
 }
 
 # SENTRY config for production
