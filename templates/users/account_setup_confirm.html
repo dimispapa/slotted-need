@@ -1,18 +1,27 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
+{% load socialaccount %}
 
 {% block content %}
 {% if validlink %}
 <div class="container mt-2 mt-md-4 mb-2 mb-md-4">
-  <h2 class="display-6 mb-2 mb-md-4"><i class="fa-solid fa-screwdriver-wrench text-primary"></i> Set up your account
-  </h2>
+  <h1 class="display-6 mb-2 mb-md-4"><i class="fa-solid fa-screwdriver-wrench text-primary"></i> Set up your account
+  </h1>
   <p>Please set your password below. Your username is your email.</p>
-
+  <!-- Password Setup Form -->
   <form method="post">
     {% csrf_token %}
     {{ form|crispy }}
     <button type="submit" class="btn btn-primary">Set Password</button>
   </form>
+  <!-- Google OAuth Setup Option -->
+  <div class="mt-2 mt-md-4">
+    <h2>Or set up your account using Third-party OAuth:</h2>
+    <a href="{% provider_login_url 'google' %}" class="btn btn-danger">
+      <i class="fab fa-google"></i> Sign Up with Google
+    </a>
+  </div>
+
 </div>
 
 {% else %}

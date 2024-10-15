@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'users'
 ]
 
+# Sited IDs
 if DEBUG:
     SITE_ID = 1
 else:
@@ -72,8 +73,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # django-allauth settings
-# Options: 'mandatory', 'optional', 'none'
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = True
 # Allow authentication via username or email
@@ -81,10 +81,16 @@ ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = False
 # Automatically logs the user in upon successful email confirmation.
 ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
+# Autoconnect social account to existing matching email user
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+# Do not require email verification when signing up with social account
+# as already email is authenticated by invitation
+SOCIALACCOUNT_EMAIL_VERIFICATION = False
 
 # Disable public signups (handled via custom adapter)
 ACCOUNT_ALLOW_REGISTRATION = False
 SOCIALACCOUNT_ALLOW_REGISTRATION = False
+SOCIALACCOUNT_AUTO_SIGNUP = False
 
 # Login/Logout redirect
 LOGIN_REDIRECT_URL = 'home'
@@ -104,6 +110,9 @@ SOCIALACCOUNT_PROVIDERS = {
     },
     # 'apple': { ... }  # To be configured below
 }
+
+# Custom adapter to prevent unauthorised signin/signup
+SOCIALACCOUNT_ADAPTER = 'users.adapters.CustomSocialAccountAdapter'
 
 # Crispy bootstrap5 templates
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
