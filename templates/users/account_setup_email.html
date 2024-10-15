@@ -1,13 +1,16 @@
 {% autoescape off %}
+
 Hi {{ user.email }},
 
 You have been invited to set up your account on {{ site_name }}.
 
-Please click the link below to set your username and password:
+Please click the link below to set up your account:
 
-{{ protocol }}://{{ domain }}{% url 'account_setup_confirm' uidb64=uid token=token %}
+{{ confirmation_url }}
 
-If you didn't request this, please ignore this email.
+This link will expire in 30 minutes.
+
+If you did not expect this invitation, please ignore this email.
 
 Thanks,
 The {{ site_name }} Team

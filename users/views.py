@@ -7,10 +7,14 @@ from django.shortcuts import redirect, get_object_or_404
 from django.views import View
 import os
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from .forms import (CustomUserCreationForm, CustomUserChangeForm,
-                    CustomPasswordSetupForm)
+from .forms import (CustomUserCreationForm,
+                    CustomUserChangeForm,)
+from .utils import send_invitation_email
 if os.path.isfile('env.py'):
     import env  # noqa
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class AdminUserRequiredMixin(UserPassesTestMixin):
@@ -32,87 +36,70 @@ class UserListView(LoginRequiredMixin, ListView):
 
 
 class UserCreateView(LoginRequiredMixin, AdminUserRequiredMixin, CreateView):
-    model = User
+    # model = User
     form_class = CustomUserCreationForm
     template_name = 'users/user_form.html'
     success_url = reverse_lazy('user_list')
     extra_context = {'title': 'Add User'}
 
     def form_valid(self, form):
-        # Set user as inactive
+        # Extract form data without saving to commit=False
         user = form.save(commit=False)
+        # Set username to email
+        user.username = user.email
+        # User is inactive until they set their password
         user.is_active = False
+        # Prevent login until password is set
+        user.set_unusable_password()
         user.save()
-        form.save_m2m()
 
-        # Send account setup email (invitation)
-        # using a custom passowrd setup form
-        email = form.cleaned_data['email']
-        reset_form = CustomPasswordSetupForm({'email': email})
-        if reset_form.is_valid():
-            try:
-                reset_form.save(
-                    request=self.request,
-                    use_https=self.request.is_secure(),
-                    email_template_name='users/account_setup_email.html',
-                    subject_template_name='users/account_setup_subject.txt',
-                    from_email=os.environ.get("DEFAULT_EMAIL"),
-                    extra_email_context={
-                        'user': user,
-                    },
-                )
-                messages.success(self.request,
-                                 'User added successfully. An invitation email'
-                                 ' has been sent for account setup.')
-
-            except Exception as e:
-                print(f"Error sending email: {e}")
-                messages.error(
-                    self.request, 'Error sending account setup email.')
-
+        # Send the invitation email using the utility function
+        success, error = send_invitation_email(user, self.request)
+        if success:
+            messages.success(self.request,
+                             'User added successfully. An invitation email '
+                             'has been sent for account setup.')
         else:
-            messages.error(self.request, 'Error sending account setup email.')
+            messages.error(
+                self.request, 'Error sending account setup email.')
+            logger.error(
+                "UserCreateView: "
+                F"Failed to send invitation email to {user.email}: {error}")
 
-        return super().form_valid(form)
+        return redirect(self.success_url)
 
 
 class ResendInviteView(LoginRequiredMixin, AdminUserRequiredMixin, View):
     def post(self, request, user_id, *args, **kwargs):
         user = get_object_or_404(User, id=user_id)
-        # check if user has already activated their account
+
+        # Check if user has already activated their account
         if user.is_active:
             messages.warning(request, 'This user is already active.')
+            logger.warning(
+                f"SendInviteView: User {user.email} is already active.")
             return redirect('user_list')
 
-        # Resend the account setup email
-        reset_form = CustomPasswordSetupForm({'email': user.email})
-        if reset_form.is_valid():
-            try:
-                reset_form.save(
-                    request=request,
-                    use_https=request.is_secure(),
-                    email_template_name='users/account_setup_email.html',
-                    subject_template_name='users/account_setup_subject.txt',
-                    from_email=os.environ.get("DEFAULT_EMAIL"),
-                    extra_email_context={
-                        'user': user,
-                    },
-                )
-                messages.success(request, 'Invitation email has been resent '
-                                 f'to {user.email}.')
-
-            except Exception as e:
-                print(f"Error sending email: {e}")
-                messages.error(request, 'Error resending account setup email.')
+        # Send the invitation email using the utility function
+        success, error = send_invitation_email(user, request)
+        if success:
+            messages.success(
+                request,
+                f'Invitation email has been sent to {user.email}.')
         else:
-            messages.error(request, 'Invalid form submission.')
+            messages.error(request,
+                           'Error sending account setup email.')
+            logger.error(
+                "SendInviteView: Failed to send invitation email to"
+                f" {user.email}: {error}")
 
         return redirect('user_list')
 
 
-class CustomPasswordSetupConfirmView(PasswordResetConfirmView):
+class PasswordSetupConfirmView(PasswordResetConfirmView):
     template_name = 'users/account_setup_confirm.html'
     success_url = reverse_lazy('account_login')
+    # form_class = PasswordSetupForm
 
     def form_valid(self, form):
         # Save the new password
@@ -126,11 +113,16 @@ class CustomPasswordSetupConfirmView(PasswordResetConfirmView):
         # Add a success message
         messages.success(
             self.request,
-            'Your password has been set successfully. You can now log in.')
+            'Your password has been set successfully. You are now logged in.')
         return response
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['validlink'] = self.validlink
+        return context
 
-class UserUpdateView(LoginRequiredMixin, AdminUserRequiredMixin, UpdateView):
+
+class UserUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = CustomUserChangeForm
     template_name = 'users/user_form.html'
@@ -139,10 +131,15 @@ class UserUpdateView(LoginRequiredMixin, AdminUserRequiredMixin, UpdateView):
 
     def dispatch(self, request, *args, **kwargs):
         user = self.get_object()
-        if user.is_superuser and not request.user.is_superuser:
+        # check if to allow edit
+        if (request.user.is_superuser or
+            (request.user.is_staff and not user.is_staff) or
+                request.user == user):
+            return super().dispatch(request, *args, **kwargs)
+        # otherwise notify that it is not allowed
+        else:
             messages.error(request, 'You cannot edit this user.')
             return redirect('user_list')
-        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -157,11 +154,15 @@ class UserDeleteView(LoginRequiredMixin, DeleteView):
 
     def dispatch(self, request, *args, **kwargs):
         user = self.get_object()
-        if (not (request.user.is_staff or user == request.user)
-                or user.is_superuser):
+        # check if to allow for deletion
+        if (request.user.is_superuser or
+            (request.user.is_staff and not user.is_staff) or
+                request.user == user):
+            return super().dispatch(request, *args, **kwargs)
+        # otherwise notify that it is not allowed
+        else:
             messages.error(request, 'You cannot delete this user.')
             return redirect('user_list')
-        return super().dispatch(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, 'User deleted successfully.')

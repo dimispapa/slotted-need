@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import (UserChangeForm, PasswordResetForm)
+from django.contrib.auth.forms import UserChangeForm, PasswordResetForm
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
@@ -31,35 +31,25 @@ class CustomUserCreationForm(forms.ModelForm):
         model = User
         fields = ('email', 'email2', 'is_staff')
 
-    def clean(self):
-        cleaned_data = super().clean()
-        email = cleaned_data.get('email')
-        email2 = cleaned_data.get('email2')
+    def clean_email2(self):
+        """
+        Validate that the two email entries match and that the email is unique.
+        """
+        email = self.cleaned_data.get('email')
+        email2 = self.cleaned_data.get('email2')
 
-        # Check if emails match
         if email and email2 and email != email2:
             raise ValidationError('Email addresses must match.')
 
-        # Check if email is already in use
         if User.objects.filter(email=email).exists():
             raise ValidationError('A user with that email already exists.')
 
-        return cleaned_data
-
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        # Use email as username or generate a unique username
-        user.username = self.cleaned_data['email']
-        # User cannot log in until they set a password
-        user.set_unusable_password()
-        user.is_staff = self.cleaned_data['is_staff']
-        if commit:
-            user.save()
-        return user
+        return email2
 
 
 class CustomUserChangeForm(UserChangeForm):
     password = None  # Hide password field
+    email = forms.EmailField(required=True)
     is_staff = forms.BooleanField(required=False, label='Admin User',
                                   help_text=('Designates whether the user can '
                                              'log into the admin site and '
@@ -70,7 +60,7 @@ class CustomUserChangeForm(UserChangeForm):
         fields = ('username', 'email', 'is_active', 'is_staff')
 
 
-class CustomPasswordSetupForm(PasswordResetForm):
+class PasswordSetupForm(PasswordResetForm):
     def get_users(self, email):
         UserModel = get_user_model()
         inactive_users = UserModel._default_manager.filter(
