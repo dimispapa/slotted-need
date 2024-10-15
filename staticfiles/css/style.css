@@ -1,0 +1,204 @@
+/*************** BASE TEMPLATE **************************/
+/* NAVBAR */
+/* Nav dropdown active highlight */
+.active-dropdown-item {
+  background-color: ghostwhite;
+  color: #0d6efd;
+}
+
+/*************** CREATE ORDERS PAGE **************************/
+
+/******* CLIENT SEARCH FEATURE */
+
+/* CSS for the suggestion items */
+.suggestion-item {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+/* Highlight the suggestion item when hovering */
+.suggestion-item:hover,
+.suggestion-item.active {
+  background-color: #f0f0f0;
+}
+
+/* Set up Flexbox and media queries for dynamic positioning
+of the suggestions div depending on viewport size */
+
+/* Default styles for mobile (small devices) */
+.client-form-container {
+  display: flex;
+  /* Position suggestions below client_name */
+  flex-direction: column;
+}
+
+/* Default mobile order */
+#client-name-div {
+  order: 1;
+  /* Client name comes first */
+}
+
+/* Search dropdown second */
+#client-suggestions {
+  /* Position it relative to the client_name field, directly below it */
+  position: relative;
+  order: 2;
+  top: 0;
+  left: 0;
+  width: 100%;
+  /* Make sure it takes the full width of the input field */
+  z-index: 1;
+  /* Ensure it's on top of other elements */
+  background-color: #fff;
+  /* Keep background color white for readability */
+  border: 1px solid #ddd;
+  /* Add a border to differentiate it */
+  max-height: 200px;
+  /* limit the height of the dropdown */
+  overflow-y: auto;
+  /* Add scrolling if there are too many options */
+}
+
+/* Phone third */
+#client-phone-div {
+  order: 3;
+}
+
+/* Email fourth */
+#client-email-div {
+  order: 4;
+}
+
+/* For larger devices, reorder the dropdown */
+@media (min-width: 768px) {
+  .client-form-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  #client-suggestions {
+    order: 5;
+    /* Place suggestions after all client fields on larger devices */
+    width: 100%;
+    /* Align below the client name */
+  }
+}
+
+/**** ORDER TRACKER PAGE ****/
+/* toggle items btn */
+.toggle-items-btn {
+  background-color: #0d6efd;
+  color: white;
+}
+
+/* order status badge */
+.order-status-badge {
+  font-size: inherit;
+}
+
+/* custom boostrap-like classes for bg colours */
+.bg-pending {
+  background-color: #e3ff2c;
+  text-decoration: none;
+  opacity: 1;
+}
+
+.bg-danger-light {
+  background-color: #ef868f;
+  text-decoration: none;
+  opacity: 1;
+}
+
+/* ensure status dropdowns don't shrink too much */
+.item-status,
+.paid-status,
+.priority-status {
+  min-width: 75px;
+  width: auto;
+  font-size: inherit;
+}
+
+/* set max height for scrolling table */
+.table-container {
+  overflow: auto;
+  max-height: 80vh;
+}
+
+/* ORDER ITEM TRACKER */
+/* Custom header styles */
+/* mouse pointer on sortable columns */
+th.sortable {
+  cursor: pointer;
+}
+
+/* default pointer on non-sortable */
+th.not-sortable {
+  cursor: default;
+}
+
+/* Order item table */
+.dataTables_scrollHeadInner,
+.dataTables_scrollBody table,
+#orderitem-table_wrapper,
+#orders-table_wrapper,
+#order-archive-table_wrapper,
+#orderitem-home-table_wrapper {
+  width: 100% !important;
+}
+
+#orderitem-table_wrapper,
+#orders-table_wrapper,
+#order-archive-table_wrapper {
+  /* set font-size */
+  font-size: 14px;
+}
+
+/* completed filter */
+#filter-completed-label {
+  font-size: 0.8rem;
+}
+
+/* Home dashboard */
+.input-group-text {
+  font-size: smaller;
+}
+
+/* Order item table */
+#orderitem-home-table_wrapper {
+  /* set font-size */
+  font-size: 10px;
+}
+
+#orderitem-home-table-title {
+  /* font-size */
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: dimgray;
+}
+
+/* for larger screens limit the width of the metric banners */
+@media (min-width: 768px) {
+  .metric-banner {
+    max-width: 60%;
+  }
+}
+
+/********* General data table styles *************/
+/* reduce font-size for smaller viewports */
+@media (max-width: 768px) {
+
+  /* all tables */
+  .table-container,
+  .table-container input,
+  .table-container select,
+  /* order tracker */
+  #order-list-form {
+    font-size: 12px;
+  }
+}
+
+.inline-spinner-div {
+  position: absolute;
+  margin-left: 5px;
+}
