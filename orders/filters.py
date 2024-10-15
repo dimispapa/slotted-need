@@ -13,6 +13,14 @@ class OrderItemFilter(django_filters.FilterSet):
         field_name='order__id',
         lookup_expr='exact')
 
+    date_from = django_filters.DateFilter(
+        field_name="order__created_on",
+        lookup_expr='gte')
+
+    date_to = django_filters.DateFilter(
+        field_name="order__created_on",
+        lookup_expr='lte')
+
     client_name = django_filters.CharFilter(
         field_name='order__client__client_name',
         lookup_expr='icontains')
@@ -61,6 +69,7 @@ class OrderItemFilter(django_filters.FilterSet):
             'id',
             'order__id',
             'order__client__client_name',
+            'order__created_on',
             'product__name',
             'option_values__value',
             'product_finish__name',

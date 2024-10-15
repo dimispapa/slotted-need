@@ -54,6 +54,8 @@ $(document).ready(function () {
                 // Filtering parameters based on filters.py
                 d.id = $('#filter-id').val();
                 d.order_id = $('#filter-order').val();
+                d.date_from = $('#filter-date-from').val();
+                d.date_to = $('#filter-date-to').val();
                 d.client_name = $('#filter-client').val();
                 d.product = $('#filter-product').val();
                 d.design_options = $('#filter-design-options').val();
@@ -100,7 +102,7 @@ $(document).ready(function () {
             {
                 data: 'order.created_on',
                 name: 'order__created_on',
-                className: 'not-sortable'
+                className: 'sortable'
             },
             {
                 data: 'order.client.client_name',
@@ -267,9 +269,11 @@ $(document).ready(function () {
     $('#filter-id, #filter-order, #filter-client, #filter-product, #filter-value-min, ' +
         '#filter-value-max, #filter-item-status, #filter-priority-level, #filter-paid-status, ' +
         '#filter-design-options, #filter-product-finish, #filter-component-finishes, ' +
-        '#filter-exclude-completed').on('keyup change', debounce(function () {
-        table.ajax.reload();
-    }, 300));
+        '#filter-exclude-completed, #filter-date-from, #filter-date-to'
+    ).on('keyup change',
+        debounce(function () {
+            table.ajax.reload();
+        }, 300));
 
     // Handle change for item_status
     $('#orderitem-table').on('change', '.item-status', function () {
