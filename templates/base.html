@@ -19,6 +19,8 @@
   <title>Slotted Need</title>
   {% block extra_head %}
   {% endblock %}
+  <!-- Sentry error logging configuration for JS -->
+  {% include 'partials/sentry_js.html' %}
   <!-- Favicons -->
   <link rel="icon" sizes="192x192" href="{% static 'favicon/favicon-tns.png' %}" type="image/png">
   <link rel="shortcut icon" href="{% static 'favicon/shortcun-icon-tns.png' %}" type="image/png">
