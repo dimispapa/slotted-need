@@ -37,6 +37,9 @@ ALLOWED_HOSTS = ['.herokuapp.com',
 # Application definition
 
 INSTALLED_APPS = [
+    # added to use WhiteNoise in dev environment too, 
+    # to avoid diffs in behaviour between production and development
+    "whitenoise.runserver_nostatic",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -227,6 +230,13 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Staticfile caching with Whitenoise
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
