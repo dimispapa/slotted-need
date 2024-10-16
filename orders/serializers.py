@@ -44,9 +44,7 @@ class ComponentFinishSerializer(ModelSerializer):
 
 class SummaryOrderSerializer(ModelSerializer):
     client = ClientSerializer(read_only=True)
-    created_on = DateTimeField(read_only=True,
-                               #    format="%d-%b-%Y"
-                               )
+    created_on = DateTimeField(read_only=True)
 
     class Meta:
         model = Order
