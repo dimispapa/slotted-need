@@ -99,11 +99,11 @@ $(document).ready(function () {
                 name: 'order__id',
                 className: 'sortable'
             },
-            // {
-            //     data: 'order.created_on',
-            //     name: 'order__created_on',
-            //     className: 'sortable'
-            // },
+            {
+                data: 'order.created_on',
+                name: 'order__created_on',
+                className: 'sortable'
+            },
             {
                 data: 'order.client.client_name',
                 name: 'order__client__client_name',
@@ -269,7 +269,7 @@ $(document).ready(function () {
     $('#filter-id, #filter-order, #filter-client, #filter-product, #filter-value-min, ' +
         '#filter-value-max, #filter-item-status, #filter-priority-level, #filter-paid-status, ' +
         '#filter-design-options, #filter-product-finish, #filter-component-finishes, ' +
-        '#filter-exclude-completed, #filter-date-from, #filter-date-to'
+        '#filter-exclude-completed, ' // + '#filter-date-from, #filter-date-to'
     ).on('keyup change',
         debounce(function () {
             table.ajax.reload();
