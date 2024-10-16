@@ -105,7 +105,7 @@ $(document).ready(function () {
                 className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        let order_date = moment(data).format('Do MMM YY');
+                        let order_date = moment(data).format('DD/MM/YYYY');
                         return order_date;
                     }
                     return data;

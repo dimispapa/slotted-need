@@ -443,6 +443,18 @@ $(document).ready(function () {
                 className: 'sortable'
             },
             {
+                data: 'order.created_on',
+                name: 'order__created_on',
+                className: 'sortable',
+                render: function (data, type, row) {
+                    if (type === 'display') {
+                        let order_date = moment(data).format('DD/MM/YYYY');
+                        return order_date;
+                    }
+                    return data;
+                }
+            },
+            {
                 data: 'order.client.client_name',
                 name: 'order__client__client_name',
                 className: 'sortable'
@@ -495,7 +507,7 @@ $(document).ready(function () {
         ],
         // Default ordering by priority_level descending
         order: [
-            [9, 'desc']
+            [10, 'desc']
         ],
         // Callback after every draw (initial load and subsequent updates)
         drawCallback: function (settings) {
