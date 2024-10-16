@@ -105,7 +105,7 @@ $(document).ready(function () {
                 className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        let order_date = DataTable.render.datetime('Do - MM - YYYY');
+                        let order_date = moment(data).format('Do MMM YY');
                         return order_date;
                     }
                     return data;
@@ -276,7 +276,7 @@ $(document).ready(function () {
     $('#filter-id, #filter-order, #filter-client, #filter-product, #filter-value-min, ' +
         '#filter-value-max, #filter-item-status, #filter-priority-level, #filter-paid-status, ' +
         '#filter-design-options, #filter-product-finish, #filter-component-finishes, ' +
-        '#filter-exclude-completed, ' // + '#filter-date-from, #filter-date-to'
+        '#filter-exclude-completed'
     ).on('keyup change',
         debounce(function () {
             table.ajax.reload();
