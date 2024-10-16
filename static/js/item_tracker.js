@@ -102,7 +102,14 @@ $(document).ready(function () {
             {
                 data: 'order.created_on',
                 name: 'order__created_on',
-                className: 'sortable'
+                className: 'sortable',
+                render: function (data, type, row) {
+                    if (type === 'display') {
+                        let order_date = DataTable.render.datetime('Do - MM - YYYY');
+                        return order_date;
+                    }
+                    return data;
+                }
             },
             {
                 data: 'order.client.client_name',
