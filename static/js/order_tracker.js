@@ -62,6 +62,8 @@ $(document).ready(function () {
 
                 // Filtering parameters based on filters.py
                 d.id = $('#filter-id').val();
+                d.date_from = $('#filter-date-from').val();
+                d.date_to = $('#filter-date-to').val();
                 d.client_name = $('#filter-client').val();
                 d.discount_min = $('#filter-discount-min').val();
                 d.discount_max = $('#filter-discount-max').val();
@@ -112,6 +114,17 @@ $(document).ready(function () {
             {
                 data: 'id',
                 className: 'sortable'
+            },
+            {
+                data: 'created_on',
+                className: 'sortable',
+                render: function (data, type, row) {
+                    if (type === 'display') {
+                        let order_date = moment(data).format('DD/MM/YYYY');
+                        return order_date;
+                    }
+                    return data;
+                }
             },
             {
                 data: 'client.client_name',
@@ -218,7 +231,7 @@ $(document).ready(function () {
     // Event listeners for filter inputs with debounce
     $('#filter-id, #filter-client, #filter-discount-min, #filter-discount-max, ' +
         '#filter-deposit-min, #filter-deposit-max, #filter-value-min, #filter-value-max, ' +
-        '#filter-order-status, #filter-paid-status').on('keyup change', debounce(function () {
+        '#filter-order-status, #filter-paid-status, #filter-date-from, #filter-date-to').on('keyup change', debounce(function () {
         // apply filters
         table.ajax.reload();
     }, 300));

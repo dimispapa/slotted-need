@@ -1,5 +1,6 @@
 import django_filters
 from django.db.models import Q
+from datetime import timedelta
 from .models import OrderItem, Order
 
 
@@ -18,8 +19,7 @@ class OrderItemFilter(django_filters.FilterSet):
         lookup_expr='gte')
 
     date_to = django_filters.DateFilter(
-        field_name="order__created_on",
-        lookup_expr='lte')
+        method='filter_to_date')
 
     client_name = django_filters.CharFilter(
         field_name='order__client__client_name',
@@ -83,6 +83,13 @@ class OrderItemFilter(django_filters.FilterSet):
             'order__paid',
             'completed'
         ]
+
+    def filter_to_date(self, queryset, name, value):
+        """Custom filter method for upper boundary date to capture dates up
+        to the end of the date input"""
+        # Increment to_date by one day to capture up to end of the date
+        next_day = value + timedelta(days=1)
+        return queryset.filter(create_on__lt=next_day)
 
     def filter_exclude_completed(self, queryset, name, value):
         """
@@ -170,6 +177,13 @@ class OrderFilter(django_filters.FilterSet):
         field_name='client__client_name',
         lookup_expr='icontains')
 
+    date_from = django_filters.DateFilter(
+        field_name="created_on",
+        lookup_expr='gte')
+
+    date_to = django_filters.DateFilter(
+        method='filter_to_date')
+
     dicount_min = django_filters.NumberFilter(
         field_name='discount',
         lookup_expr='gte')
@@ -212,5 +226,13 @@ class OrderFilter(django_filters.FilterSet):
             'order_value',
             'order_status',
             'paid',
-            'archived'
+            'archived',
+            'created_on'
         ]
+
+    def filter_to_date(self, queryset, name, value):
+        """Custom filter method for upper boundary date to capture dates up
+        to the end of the date input"""
+        # Increment to_date by one day to capture up to end of the date
+        next_day = value + timedelta(days=1)
+        return queryset.filter(created_on__lt=next_day)
