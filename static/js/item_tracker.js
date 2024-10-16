@@ -54,8 +54,8 @@ $(document).ready(function () {
                 // Filtering parameters based on filters.py
                 d.id = $('#filter-id').val();
                 d.order_id = $('#filter-order').val();
-                d.date_from = $('#filter-date-from').val();
-                d.date_to = $('#filter-date-to').val();
+                // d.date_from = $('#filter-date-from').val();
+                // d.date_to = $('#filter-date-to').val();
                 d.client_name = $('#filter-client').val();
                 d.product = $('#filter-product').val();
                 d.design_options = $('#filter-design-options').val();
@@ -99,11 +99,11 @@ $(document).ready(function () {
                 name: 'order__id',
                 className: 'sortable'
             },
-            {
-                data: 'order.created_on',
-                name: 'order__created_on',
-                className: 'sortable'
-            },
+            // {
+            //     data: 'order.created_on',
+            //     name: 'order__created_on',
+            //     className: 'sortable'
+            // },
             {
                 data: 'order.client.client_name',
                 name: 'order__client__client_name',
@@ -250,7 +250,7 @@ $(document).ready(function () {
         ],
         // Default ordering by priority_level descending
         order: [
-            [9, 'desc']
+            [10, 'desc']
         ],
         // Callback after every draw (initial load and subsequent updates)
         drawCallback: function (settings) {
