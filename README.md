@@ -17,16 +17,18 @@ The Slotted Need app aims to streamline the management of customised products an
 
 ## Key Features
 
-- **Product-Component Relationship Management:** Effectively manage products and their components, accommodating complex product builds with different components and quantities.
+- **Product-Component Relationship Management:** Effectively manage products and their components, accommodating complex product builds with different components and quantities via the app administration page. Accommodate user-driven product builds via the django app admin interface.
 
-- **Dynamic Order Forms:** Use dynamic order forms, capturing product selections along with related design options and finishes.
+- **Dynamic Order Forms:** Use dynamic order forms, to accurately and consistently capture product selections along with their related design options and finishes.
 
 - **Granular Component Tracking:** Track individual components and sub-components (ComponentPart) for each product, including quantities and input costs.
 
-- **Order Tracking:** Track and edit order details directly from the order list page with a hybrid approach, allowing inline editing with live updates.
+- **Integration of Options and Finishes:** Manage products with multiple options and finishes that adjust dynamically based on the selected components.
 
-- **Order Item Tracking:** Monitor item fulfillment by tracking the item status, priority levels and setting items as completed.
+- **Order Tracking:** Track and edit order details directly from the order list page, allowing inline editing with live updates to order and payment statuses, or moving completed orders to archive.
+
+- **Order Item Tracking:** Monitor item fulfillment by tracking the item status, priority level and setting items as completed.
 
 - **Order Archive:** Maintain an order archive with completed orders keeping a history of orders over time.
 
-- **Integration of Options and Finishes:** Manage products with multiple options and finishes that adjust dynamically based on the selected components.
+- **Filtering and Sorting Data:** Allow the filtering and sorting of data tables in the order and item trackers to facilitate drilling down and understanding data.
