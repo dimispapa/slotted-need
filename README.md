@@ -51,8 +51,8 @@ The Slotted Need app aims to streamline the management of customised products an
 ### Desktop frames
 
 ## Typography & Colours
-## Fonts
-## Colour palette
+### Fonts
+### Colour palette
 
 ## Database
 ### Design
