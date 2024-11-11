@@ -2,6 +2,8 @@
 
 "Slotted Need" is a Django-based web application developed to simplify the management of products, components, and order configurations for designer products such as designer tables and lamps. This app provides an easy-to-use interface to manage the complex relationships between products, components, options, and finishes, making the entire process intuitive and efficient. The name implies that this application targets the need for a system that facilitates the various components being "slotted" seamlessly between them and interacting to provide a well structured products and orders management application.
 
+# App Overview
+
 ## App Purpose / User Goals
 The Slotted Need app aims to streamline the management of customised products and orders by offering a comprehensive interface for tracking products, components, and associated configurations. The main goals include:
 
@@ -32,3 +34,76 @@ The Slotted Need app aims to streamline the management of customised products an
 - **Order Archive:** Maintain an order archive with completed orders keeping a history of orders over time.
 
 - **Filtering and Sorting Data:** Allow the filtering and sorting of data tables in the order and item trackers to facilitate drilling down and understanding data.
+
+# App Design & Planning
+
+## User Stories
+### Must have
+### Should have
+### Could have
+### Won't have
+
+## Wireframes
+### Mobile frames
+### Desktop frames
+
+## Typography & Colours
+## Fonts
+## Colour palette
+
+## Database
+### Design
+### Implementation
+
+## Technologies & Tools Stack
+### Progamming languages
+### Frameworks
+### Third-party libraries
+
+# Functionality & Features deep-dive
+## Home Dashboard
+
+## Order Management
+### Create Order form
+### Order Tracker view
+### Item Tracker view
+### Order Archive view
+
+## Admin Portal
+### Product Build Management
+
+## User Access Management
+### Access Privileges
+### Logging In/Out
+### Add/Invite New User
+### Edit User
+### Delete User
+
+## UX
+
+## Future Features
+
+## Development & Deployment
+### Agile development process
+### Deployment to Heroku
+#### How to Deploy
+#### How to Clone
+
+
+
+# Testing & Monitoring
+## Manual Testing
+## Automated Testing
+## Code Validation
+### HTML
+### CSS
+### JavaScript
+### Python
+### Lighthouse Audit
+## Error Logging
+## Error Monitoring
+## Fixed Bugs
+
+# Credits
+
+# Acknowledgements
