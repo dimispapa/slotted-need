@@ -42,6 +42,12 @@ The Slotted Need app aims to streamline the management of customised products an
 
 ## User Stories
 ### Must have
+
+| Title | User Story | Acceptance Criteria |
+| ----------- | ----------- | ----------- |
+Admin user can login on the cloud app to access through authentication | As a User I can login on the cloud app so that I can access the app securely from any device | - User can register as admin via email
+- User can sign in and sign out |
+
 ### Should have
 ### Could have
 ### Won't have
