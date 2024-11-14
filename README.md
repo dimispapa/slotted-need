@@ -102,6 +102,35 @@ Export data from the system in XLS or PDF format | As a user I can export data f
 
 ## Database
 ### Design
+#### Entity Relationship Diagram (ERD)
+The ERD below was generated using the [graph-models](https://django-extensions.readthedocs.io/en/latest/graph_models.html) django extension which created a .dot file (see [erd_diagram.dot](documentation/erd/erd_diagram.dot)) which was then used by the [dreampuf](https://dreampuf.github.io/GraphvizOnline/#digraph%20G%20%7B%0A%0A%20%20subgraph%20cluster_0%20%7B%0A%20%20%20%20style%3Dfilled%3B%0A%20%20%20%20color%3Dlightgrey%3B%0A%20%20%20%20node%20%5Bstyle%3Dfilled%2Ccolor%3Dwhite%5D%3B%0A%20%20%20%20a0%20-%3E%20a1%20-%3E%20a2%20-%3E%20a3%3B%0A%20%20%20%20label%20%3D%20%22process%20%231%22%3B%0A%20%20%7D%0A%0A%20%20subgraph%20cluster_1%20%7B%0A%20%20%20%20node%20%5Bstyle%3Dfilled%5D%3B%0A%20%20%20%20b0%20-%3E%20b1%20-%3E%20b2%20-%3E%20b3%3B%0A%20%20%20%20label%20%3D%20%22process%20%232%22%3B%0A%20%20%20%20color%3Dblue%0A%20%20%7D%0A%20%20start%20-%3E%20a0%3B%0A%20%20start%20-%3E%20b0%3B%0A%20%20a1%20-%3E%20b3%3B%0A%20%20b2%20-%3E%20a3%3B%0A%20%20a3%20-%3E%20a0%3B%0A%20%20a3%20-%3E%20end%3B%0A%20%20b3%20-%3E%20end%3B%0A%0A%20%20start%20%5Bshape%3DMdiamond%5D%3B%0A%20%20end%20%5Bshape%3DMsquare%5D%3B%0A%7D) GraphViz generator to generate this diagram.
+![erd](documentation/erd/slotted-need_core-custom-models_erd.png)
+
+#### Products app
+This is the focal point of the project, as "slotted need" revolves around design products and its configurations that then lead to orders.
+- ##### Product model
+    <p>The app's main model, that contains the high-level key information concerning a product, importantly <em>name</em> and <em>base_price</em>.</p>
+- ##### Option & OptionValue models
+    <p>These models define the design options that pertain to a product. For example a table might have a "Table Top" option which allows for various design option values such as "Cloud", "Four" or "Pick". At the same time this table could have an option for "Leg Shape" with "Husky" or "Feeble" being the available option values. Product to Option and Option to OptionValue relationships are defined as one-to-many.</p>
+- ##### Component, ProductComponent, & ComponentPart models
+    <p>Represents a separately identifiable component of a product e.g. a "Husky Legs" of a table. Product is linked to Component via a many-to-many relationship through the ProductComponent intermediary model. This allows for components to potentially relate to more than one product and vice versa.</p>
+    <p>The ProductComponent intermediary model also captures additional information about the relationship regarding the quantity of the components that are needed to complete the product build. Optionaly, this component can be associated with a specific option value e.g. the "Husky Leg" is linked to the "Husky" option value for "Leg Shape" option. Naturally, essential components that are part the product build irrespective of option selections, will have a null option_value in this intermediary table.</p>
+    <p>A component can also be broken down into granular parts of the component, captured by the ComponentPart model. e.g. a "Husky Legs" can be broken down into "Husky Top Leg" and "Husky Bottom Leg" that together make up a complete component.</p>
+- ##### Finish and FinishOption model
+    <p>A finish is some kind of processing applied to the finished product, such as a colour paint or oil varnish. The finish can be applied generally at product-level or more specifically at component-level, captured by the many-to-many relationships with Product and Component.</p>
+    <p>FinishOption provides the selection options for each finish category e.g. "Honest Blue" for colour paint or "Linseed Oil" for oil varnish.</p>
+
+
+#### Orders app
+- ##### Client model
+    <p>Holds key information regarding a customer and has a one-to-many relationship with the Order model, which means a client can have multiple orders for products.</p>
+- ##### Order model
+    <p>Defines an order which includes <em>order_status</em>, <em>paid</em> and <em>archived</em> fields to signify the status of the order, amongst other monetary fields. An order contains one or more order items.</p>
+- ##### OrderItem model
+    <p>This model captures the link between orders and products, with many-to-one relationships against the Order and Product models. It also holds various status and monetary fields.</p>
+- ##### ComponentFinish model
+    <p>This is in place to maintain the link between a component and its associated finish option applied by the order configuration selected.</p>
+
 ### Implementation
 
 ## Technologies & Tools Stack
