@@ -103,7 +103,7 @@ Export data from the system in XLS or PDF format | As a user I can export data f
 ## Database
 ### Design
 #### Entity Relationship Diagram (ERD)
-The ERD below was generated using the [graph-models](https://django-extensions.readthedocs.io/en/latest/graph_models.html) django extension which created a .dot file (see [erd_diagram.dot](documentation/erd/erd_diagram.dot)) which was then used by the [dreampuf](https://dreampuf.github.io/GraphvizOnline/#digraph%20G%20%7B%0A%0A%20%20subgraph%20cluster_0%20%7B%0A%20%20%20%20style%3Dfilled%3B%0A%20%20%20%20color%3Dlightgrey%3B%0A%20%20%20%20node%20%5Bstyle%3Dfilled%2Ccolor%3Dwhite%5D%3B%0A%20%20%20%20a0%20-%3E%20a1%20-%3E%20a2%20-%3E%20a3%3B%0A%20%20%20%20label%20%3D%20%22process%20%231%22%3B%0A%20%20%7D%0A%0A%20%20subgraph%20cluster_1%20%7B%0A%20%20%20%20node%20%5Bstyle%3Dfilled%5D%3B%0A%20%20%20%20b0%20-%3E%20b1%20-%3E%20b2%20-%3E%20b3%3B%0A%20%20%20%20label%20%3D%20%22process%20%232%22%3B%0A%20%20%20%20color%3Dblue%0A%20%20%7D%0A%20%20start%20-%3E%20a0%3B%0A%20%20start%20-%3E%20b0%3B%0A%20%20a1%20-%3E%20b3%3B%0A%20%20b2%20-%3E%20a3%3B%0A%20%20a3%20-%3E%20a0%3B%0A%20%20a3%20-%3E%20end%3B%0A%20%20b3%20-%3E%20end%3B%0A%0A%20%20start%20%5Bshape%3DMdiamond%5D%3B%0A%20%20end%20%5Bshape%3DMsquare%5D%3B%0A%7D) GraphViz generator to generate this diagram.
+The ERD below was generated using the [graph-models](https://django-extensions.readthedocs.io/en/latest/graph_models.html) django extension which created a .dot file (see [erd_diagram.dot](documentation/erd/erd_diagram.dot)) which was then used by the [dreampuf](https://dreampuf.github.io/GraphvizOnline/) GraphViz generator to generate this diagram.
 ![erd](documentation/erd/slotted-need_core-custom-models_erd.png)
 
 #### Products app
@@ -116,7 +116,7 @@ This is the focal point of the project, as "slotted need" revolves around design
     <p>Represents a separately identifiable component of a product e.g. a "Husky Legs" of a table. Product is linked to Component via a many-to-many relationship through the ProductComponent intermediary model. This allows for components to potentially relate to more than one product and vice versa.</p>
     <p>The ProductComponent intermediary model also captures additional information about the relationship regarding the quantity of the components that are needed to complete the product build. Optionaly, this component can be associated with a specific option value e.g. the "Husky Leg" is linked to the "Husky" option value for "Leg Shape" option. Naturally, essential components that are part the product build irrespective of option selections, will have a null option_value in this intermediary table.</p>
     <p>A component can also be broken down into granular parts of the component, captured by the ComponentPart model. e.g. a "Husky Legs" can be broken down into "Husky Top Leg" and "Husky Bottom Leg" that together make up a complete component.</p>
-- ##### Finish and FinishOption model
+- ##### Finish and FinishOption models
     <p>A finish is some kind of processing applied to the finished product, such as a colour paint or oil varnish. The finish can be applied generally at product-level or more specifically at component-level, captured by the many-to-many relationships with Product and Component.</p>
     <p>FinishOption provides the selection options for each finish category e.g. "Honest Blue" for colour paint or "Linseed Oil" for oil varnish.</p>
 
@@ -132,6 +132,29 @@ This is the focal point of the project, as "slotted need" revolves around design
     <p>This is in place to maintain the link between a component and its associated finish option applied by the order configuration selected.</p>
 
 ### Implementation
+#### Products app
+The products app models were implemented in the [products/models.py](products/models.py) file as follows:
+| Model Name | Description | Fields | Custom Methods |
+|------------|-------------|--------|----------------|
+**Finish** | Represents a type of finish that can be applied to a component or product. | `name` (CharField, max_length=50), `description` (TextField, optional) | None |
+**FinishOption** | Represents detailed options available for a specific finish. | `finish` (ForeignKey to Finish), `name` (CharField, max_length=50) | None |
+**ComponentPart** | Represents the most granular parts of a component, including cost and quantity. | `name` (CharField, unique), `slug` (SlugField, unique), `description` (TextField, optional), `unit_cost` (DecimalField), `component` (ForeignKey to Component), `quantity` (PositiveIntegerField, default=1) | None |
+**Component** | Represents high-level components that make up a product, such as legs or tops. | `name` (CharField, unique), `slug` (SlugField, unique), `description` (TextField, optional), `unit_cost` (DecimalField), `supplier_details` (TextField, optional), `finishes` (ManyToManyField to Finish, optional) | `calculate_unit_cost()`: Calculates total unit cost based on the sum of unit costs of its parts. `save()`: Ensures unit cost is calculated and updated after saving related parts. |
+**Product** | Represents the main product that can be ordered, consisting of components and finishes. | `name` (CharField, unique), `slug` (SlugField, unique), `description` (TextField, optional), `base_price` (DecimalField), `components` (ManyToManyField through ProductComponent), `finishes` (ManyToManyField to Finish, optional) | None |
+**Option** | Represents additional options available for a product. | `name` (CharField), `product` (ForeignKey to Product) | None |
+**OptionValue** | Represents specific values for an option. | `option` (ForeignKey to Option), `value` (CharField) | None |
+**ProductComponent** | Acts as an intermediary to link products with components, tracking the quantity used. | `product` (ForeignKey to Product), `component` (ForeignKey to Component), `option_value` (ForeignKey to OptionValue, optional), `quantity` (PositiveIntegerField, default=1) | None |
+
+#### Orders app
+The orders app models were implemented in the [orders/models.py](orders/models.py) file as follows:
+| Model Name | Description | Fields | Custom Methods |
+|------------|-------------|--------|----------------|
+**Client** | Represents a customer placing an order. | `client_name` (CharField, max_length=100), `client_phone` (CharField, max_length=20), `client_email` (EmailField), `created_on` (DateField, auto_now_add=True) | None |
+**Order** | Represents a customer's order. | `client` (ForeignKey to Client, optional), `discount` (DecimalField), `deposit` (DecimalField), `order_value` (DecimalField), `order_status` (IntegerField), `paid` (IntegerField), `created_on` (DateTimeField, auto_now_add=True), `updated_on` (DateTimeField, auto_now=True), `archived` (BooleanField, default=False) | `calculate_totals()`: Calculates the total discount and order value based on order items. `update_order_status()`: Updates the order status based on the statuses of related items. `save()`: Custom save method to calculate totals and update statuses as needed. |
+**OrderItem** | Represents an item in an order, including the product, options, and finishes. | `order` (ForeignKey to Order), `product` (ForeignKey to Product), `base_price` (DecimalField), `discount` (DecimalField, optional), `item_value` (DecimalField), `option_values` (ManyToManyField to OptionValue, optional), `product_finish` (ForeignKey to FinishOption, optional), `item_status` (IntegerField), `priority_level` (IntegerField), `completed` (BooleanField) | `calculate_item_value()`: Calculates the value of the order item based on base price and discount. `update_completed()`: Updates the `completed` status based on item status and order payment status. `save()`: Custom save method to ensure value calculations and completed status updates. `unique_configuration()`: Generates a unique configuration string representing the product, options, and finishes. |
+**ComponentFinish** | Represents finishes associated with specific components in an order item. | `order_item` (ForeignKey to OrderItem), `component` (ForeignKey to Component), `finish_option` (ForeignKey to FinishOption) | None |
+
+
 
 ## Technologies & Tools Stack
 ### Progamming languages
