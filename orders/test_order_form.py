@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from model_bakery import baker
 from products.models import Product, OptionValue
 from orders.models import Order
-from orders.forms import OrderForm
+from orders.forms import OrderForm, OrderItemFormSet
 
 
 class TestCreateOrderView(TestCase):
@@ -38,14 +38,14 @@ class TestCreateOrderView(TestCase):
         # Check that the correct template was used
         self.assertTemplateUsed(response, 'orders/create_order.html')
         # Check if form and formset are in the response context
-        self.assertIn('order_form', response.context,
-                      msg='Order form missing in context')
-        self.assertIn('order_item_formset', response.context,
-                      msg='Order item formset missing in context')
+        self.assertIsInstance(response.context['order_form'],
+                              OrderForm)
+        self.assertIsInstance(response.context['order_item_formset'],
+                              OrderItemFormSet)
 
     def test_create_order_with_valid_data(self):
         """
-        Test form submission with valid data
+        Test create order form submission with valid data
         """
         data = {
             'client_name': 'Test Client',
@@ -70,8 +70,7 @@ class TestCreateOrderView(TestCase):
         self.assertTrue(order_form.is_valid())
         # Check if the form submission was successful
         self.assertEqual(response.status_code, 302, msg='Redirect NOT OK')
-        # self.assertTrue(Order.objects.filter(client__client_name='Test Client'
-        #                                      ).exists(),
-        #                 msg='Client was not created')
-        # self.assertIn(b"Order created successfully!", response.content,
-        #               msg="Success message not displayed")
+        # Check if the test client (customer) was created successfully
+        self.assertTrue(Order.objects.filter(client__client_name='Test Client'
+                                             ).exists(),
+                        msg='Client was not created')
