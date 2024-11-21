@@ -26,7 +26,8 @@ class TestHomeView(TestCase):
     """
 
     def setUp(self):
-        self.url_name = 'home'
+        # Define the URL for accessing the home dashboard
+        self.home_url = reverse('home')
         # Create a superuser / admin
         self.user = baker.make(User, is_staff=True, is_superuser=True)
         self.user.set_password('testpass')
@@ -39,7 +40,7 @@ class TestHomeView(TestCase):
         """
         Test for the home view rendering correctly for an admin
         """
-        response = self.client.get(reverse(self.url_name))
+        response = self.client.get(self.home_url)
 
         # check that the response is 200 OK
         self.assertEqual(response.status_code, 200,
@@ -74,7 +75,7 @@ class TestHomeView(TestCase):
         # Create a client with no logged in user
         self.client_loggedout = Client()
 
-        response = self.client_loggedout.get(reverse(self.url_name))
+        response = self.client_loggedout.get(self.home_url)
 
         # check for non 200 status code
         self.assertNotEqual(response.status_code, 200,

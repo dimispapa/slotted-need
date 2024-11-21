@@ -184,3 +184,17 @@ class TestCreateOrderView(TestCase):
         self.assertEqual(response_data['partial_match']['id'],
                          existing_client.id,
                          msg='Incorrect client match')
+
+    def test_non_user_cannot_access(self):
+        """
+        Test a request without logged-in user to ensure
+        that it gets rejected
+        """
+        # Create a client with no logged in user
+        self.client_loggedout = Client()
+
+        response = self.client_loggedout.get(self.create_order_url)
+
+        # check for non 200 status code
+        self.assertNotEqual(response.status_code, 200,
+                            msg='Anauthorised access allowed')
