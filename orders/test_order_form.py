@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from model_bakery import baker
 from products.models import Product, OptionValue
-from orders.models import Order
+from orders.models import Order, Client as ClientModel
 from orders.forms import OrderForm, OrderItemFormSet
 
 
@@ -115,3 +115,72 @@ class TestCreateOrderView(TestCase):
             self.assertIn('base_price', form.errors)
             self.assertIn('item_value', form.errors)
             self.assertIn('quantity', form.errors)
+
+    def test_client_exact_match_handling(self):
+        """
+        Test client conflict handling with exact match
+        """
+        # Create an existing client to trigger conflict
+        existing_client = baker.make(ClientModel, client_name='Test Client',
+                                     client_phone='1234567890',
+                                     client_email='testclient@example.com')
+
+        # Use the same details for a new order to trigger the conflict modal
+        data = {
+            'client_name': 'Test Client',
+            'client_phone': '1234567890',
+            'client_email': 'testclient@example.com',
+            'order_value': '100.00',
+            'deposit': '20.00',
+            'items-TOTAL_FORMS': '1',
+            'items-INITIAL_FORMS': '0',
+            'items-0-product': self.product.id,
+            'items-0-quantity': '1',
+            'items-0-base_price': '100.00',
+            'items-0-discount': '0.00',
+            'items-0-item_value': '100.00',
+        }
+
+        response = self.client.post(reverse('check_client'), data)
+        response_data = response.json()
+        # Verify that the exact match is returned
+        self.assertIn('exact_match', response_data,
+                      msg='Exact match not detected')
+        self.assertEqual(response_data['exact_match']['id'],
+                         existing_client.id,
+                         msg='Incorrect client match')
+
+    def test_client_partial_match_handling(self):
+        """
+        Test client conflict handling with partial match
+        i.e. matching name and phone, but non-matching email
+        """
+        # Create an existing client to trigger conflict
+        existing_client = baker.make(ClientModel, client_name='Test Client',
+                                     client_phone='1234567890',
+                                     client_email='testclient@example.com')
+
+        # Use the same details for a new order to trigger the conflict modal
+        data = {
+            'client_name': 'Test Client',  # matching
+            'client_phone': '1234567890',  # matching
+            'client_email': 'testcustomer@example.com',  # non-matching
+            'order_value': '100.00',
+            'deposit': '20.00',
+            'items-TOTAL_FORMS': '1',
+            'items-INITIAL_FORMS': '0',
+            'items-0-product': self.product.id,
+            'items-0-quantity': '1',
+            'items-0-base_price': '100.00',
+            'items-0-discount': '0.00',
+            'items-0-item_value': '100.00',
+        }
+
+        response = self.client.post(reverse('check_client'), data)
+        response_data = response.json()
+        # Verify that the partial match is returned
+        self.assertIn('partial_match', response_data,
+                      msg='Partial match not detected')
+        self.assertEqual(response_data['partial_match']['id'],
+                         existing_client.id,
+                         msg='Incorrect client match')
