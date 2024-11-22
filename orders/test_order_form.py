@@ -5,6 +5,7 @@ from model_bakery import baker
 from products.models import Product, OptionValue
 from orders.models import Order, Client as ClientModel
 from orders.forms import OrderForm, OrderItemFormSet
+from orders.views import get_update_create_client
 
 
 class TestCreateOrderView(TestCase):
@@ -198,6 +199,15 @@ class TestCreateOrderView(TestCase):
         self.assertEqual(response_data['partial_match']['id'],
                          existing_client.id,
                          msg='Incorrect client match')
+
+        # Update the existing client
+        client = get_update_create_client(action='update_client',
+                                          client_id=existing_client.id,
+                                          cleaned_data=data)
+
+        # Verify that the client details were updated
+        self.assertEqual(client.client_email, 'existingcustomer@example.com',
+                         msg='Client email was not updated correctly')
 
     def test_non_user_cannot_access(self):
         """
