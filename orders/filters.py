@@ -89,7 +89,7 @@ class OrderItemFilter(django_filters.FilterSet):
         to the end of the date input"""
         # Increment to_date by one day to capture up to end of the date
         next_day = value + timedelta(days=1)
-        return queryset.filter(create_on__lt=next_day)
+        return queryset.filter(created_on__lt=next_day)
 
     def filter_exclude_completed(self, queryset, name, value):
         """
