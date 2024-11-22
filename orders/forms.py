@@ -2,7 +2,7 @@ from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Div, Field
 from crispy_forms.bootstrap import PrependedText
-from .models import OrderItem, Order, Product, OptionValue
+from .models import OrderItem, Order, Product
 
 
 class OrderForm(forms.Form):
@@ -108,36 +108,6 @@ class OrderItemForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # ***** FIELD LEVEL VALIDATION *********
-        # Dynamically set the queryset for option_values based on the
-        # selected product and handle errors to data
-
-        # Handle when a product is in the new form data
-        if 'product' in self.data:
-
-            try:
-                product_id = int(self.data.get('product'))
-                product = Product.objects.get(id=product_id)
-                self.fields['option_values'
-                            ].queryset = OptionValue.objects.filter(
-                    option__product=product)
-
-            # Handle cases when product does not exist or
-            # ID cannot be converted to int
-            except (ValueError, TypeError, Product.DoesNotExist):
-                self.fields['option_values'
-                            ].queryset = OptionValue.objects.none()
-
-        # Handle an existing order item instance
-        elif self.instance.pk and self.instance.product:
-            product = self.instance.product
-            self.fields['option_values'].queryset = OptionValue.objects.filter(
-                option__product=product)
-
-        # Handle when a product is not selected
-        else:
-            self.fields['option_values'].queryset = OptionValue.objects.none()
-
         # *** FORM LAYOUT DESIGN WITH CRISPY-DJANGO FORM-HELPER ***
         # Initialise the form helper to design the layout of the form
         self.helper = FormHelper()
@@ -192,19 +162,6 @@ class OrderItemForm(forms.ModelForm):
             ),
         )
 
-    # add custom server-side validation for option-values to ensure
-    # data integrity if client-side validation is bypassed
-    def clean(self):
-        cleaned_data = super().clean()
-        product = cleaned_data.get('product')
-
-        if not product:
-            # raise validation error as an order item must have a product
-            if not self.has_error('product'):
-                self.add_error('product', 'This field is required.')
-
-        return cleaned_data
-
 
 # Create the order items formset
 OrderItemFormSet = forms.inlineformset_factory(
@@ -215,42 +172,4 @@ OrderItemFormSet = forms.inlineformset_factory(
             'option_values'],
     extra=1,  # Start with 1 empty form
     can_delete=False,  # Deletion only on the front-end
-)
-
-
-# define form for the Orders view
-class OrderViewForm(forms.ModelForm):
-    class Meta:
-        model = Order
-        fields = ['paid']
-        widgets = {
-            'paid': forms.Select(
-                attrs={'class':
-                       'form-select form-select-sm paid-status '
-                       'fw-bolder text-wrap'
-                       })
-        }
-
-
-# define form for the OrdersItem view
-class OrderItemViewForm(forms.ModelForm):
-    class Meta:
-        model = OrderItem
-        fields = ['item_status']
-        widgets = {
-            'item_status': forms.Select(
-                attrs={'class':
-                       'form-select form-select-sm item-status '
-                       'fw-bolder text-wrap'})
-        }
-
-
-# Create the order view formset
-OrderViewFormSet = forms.inlineformset_factory(
-    parent_model=Order,
-    model=OrderItem,
-    form=OrderItemViewForm,
-    fields=('item_status',),
-    extra=0,
-    can_delete=True
 )
