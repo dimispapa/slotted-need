@@ -62,17 +62,29 @@ class TestCreateOrderView(TestCase):
             'items-0-item_value': '220.00',
             'items-0-option_1': self.option_value.id,
         }
-
+        # Check if the check client API is working as expected
+        # before posting form data
+        check_client_response = self.client.post(reverse('check_client'), data)
+        # post the form data
         response = self.client.post(self.create_order_url, data)
         # pass the post request to the form and formset objects
         order_form = OrderForm(data=data)
         order_item_formset = OrderItemFormSet(data, prefix='items')
+
         # check if the form and forsmet have no errors
         self.assertTrue(order_form.is_valid())
         self.assertTrue(order_item_formset.is_valid())
         # Check if the form submission was successful
         self.assertEqual(response.status_code, 302, msg='Redirect NOT OK')
-        # Check if the test client (customer) was created successfully
+
+        # Check client API tests
+        check_client_response_data = check_client_response.json()
+        # Verify that the partial match and exact match are false
+        self.assertFalse(check_client_response_data['exact_match'],
+                         msg='Incorrect exact match')
+        self.assertFalse(check_client_response_data['partial_match'],
+                         msg='Incorrect partial match')
+        # Check if the new test client (customer) was created successfully
         self.assertTrue(Order.objects.filter(client__client_name='Test Client'
                                              ).exists(),
                         msg='Client was not created')
@@ -121,15 +133,16 @@ class TestCreateOrderView(TestCase):
         Test client conflict handling with exact match
         """
         # Create an existing client to trigger conflict
-        existing_client = baker.make(ClientModel, client_name='Test Client',
+        existing_client = baker.make(ClientModel,
+                                     client_name='Existing Client',
                                      client_phone='1234567890',
-                                     client_email='testclient@example.com')
+                                     client_email='existingclient@example.com')
 
         # Use the same details for a new order to trigger the conflict modal
         data = {
-            'client_name': 'Test Client',
+            'client_name': 'Existing Client',
             'client_phone': '1234567890',
-            'client_email': 'testclient@example.com',
+            'client_email': 'existingclient@example.com',
             'order_value': '100.00',
             'deposit': '20.00',
             'items-TOTAL_FORMS': '1',
@@ -156,15 +169,16 @@ class TestCreateOrderView(TestCase):
         i.e. matching name and phone, but non-matching email
         """
         # Create an existing client to trigger conflict
-        existing_client = baker.make(ClientModel, client_name='Test Client',
+        existing_client = baker.make(ClientModel,
+                                     client_name='Existing Client',
                                      client_phone='1234567890',
-                                     client_email='testclient@example.com')
+                                     client_email='existclient@example.com')
 
         # Use the same details for a new order to trigger the conflict modal
         data = {
-            'client_name': 'Test Client',  # matching
+            'client_name': 'Existing Client',  # matching
             'client_phone': '1234567890',  # matching
-            'client_email': 'testcustomer@example.com',  # non-matching
+            'client_email': 'existingcustomer@example.com',  # non-matching
             'order_value': '100.00',
             'deposit': '20.00',
             'items-TOTAL_FORMS': '1',
