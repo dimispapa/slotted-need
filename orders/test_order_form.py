@@ -23,8 +23,11 @@ class TestCreateOrderView(TestCase):
 
         # Create test products and options
         self.product = baker.make(Product)
+        self.product2 = baker.make(Product)
         self.option_value = baker.make(OptionValue,
                                        option__product=self.product)
+        self.option_value2 = baker.make(OptionValue,
+                                        option__product=self.product2)
 
         # Define the URL for creating an order
         self.create_order_url = reverse('create_order')
@@ -52,9 +55,9 @@ class TestCreateOrderView(TestCase):
             'client_name': 'Test Client',
             'client_phone': '1234567890',
             'client_email': 'testclient@example.com',
-            'order_value': '220.00',
+            'order_value': '700.00',
             'deposit': '20.00',
-            'items-TOTAL_FORMS': '1',
+            'items-TOTAL_FORMS': '2',
             'items-INITIAL_FORMS': '0',
             'items-0-product': self.product.id,
             'items-0-quantity': '1',
@@ -62,6 +65,12 @@ class TestCreateOrderView(TestCase):
             'items-0-discount': '0.00',
             'items-0-item_value': '220.00',
             'items-0-option_1': self.option_value.id,
+            'items-1-product': self.product2.id,
+            'items-1-quantity': '3',
+            'items-1-base_price': '180.00',
+            'items-1-discount': '20.00',
+            'items-1-item_value': '160.00',
+            'items-1-option_2': self.option_value2.id,
         }
         # Check if the check client API is working as expected
         # before posting form data
@@ -168,6 +177,7 @@ class TestCreateOrderView(TestCase):
         """
         Test client conflict handling with partial match
         i.e. matching name and phone, but non-matching email
+        and test handling of updating client data
         """
         # Create an existing client to trigger conflict
         existing_client = baker.make(ClientModel,
@@ -204,7 +214,6 @@ class TestCreateOrderView(TestCase):
         client = get_update_create_client(action='update_client',
                                           client_id=existing_client.id,
                                           cleaned_data=data)
-
         # Verify that the client details were updated
         self.assertEqual(client.client_email, 'existingcustomer@example.com',
                          msg='Client email was not updated correctly')
