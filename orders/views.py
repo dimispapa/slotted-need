@@ -537,7 +537,7 @@ class OrderItemViewSet(viewsets.ModelViewSet, LoginRequiredMixin):
     """
     A ViewSet for viewing and editing OrderItem instances.
     """
-
+    queryset = OrderItem.objects.all()
     serializer_class = OrderItemSerializer
     pagination_class = Pagination
     permission_classes = [permissions.IsAuthenticated]
