@@ -584,6 +584,7 @@ class OrderItemViewSet(viewsets.ModelViewSet, LoginRequiredMixin):
         # Optimize related objects with related objects for filtered queryset
         queryset = OrderItem.objects.select_related(
             'order',
+            'order__client',
             'product',
             'product_finish'
         ).prefetch_related(
