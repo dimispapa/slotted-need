@@ -537,16 +537,6 @@ class OrderItemViewSet(viewsets.ModelViewSet, LoginRequiredMixin):
     """
     A ViewSet for viewing and editing OrderItem instances.
     """
-    # fetch queryset with optimised query for related objects
-    queryset = OrderItem.objects.select_related(
-        'order',
-        'product',
-        'product_finish'
-    ).prefetch_related(
-        'option_values',
-        'item_component_finishes__finish_option',
-        'item_component_finishes__component'
-    ).all().order_by('-id')
 
     serializer_class = OrderItemSerializer
     pagination_class = Pagination
@@ -590,6 +580,16 @@ class OrderItemViewSet(viewsets.ModelViewSet, LoginRequiredMixin):
                 Q(order__paid=2, item_status=1) |
                 Q(order__paid=1, item_status=4)
             )
+
+        # Optimize related objects with related objects for filtered queryset
+        queryset = OrderItem.objects.select_related(
+            'order',
+            'product',
+            'product_finish'
+        ).prefetch_related(
+            'option_values',
+            'item_component_finishes'
+        ).all().order_by('-id')
 
         # Return the filtered or full queryset
         return queryset
