@@ -587,7 +587,7 @@ class OrderItemViewSet(viewsets.ModelViewSet, LoginRequiredMixin):
             'order__client',
             'product',
             'product_finish',
-            'product_finish__finish'
+            'product_finish__finish_option'
         ).prefetch_related(
             'option_values',
             Prefetch(
