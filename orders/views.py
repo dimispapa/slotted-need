@@ -586,7 +586,8 @@ class OrderItemViewSet(viewsets.ModelViewSet, LoginRequiredMixin):
             'order',
             'order__client',
             'product',
-            'product_finish'
+            'product_finish',
+            'product_finish__finish'
         ).prefetch_related(
             'option_values',
             Prefetch(
@@ -598,10 +599,6 @@ class OrderItemViewSet(viewsets.ModelViewSet, LoginRequiredMixin):
                 'product__components',
                 queryset=Component.objects.all()
             ),
-            Prefetch(
-                'product_finish__finish',
-                queryset=Finish.objects.all()
-            )
         ).all().order_by('-id')
 
         # Return the filtered or full queryset
