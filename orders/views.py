@@ -595,7 +595,11 @@ class OrderItemViewSet(viewsets.ModelViewSet, LoginRequiredMixin):
                     'finish_option', 'component')
             ),
             Prefetch(
-                'finish',
+                'product_finish__finish_option',
+                queryset=FinishOption.objects.all()
+            ),
+            Prefetch(
+                'product_finish__finish',
                 queryset=Finish.objects.all()
             ),
             Prefetch(
