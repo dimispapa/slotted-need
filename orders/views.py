@@ -587,13 +587,20 @@ class OrderItemViewSet(viewsets.ModelViewSet, LoginRequiredMixin):
             'order__client',
             'product',
             'product_finish',
-            'product_finish__finish_option'
         ).prefetch_related(
             'option_values',
             Prefetch(
                 'item_component_finishes',
                 queryset=ComponentFinish.objects.select_related(
                     'finish_option', 'component')
+            ),
+            Prefetch(
+                'finish',
+                queryset=Finish.objects.all()
+            ),
+            Prefetch(
+                'finish_option',
+                queryset=FinishOption.objects.all()
             ),
             Prefetch(
                 'product__components',
