@@ -599,8 +599,8 @@ class OrderItemViewSet(viewsets.ModelViewSet, LoginRequiredMixin):
                 queryset=Component.objects.all()
             ),
             Prefetch(
-                'product_finish__finish_option',
-                queryset=FinishOption.objects.all()
+                'product_finish__finish',
+                queryset=Finish.objects.all()
             )
         ).all().order_by('-id')
 
