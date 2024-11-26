@@ -9,7 +9,7 @@ from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Prefetch
 from rest_framework import viewsets, permissions, status, response
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -18,7 +18,7 @@ from rest_framework import filters
 from slotted_need.views import BaseLoginRequiredView
 from .models import Client, Order, OrderItem, ComponentFinish
 from products.models import (Product, Option, OptionValue, FinishOption,
-                             ProductComponent, Component)
+                             ProductComponent, Component, Finish)
 from .forms import OrderForm, OrderItemFormSet
 from .filters import OrderItemFilter, OrderFilter
 from .serializers import OrderItemSerializer, OrderSerializer
@@ -589,7 +589,19 @@ class OrderItemViewSet(viewsets.ModelViewSet, LoginRequiredMixin):
             'product_finish'
         ).prefetch_related(
             'option_values',
-            'item_component_finishes'
+            Prefetch(
+                'item_component_finishes',
+                queryset=ComponentFinish.objects.select_related(
+                    'finish_option', 'component')
+            ),
+            Prefetch(
+                'product__components',
+                queryset=Component.objects.all()
+            ),
+            Prefetch(
+                'product_finish__finish',
+                queryset=Finish.objects.all()
+            )
         ).all().order_by('-id')
 
         # Return the filtered or full queryset
