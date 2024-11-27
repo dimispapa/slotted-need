@@ -161,4 +161,4 @@ class ProductComponent(models.Model):
 
     def __str__(self):
         return (f"{self.component.name} ({self.quantity} x "
-                f"{self.component.unit_measurement})")
+                f"{self.component.get_unit_measurement_display()})")
