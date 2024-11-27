@@ -133,7 +133,7 @@ class OptionValue(models.Model):
     value = models.CharField(max_length=50)
 
     def __str__(self):
-        return f"{self.value}"
+        return f"{self.option} - {self.value}"
 
 
 # Create a ProductComponent intermediary model to link the Product with its
