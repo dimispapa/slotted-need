@@ -56,6 +56,17 @@ class Component(models.Model):
     unit_cost = models.DecimalField(max_digits=7, decimal_places=2,
                                     validators=[MinValueValidator(0.00)],
                                     blank=True, null=True)
+    # create a unit measurement mapping
+    UNITS = {1: 'm',
+             2: 'kg',
+             3: 'l',
+             4: 'm2',
+             5: 'm3',
+             6: 'pc'}
+    unit_measurement = models.IntegerField(
+        choices=UNITS,
+        default=6
+    )
     supplier_details = models.TextField(blank=True, null=True)
     finishes = models.ManyToManyField(Finish, blank=True,
                                       related_name='components')
@@ -145,8 +156,9 @@ class ProductComponent(models.Model):
     option_value = models.ForeignKey(OptionValue, on_delete=models.SET_NULL,
                                      blank=True, null=True,
                                      related_name='product_components')
-    quantity = models.PositiveIntegerField(default=1,
-                                           validators=[MinValueValidator(1)])
+    quantity = models.DecimalField(default=1, decimal_places=2, max_digits=4,
+                                   validators=[MinValueValidator(0.00)])
 
     def __str__(self):
-        return (f"{self.component.name} (x{self.quantity})")
+        return (f"{self.component.name} ({self.quantity} x "
+                f"{self.component.unit_measurement})")
