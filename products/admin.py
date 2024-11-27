@@ -19,6 +19,16 @@ class ProductAdmin(nested_admin.NestedModelAdmin):
     class ProductComponentInline(nested_admin.NestedStackedInline):
         model = ProductComponent
         extra = 0
+        readonly_fields = ['component_unit_measurement']
+
+        # Method to display the related unit_measurement from Component
+        def component_unit_measurement(self, obj):
+            if obj.component:
+                return obj.component.get_unit_measurement_display()
+            return "-"
+        component_unit_measurement.short_description = 'Unit Measurement'
+        fields = ['component', 'option_value', 'quantity',
+                  'component_unit_measurement']
 
     list_display = ('name', 'slug', 'description', 'base_price',)
     inlines = [OptionInline, ProductComponentInline, ]
