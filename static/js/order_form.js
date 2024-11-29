@@ -50,12 +50,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         // Clear old options
                         optionsContainer.innerHTML = '';
+                        debugger;
+                        // Populate options (and add listener to populate the selection's associated finishes) dynamically
+                        populateProductOptions(data, productId, formIndex, optionsContainer);
 
                         // Populate product-level finishes dynamically
                         updateProductFinishes(data, productId, formIndex, optionsContainer);
-
-                        // Populate options (and add listener to populate the selection's associated finishes) dynamically
-                        populateProductOptions(data, productId, formIndex, optionsContainer);
 
                         if (optionsContainer.childElementCount > 0) {
                             // Show the options container
@@ -131,6 +131,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Define function to update product finishes
     function updateProductFinishes(data, productId, formIndex, optionsContainer) {
         if (data.component_finishes && data.component_finishes.length > 0) {
+            debugger;
             // create a column for product finishes
             let finishCol = document.createElement('div');
             // add column styles from list constant

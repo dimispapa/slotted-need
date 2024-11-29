@@ -419,11 +419,16 @@ def get_product_data(request, product_id):
         ).filter(option_value_count=0)
 
         # initialise empty component finishes data list
-        comp_finish_data = []
+        comp_finish_data = {}
 
         for component in components_without_options:
             # retrieve finishes of component
             finishes = component.finishes.all()
+
+            comp_finish_data[component.id] = {
+                'component_name': component.name,
+                'finishes': []
+            }
 
             for finish in finishes:
                 # use filter to retrieve finish options,
@@ -431,12 +436,10 @@ def get_product_data(request, product_id):
                 finish_options = FinishOption.objects.filter(finish=finish)
                 finish_options_data = [{'id': fo.id, 'name': fo.name}
                                        for fo in finish_options]
-                comp_finish_data.append({
+                comp_finish_data[component.id]['finishes'].append({
                     'id': finish.id,
                     'name': finish.name,
                     'options': finish_options_data,
-                    'component_id': component.id,
-                    'component_name': component.name
                 })
 
         # Return the data as JSON
