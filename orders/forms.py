@@ -133,9 +133,9 @@ class OrderItemForm(forms.ModelForm):
                     css_class='form-group col-md-3 mb-2 mb-md-3'
                 ),
             ),
-            # Options container/row div
+            # Configuration container/row div
             Row(
-                css_class=("options-form-container p-1 p-md-2 bg-light "
+                css_class=("config-form-container p-1 p-md-2 bg-light "
                            "text-dark mb-2 mb-md-3 d-none rounded")
             ),
             Row(

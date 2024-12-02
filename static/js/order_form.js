@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let productId = target.value;
         let orderItem = target.closest('.order-item-form');
         let formIndex = orderItem.getAttribute('data-form-index');
-        let optionsContainer = orderItem.querySelector('.options-form-container')
+        let configurationContainer = orderItem.querySelector('.config-form-container')
         let basePriceField = document.getElementById(`id_items-${formIndex}-base_price`);
         let discountField = document.getElementById(`id_items-${formIndex}-discount`);
         let itemValueField = document.getElementById(`id_items-${formIndex}-item_value`);
@@ -49,17 +49,17 @@ document.addEventListener('DOMContentLoaded', function () {
                         itemValueField.value = (basePrice - discount).toFixed(2);
 
                         // Clear old options
-                        optionsContainer.innerHTML = '';
-                        debugger;
+                        configurationContainer.innerHTML = '';
+
                         // Populate options (and add listener to populate the selection's associated finishes) dynamically
-                        populateProductOptions(data, productId, formIndex, optionsContainer);
+                        populateProductOptions(data, productId, formIndex, configurationContainer);
 
-                        // Populate product-level finishes dynamically
-                        updateProductFinishes(data, productId, formIndex, optionsContainer);
+                        // Populate product-level and component-level finishes dynamically
+                        updateProductComponentFinishes(data, productId, formIndex, configurationContainer);
 
-                        if (optionsContainer.childElementCount > 0) {
+                        if (configurationContainer.childElementCount > 0) {
                             // Show the options container
-                            optionsContainer.classList.remove('d-none');
+                            configurationContainer.classList.remove('d-none');
                         };
 
                         // Once the product details have been updated, resolve the promise
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         } else {
             // Hide the options and finishes container if no product is selected
-            optionsContainer.classList.add('d-none');
+            configurationContainer.classList.add('d-none');
             finishesContainer.classList.remove('d-none');
             // set the base price and discount to zero to reset
             basePriceField.value = 0;
@@ -86,19 +86,20 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     // Define function to populate product options
-    function populateProductOptions(data, productId, formIndex, optionsContainer) {
+    function populateProductOptions(data, productId, formIndex, configurationContainer) {
         // Populate options dynamically
         if (data.options && data.options.length > 0) {
-            data.options.forEach(option => {
+            data.options.forEach((option, index) => {
                 // create columns for options
                 let optionCol = document.createElement('div');
                 optionCol.classList.add(...OPTION_COL_STYLES);
+                optionCol.innerHTML += `<h4>${option.name}</h4>`
 
                 let optionDiv = document.createElement('div');
                 optionDiv.classList.add('row');
                 let optionDivHTML = `
                                 <div class="${OPTION_GROUP_STYLES}">
-                                    <label for="id_items-${formIndex}-option-${option.id}" class="form-label requiredField">${option.name}<span class="asteriskField">*</span></label>
+                                    <label for="id_items-${formIndex}-option-${option.id}" class="form-label requiredField">Design Option<span class="asteriskField">*</span></label>
                                     <select class="form-select options-dropdown" name="items-${formIndex}-option_${option.id}"
                                     id="id_items-${formIndex}-option-${option.id}" required aria-required="true">
                                         <option value="">------------</option>
@@ -118,60 +119,71 @@ document.addEventListener('DOMContentLoaded', function () {
                 optionCol.appendChild(finishRow);
 
                 // append the column to the container
-                optionsContainer.appendChild(optionCol);
+                configurationContainer.appendChild(optionCol);
 
                 // Fetch finishes dynamically when the option value changes
                 document.getElementById(`id_items-${formIndex}-option-${option.id}`).addEventListener('change', function () {
-                    updateFinishes(formIndex, productId, finishRow.id, this.value);
+                    updateOptionRelatedFinishes(formIndex, productId, finishRow.id, this.value);
                 });
             });
         }
     }
 
     // Define function to update product finishes
-    function updateProductFinishes(data, productId, formIndex, optionsContainer) {
+    function updateProductComponentFinishes(data, productId, formIndex, configurationContainer) {
         if (data.component_finishes && data.component_finishes.length > 0) {
-            debugger;
-            // create a column for product finishes
-            let finishCol = document.createElement('div');
+
+            // create a column for product and component finishes
+            let productFinishCol = document.createElement('div');
+
             // add column styles from list constant
-            finishCol.classList.add(...OPTION_COL_STYLES);
-            // Create a finish div row
-            let finishDiv = document.createElement('div');
-            finishDiv.classList.add('row');
+            productFinishCol.classList.add(...OPTION_COL_STYLES);
+
             // Populate component-level finishes (not driven by config options) dynamically
-            data.component_finishes.forEach(finish => {
-                let finishDivHTML = `
-                            <div class="${OPTION_GROUP_STYLES}">
-                                <label for="id_items-${formIndex}-finish-${finish.id}-${finish.component_id}" class="form-label">${finish.component_name} ${finish.name}</label>
-                                <select class="form-select comp-finish-dropdown-${formIndex}" name="items-${formIndex}-component_finish-${finish.component_id}"
-                                id="id_items-${formIndex}-finish-${finish.id}-${finish.component_id}">
-                                    <option value="">------------</option>
-                            </div>
+            data.component_finishes.forEach(component => {
+                // create a component div container column
+                let componentFinishCol = document.createElement('div');
+                componentFinishCol.classList.add(...OPTION_COL_STYLES);
+                componentFinishCol.setAttribute('id', component.id);
+                componentFinishCol.innerHTML += `<h4>${component.name}</h4>`;
+                // Create a finish div row within the column container
+                let finishDiv = document.createElement('div');
+                finishDiv.classList.add('row');
+
+                // loop through finishes and construct the html select elements
+                component.finishes.forEach(finish => {
+                    let finishDivHTML = `
+                    <div class="${OPTION_GROUP_STYLES}">
+                        <label for="id_items-${formIndex}-finish-${finish.id}-${component.id}" class="form-label">${finish.name}</label>
+                        <select class="form-select finish-dropdown-${formIndex}" name="items-${formIndex}-component_finish-${component.id}"
+                        id="id_items-${formIndex}-finish-${finish.id}-${component.id}">
+                            <option value="">------------</option>
+                    </div>
                     `;
-                finish.options.forEach(finishOption => {
-                    finishDivHTML += `<option value="${finishOption.id}">${finishOption.name}</option>`;
-                });
-                finishDivHTML += '</select>';
-                finishDiv.innerHTML += finishDivHTML;
-                finishCol.appendChild(finishDiv);
+                    finish.options.forEach(finishOption => {
+                        finishDivHTML += `<option value="${finishOption.id}">${finishOption.name}</option>`;
+                    });
+                    finishDivHTML += '</select>';
+                    finishDiv.innerHTML += finishDivHTML;
+                    componentFinishCol.appendChild(finishDiv);
+                })
+
+                // append the finishes column to the config container
+                configurationContainer.appendChild(componentFinishCol);
             });
 
-            // append the column to the container
-            optionsContainer.appendChild(finishCol);
-
-            // Add event listeners to each comp-finish dropdown to handle the deselection of others
-            let targetClass = `.comp-finish-dropdown-${formIndex}`;
-            document.querySelectorAll(targetClass).forEach(compFinishDropdown => {
-                compFinishDropdown.addEventListener('change', function () {
-                    deselectOtherFinishes(compFinishDropdown, targetClass);
+            // Add event listeners to each finish dropdown to handle the deselection of others
+            let targetClass = `.finish-dropdown-${formIndex}`;
+            document.querySelectorAll(targetClass).forEach(finishDropdown => {
+                finishDropdown.addEventListener('change', function () {
+                    deselectOtherFinishes(finishDropdown, targetClass);
                 });
             });
         }
     }
 
     // Define function to update finishes based on selected option
-    function updateFinishes(formIndex, productId, finishRowId, optionValueId) {
+    function updateOptionRelatedFinishes(formIndex, productId, finishRowId, optionValueId) {
         let finishRow = document.getElementById(finishRowId);
 
         // Check if an actual option value was selected
@@ -190,30 +202,32 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Clear old finishes
                     finishRow.innerHTML = '';
                     // Populate finishes dynamically
-                    data.component_finishes.forEach(finish => {
-                        let finishHTML = `
-                            <div class="${OPTION_GROUP_STYLES}">
-                                <label for="id_items-${formIndex}-finish-${optionValueId}-${finish.id}" class="form-label text-dark">${finish.name}</label>
-                                <select class="form-select finish-dropdown-${formIndex}" id="id_items-${formIndex}-finish-${optionValueId}-${finish.id}"
-                                name="items-${formIndex}-option_finish_component-${finish.component_id}">
-                                    <option value="">------------</option>
-                            </div>
-                        `;
-                        finish.finish_options.forEach(finishOption => {
-                            finishHTML += `<option value="${finishOption.id}">${finishOption.name}</option>`;
+                    if (data.component_finishes && data.component_finishes.length > 0) {
+                        // loop through finishes to create select elements
+                        data.component_finishes.forEach(finish => {
+                            let finishHTML = `
+                                <div class="${OPTION_GROUP_STYLES}">
+                                    <label for="id_items-${formIndex}-finish-${optionValueId}-${finish.id}" class="form-label text-dark">${finish.name}</label>
+                                    <select class="form-select finish-dropdown-${formIndex}" id="id_items-${formIndex}-finish-${optionValueId}-${finish.id}"
+                                    name="items-${formIndex}-option_finish_component-${finish.component_id}">
+                                        <option value="">------------</option>
+                                </div>
+                            `;
+                            finish.finish_options.forEach(finishOption => {
+                                finishHTML += `<option value="${finishOption.id}">${finishOption.name}</option>`;
+                            });
+                            finishHTML += '</select>';
+                            // set the HTML to the element
+                            finishRow.innerHTML += finishHTML;
                         });
-                        finishHTML += '</select>';
-                        finishRow.innerHTML += finishHTML;
-                    });
-
-                    // Add event listeners to each finish dropdown to handle the deselection of others
-                    let targetClass = `.finish-dropdown-${formIndex}`;
-                    document.querySelectorAll(targetClass).forEach(finishDropdown => {
-                        finishDropdown.addEventListener('change', function () {
-                            deselectOtherFinishes(finishDropdown, targetClass);
+                        // Add event listeners to each finish dropdown to handle the deselection of others
+                        let targetClass = `.finish-dropdown-${formIndex}`;
+                        document.querySelectorAll(targetClass).forEach(finishDropdown => {
+                            finishDropdown.addEventListener('change', function () {
+                                deselectOtherFinishes(finishDropdown, targetClass);
+                            });
                         });
-                    });
-
+                    }
                 })
                 .catch(error => {
                     // Handle any errors that occurred during the fetch
@@ -228,6 +242,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Define function to deselect other finishes in the same option container
     function deselectOtherFinishes(selectedDropdown, targetClass) {
+
         // get the grandparent div container
         let grandParentDiv = selectedDropdown.parentElement.parentElement;
         // Loop through all finish dropdowns within the same finishRow
@@ -235,7 +250,10 @@ document.addEventListener('DOMContentLoaded', function () {
             // If it's not the dropdown that was selected, reset its value
             if (dropdown !== selectedDropdown) {
                 dropdown.value = '';
-            }
+                dropdown.classList.add('unselected')
+            } else {
+                dropdown.classList.remove('unselected');
+            };
         });
     }
 

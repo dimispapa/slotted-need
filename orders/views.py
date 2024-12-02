@@ -419,27 +419,30 @@ def get_product_data(request, product_id):
         ).filter(option_value_count=0)
 
         # initialise empty component finishes data list
-        comp_finish_data = {}
+        comp_finish_data = []
 
         for component in components_without_options:
             # retrieve finishes of component
             finishes = component.finishes.all()
+            if finishes:
+                comp_finishes = []
 
-            comp_finish_data[component.id] = {
-                'component_name': component.name,
-                'finishes': []
-            }
+                for finish in finishes:
+                    # use filter to retrieve finish options,
+                    # without raising 404 as they are optional
+                    finish_options = FinishOption.objects.filter(finish=finish)
+                    finish_options_data = [{'id': fo.id, 'name': fo.name}
+                                           for fo in finish_options]
+                    comp_finishes.append({
+                        'id': finish.id,
+                        'name': finish.name,
+                        'options': finish_options_data,
+                    })
 
-            for finish in finishes:
-                # use filter to retrieve finish options,
-                # without raising 404 as they are optional
-                finish_options = FinishOption.objects.filter(finish=finish)
-                finish_options_data = [{'id': fo.id, 'name': fo.name}
-                                       for fo in finish_options]
-                comp_finish_data[component.id]['finishes'].append({
-                    'id': finish.id,
-                    'name': finish.name,
-                    'options': finish_options_data,
+                comp_finish_data.append({
+                    'id': component.id,
+                    'name': component.name,
+                    'finishes': comp_finishes
                 })
 
         # Return the data as JSON
@@ -447,7 +450,7 @@ def get_product_data(request, product_id):
             'product': product.name,
             'base_price': product.base_price,
             'options': options_data,
-            'finishes': finishes_data,
+            'product_finishes': finishes_data,
             'component_finishes': comp_finish_data
         })
 

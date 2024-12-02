@@ -70,6 +70,12 @@ of the suggestions div depending on viewport size */
   order: 4;
 }
 
+/* Gray out unselected dropdowns */
+.unselected {
+  filter: grayscale(100%);
+  opacity: 0.2;
+}
+
 /* For larger devices, reorder the dropdown */
 @media (min-width: 768px) {
   .client-form-container {
