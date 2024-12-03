@@ -9,12 +9,26 @@ from .models import (Product, Option, OptionValue, Component, Finish,
 class ProductAdmin(nested_admin.NestedModelAdmin):
 
     class OptionInline(nested_admin.NestedStackedInline):
+        model = Option
+        extra = 0
+
         class OptionValueInline(nested_admin.NestedTabularInline):
             model = OptionValue
             extra = 0
-        model = Option
+
+            # Optimize OptionValue queryset to avoid N+1 issues
+            def get_queryset(self, request):
+                queryset = super().get_queryset(request)
+                # Use select_related for the ForeignKey relationship
+                return queryset.select_related('option')
+
         inlines = [OptionValueInline]
-        extra = 0
+
+        # Optimize Option queryset to avoid N+1 issues
+        def get_queryset(self, request):
+            queryset = super().get_queryset(request)
+            # Use prefetch_related for reverse ForeignKey relationship
+            return queryset.prefetch_related('values')
 
     class ProductComponentInline(nested_admin.NestedStackedInline):
         model = ProductComponent
@@ -30,12 +44,27 @@ class ProductAdmin(nested_admin.NestedModelAdmin):
         fields = ['component', 'option_value', 'quantity',
                   'component_unit_measurement']
 
+        # Optimize ProductComponent queryset to avoid N+1 issues
+        def get_queryset(self, request):
+            queryset = super().get_queryset(request)
+            # Use select_related for ForeignKey relationships
+            return queryset.select_related('component', 'option_value',
+                                           'product')
+
     list_display = ('name', 'slug', 'description', 'base_price',)
     inlines = [OptionInline, ProductComponentInline, ]
+
     # Allows for the selection of multiple finishes
     filter_horizontal = ['finishes',]
     search_fields = ['name', 'description']
     prepopulated_fields = {'slug': ('name',)}
+
+    # Optimize ProductAdmin queryset to avoid N+1 issues
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        # Prefetch related objects for one-to-many relationships
+        return queryset.prefetch_related('options', 'options__values',
+                                         'components', 'finishes')
 
 
 # Define the ComponentAdmin page to add components
