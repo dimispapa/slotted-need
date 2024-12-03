@@ -77,7 +77,8 @@ class ComponentAdmin(nested_admin.NestedModelAdmin):
         extra = 0
         prepopulated_fields = {'slug': ('name',)}
 
-    list_display = ('name', 'description', 'unit_cost', 'supplier_details', )
+    list_display = ('name', 'slug', 'description', 'unit_cost',
+                    'supplier_details', )
     inlines = [ComponentPartInLine, ]
     # Allows for the selection of multiple finishes
     filter_horizontal = ['finishes',]
