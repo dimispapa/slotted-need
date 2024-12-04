@@ -63,8 +63,8 @@ $(document).ready(function () {
                 d.item_component_finishes = $('#filter-component-finishes').val();
                 d.value_min = $('#filter-value-min').val();
                 d.value_max = $('#filter-value-max').val();
-                d.item_status = $('#filter-item-status').val();
                 d.priority_level = $('#filter-priority-level').val();
+                d.item_status = $('#filter-item-status').val();
                 d.paid_status = $('#filter-paid-status').val();
                 d.exclude_completed = $('#filter-exclude-completed').is(':checked');
 
@@ -161,29 +161,6 @@ $(document).ready(function () {
                 className: 'sortable',
                 render: $.fn.dataTable.render.number(',', '.', 0, '€')
             },
-            { // Item Status
-                data: 'item_status',
-                className: 'sortable',
-                render: function (data, type, row) {
-                    if (type === 'display') {
-                        let select = `<select class="form-select-sm item-status fw-bolder text-wrap" data-id="${row.id}">`;
-                        // Use global variable passed from context into JS and generate select options
-                        let options = generateSelectOptions(itemStatusChoices, data);
-                        select += options;
-                        select += '</select>';
-                        // Add a spinner
-                        select += `
-                        <span class="text-center inline-spinner-div">
-                            <div class="spinner-border text-primary d-none" role="status" id="item-status-spinner-${row.id}">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                        </span>
-                        `;
-                        return select;
-                    }
-                    return data;
-                }
-            },
             { // Priority Level Status
                 data: 'priority_level',
                 className: 'sortable',
@@ -198,6 +175,29 @@ $(document).ready(function () {
                         select += `
                         <span class="text-center inline-spinner-div">
                             <div class="spinner-border text-primary d-none" role="status" id="priority-status-spinner-${row.id}">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </span>
+                        `;
+                        return select;
+                    }
+                    return data;
+                }
+            },
+            { // Item Status
+                data: 'item_status',
+                className: 'sortable',
+                render: function (data, type, row) {
+                    if (type === 'display') {
+                        let select = `<select class="form-select-sm item-status fw-bolder text-wrap" data-id="${row.id}">`;
+                        // Use global variable passed from context into JS and generate select options
+                        let options = generateSelectOptions(itemStatusChoices, data);
+                        select += options;
+                        select += '</select>';
+                        // Add a spinner
+                        select += `
+                        <span class="text-center inline-spinner-div">
+                            <div class="spinner-border text-primary d-none" role="status" id="item-status-spinner-${row.id}">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
                         </span>
@@ -257,7 +257,7 @@ $(document).ready(function () {
         ],
         // Default ordering by priority_level descending
         order: [
-            [10, 'desc']
+            [9, 'desc']
         ],
         // Callback after every draw (initial load and subsequent updates)
         drawCallback: function (settings) {

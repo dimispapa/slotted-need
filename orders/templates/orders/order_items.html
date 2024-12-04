@@ -34,8 +34,8 @@
                 <th>Product Finish</th>
                 <th>Component Finishes</th>
                 <th>Value</th>
-                <th>Item Status</th>
                 <th>Priority Level</th>
+                <th>Item Status</th>
                 <th>Payment Status</th>
                 <th>Completed</th>
                 <th></th>
@@ -81,10 +81,10 @@
                         placeholder="Max" />
                 </th>
                 <th>
-                    {% include 'orders/partials/dropdown.html' with options=item_status_choices selected="" class="filter-item-status form-select" id="filter-item-status" %}
+                    {% include 'orders/partials/dropdown.html' with options=priority_level_choices selected="" class="filter-priority-level form-select" id="filter-priority-level" %}
                 </th>
                 <th>
-                    {% include 'orders/partials/dropdown.html' with options=priority_level_choices selected="" class="filter-priority-level form-select" id="filter-priority-level" %}
+                    {% include 'orders/partials/dropdown.html' with options=item_status_choices selected="" class="filter-item-status form-select" id="filter-item-status" %}
                 </th>
                 <th>
                     <!-- Tooltip -->
