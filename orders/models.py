@@ -1,13 +1,14 @@
 from decimal import Decimal
 from django.db import models
 from django.db.models import Case, When, Value, BooleanField
+from phonenumber_field.modelfields import PhoneNumberField
 from django.core.validators import MinValueValidator
 from products.models import Product, OptionValue, FinishOption, Component
 
 
 class Client(models.Model):
     client_name = models.CharField(max_length=100)
-    client_phone = models.CharField(max_length=20)
+    client_phone = PhoneNumberField(blank=True)
     client_email = models.EmailField()
     created_on = models.DateField(auto_now_add=True)
 

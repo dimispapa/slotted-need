@@ -2,13 +2,16 @@ from rest_framework.serializers import (ModelSerializer,
                                         PrimaryKeyRelatedField,
                                         StringRelatedField,
                                         SerializerMethodField,
-                                        DateTimeField
+                                        DateTimeField,
                                         )
+from phonenumber_field.serializerfields import PhoneNumberField
 from .models import OrderItem, Order, Product, Client, ComponentFinish
 from products.models import OptionValue, FinishOption
 
 
 class ClientSerializer(ModelSerializer):
+    client_phone = PhoneNumberField()
+
     class Meta:
         model = Client
         fields = ['id', 'client_name', 'client_phone', 'client_email']

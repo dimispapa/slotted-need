@@ -44,9 +44,9 @@ def check_client(request):
                 'id': exact_match.id,
             }})
 
-        # Check for partial match (name + phone or email)
+        # Check for partial match (name, phone or email)
         partial_match = Client.objects.filter(
-            Q(client_name__iexact=client_name) &
+            Q(client_name__iexact=client_name) |
             (Q(client_phone__iexact=client_phone) |
              Q(client_email__iexact=client_email))
         ).first()
@@ -521,7 +521,8 @@ def search_clients(request):
             # create client data using list comprehension
             client_data = [
                 {'name': client.client_name,
-                 'phone': client.client_phone,
+                 # Convert PhoneNumber object to string
+                 'phone': str(client.client_phone),
                  'email': client.client_email}
                 for client in clients
             ]

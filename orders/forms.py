@@ -1,4 +1,6 @@
 from django import forms
+from phonenumber_field.formfields import PhoneNumberField
+from phonenumber_field.widgets import RegionalPhoneNumberWidget
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Div, Field
 from crispy_forms.bootstrap import PrependedText
@@ -12,7 +14,7 @@ class OrderForm(forms.Form):
         'autocomplete': 'off',  # Disable browser autocomplete
         'id': 'client_name'
     }), required=True)
-    client_phone = forms.CharField(widget=forms.TextInput(attrs={
+    client_phone = PhoneNumberField(widget=RegionalPhoneNumberWidget(attrs={
         'class': 'form-control',
         'id': 'client_phone'
     }), required=True)
