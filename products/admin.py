@@ -51,6 +51,23 @@ class ProductAdmin(nested_admin.NestedModelAdmin):
             return queryset.select_related('component', 'option_value',
                                            'product')
 
+        # Use formfield_for_foreignkey to filter option_value field
+        # dynamically based on the product
+        def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+            if db_field.name == 'option_value':
+                # Retrieve the object ID of the Product currently being edited
+                # from the request path
+                if request.resolver_match.kwargs.get('object_id'):
+                    product_id = request.resolver_match.kwargs.get('object_id')
+                    kwargs['queryset'] = OptionValue.objects.filter(
+                        option__product_id=product_id)
+                else:
+                    # If the product cannot be determined,
+                    # return an empty queryset for safety
+                    kwargs['queryset'] = OptionValue.objects.none()
+            return super().formfield_for_foreignkey(db_field, request,
+                                                    **kwargs)
+
     list_display = ('name', 'slug', 'description', 'base_price',)
     inlines = [OptionInline, ProductComponentInline, ]
 
