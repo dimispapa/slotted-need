@@ -403,6 +403,9 @@ function clearDataTableFilters(table) {
     for (let select of selects) {
         select.value = 'All';
     };
+    // deactivate critical filter btn
+    $('#critical-filter-btn').removeClass('active btn-warning btn-pressed').addClass('btn-outline-warning btn-unpressed');
+
     // Reload the table
     table.ajax.reload();
 };

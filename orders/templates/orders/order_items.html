@@ -19,6 +19,13 @@
             class="fa-solid fa-table-list text-primary"></i> Item Tracker</h1>
     <!-- Clear filters button -->
     <div class="text-center">
+        <button id="critical-filter-btn" class="btn btn-outline-warning btn-unpressed position-relative me-3">
+            Critical Items
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                id="critical-items-badge">{{ critical_items_count }}</span>
+            <span class="visually-hidden">critical items</span>
+            </span>
+        </button>
         <button id="clear-filters-btn" class="btn btn-danger">Clear Filters</button>
     </div>
     <!-- Items table -->

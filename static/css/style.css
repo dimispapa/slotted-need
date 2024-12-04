@@ -138,6 +138,14 @@ th.sortable {
   cursor: pointer;
 }
 
+.btn-pressed {
+  box-shadow: inset 5px 5px 5px rgba(0, 0, 0, 0.125);
+}
+
+.btn-unpressed {
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.125);
+}
+
 /* default pointer on non-sortable */
 th.not-sortable {
   cursor: default;

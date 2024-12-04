@@ -580,16 +580,22 @@ class OrderItemViewSet(viewsets.ModelViewSet, LoginRequiredMixin):
             queryset = queryset.filter(order__id=order_id)
 
         # If filter type is provided, filter the queryset
-        if filter_type == 'home_dashboard':
+        if filter_type == 'critical':
             # Apply specific filters:
-            # Fully Paid but Not Started OR Delivered but Not Paid
+            # 1. Fully Paid but Not Started OR
+            # 2. Delivered but Not Paid OR
+            # 3. Priority level High
             queryset = queryset.filter(
-                Q(order__paid=2, item_status=1) |
-                Q(order__paid=1, item_status=4)
+                (
+                    Q(order__paid=2, item_status=1) |
+                    Q(order__paid=1, item_status=4) |
+                    Q(priority_level=3)
+                ) &
+                Q(completed=False)
             )
 
         # Optimize related objects with related objects for filtered queryset
-        queryset = OrderItem.objects.select_related(
+        queryset = queryset.select_related(
             'order',
             'order__client',
             'product',
@@ -658,6 +664,17 @@ class OrderItemListView(TemplateView,
             context['priority_level_choices'])
         context['paid_status_choices_json'] = json.dumps(
             context['paid_status_choices'])
+
+        # Add count of items requiring attention (critical filter)
+        critical_items_count = OrderItem.objects.filter(
+            (
+                Q(order__paid=2, item_status=1) |
+                Q(order__paid=1, item_status=4) |
+                Q(priority_level=3)
+            ) & Q(completed=False)
+        ).count()
+        context['critical_items_count'] = critical_items_count
+
         return context
 
 

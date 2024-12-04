@@ -357,7 +357,7 @@ $(document).ready(function () {
                 d.length = length;
 
                 // Append filter_type parameter
-                d.filter_type = 'home_dashboard';
+                d.filter_type = 'critical';
 
                 // Ordering parameters
                 // WARNING: "order" is a reserved array name to store sorting instructions
@@ -507,7 +507,7 @@ $(document).ready(function () {
         ],
         // Default ordering by priority_level descending
         order: [
-            [10, 'desc']
+            [2, 'desc']
         ],
         // Callback after every draw (initial load and subsequent updates)
         drawCallback: function (settings) {

@@ -25,6 +25,11 @@ $(document).ready(function () {
     // Setup AJAX to include CSRF token
     ajaxSetupToken(csrftoken);
 
+    // Activate filter button if filter_type is 'critical'
+    if (params.get('filter_type') === 'critical') {
+        $('#critical-filter-btn').addClass('active btn-warning btn-pressed').removeClass('btn-outline-warning btn-unpressed');
+    }
+
     // Initialize DataTable with AJAX source and server-side processing
     let table = $('#orderitem-table').DataTable({
         serverSide: true, // Enable server-side processing
@@ -68,8 +73,16 @@ $(document).ready(function () {
                 d.paid_status = $('#filter-paid-status').val();
                 d.exclude_completed = $('#filter-exclude-completed').is(':checked');
 
-                // get filter type param if query parameter exists
-                d.filter_type = params.get('filter_type');
+                // Check the critical filter button state
+                if ($('#critical-filter-btn').hasClass('active')) {
+                    d.filter_type = 'critical';
+                } else {
+                    // Otherwise, use URL parameter if it exists
+                    let urlFilterType = params.get('filter_type');
+                    if (urlFilterType) {
+                        d.filter_type = urlFilterType;
+                    }
+                }
 
                 // Ordering parameters
                 // WARNING: "order" is a reserved array name to store sorting instructions
@@ -281,6 +294,14 @@ $(document).ready(function () {
         debounce(function () {
             table.ajax.reload();
         }, 300));
+
+    // Handle filter button click
+    $('#critical-filter-btn').on('click', function () {
+        $(this).toggleClass('active btn-warning btn-pressed btn-outline-warning btn-unpressed');
+
+        // Refresh DataTable with the new filter state
+        table.ajax.reload();
+    });
 
     // Handle change for item_status
     $('#orderitem-table').on('change', '.item-status', function () {
