@@ -4,6 +4,7 @@ import {
     formatWithThousandsSeparator,
     generateOptionsList,
     updateStatusStyle,
+    initTooltips
 } from "./utils.js";
 
 $(document).ready(function () {
@@ -298,10 +299,10 @@ $(document).ready(function () {
                     },
                     options: {
                         responsive: true,
-                        maintainAspectRatio: false,
+                        maintainAspectRatio: true,
                         plugins: {
                             title: {
-                                display: true,
+                                display: false,
                                 text: 'Open Items by Configuration',
                                 font: {
                                     size: 20
@@ -337,7 +338,7 @@ $(document).ready(function () {
         orderCellsTop: true, // Place sorting icons to top row
         fixedHeader: true, // Fix the header when scrolling
         searching: false, // Disable global search as using column filters
-        scrollY: '30vh', // Enable vertical scrolling
+        scrollY: '80vh', // Enable vertical scrolling
         scrollX: true, // Enable horizontal scrolling
         responsive: true, // Enable responsive layout for smaller screens
         pageLength: pageSize,
@@ -527,5 +528,8 @@ $(document).ready(function () {
     RenderDebtorsChart();
     RenderItemStatusProductChart();
     RenderItemStatusConfigChart();
+
+    // initialize tooltips
+    initTooltips();
 
 });

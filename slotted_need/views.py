@@ -22,7 +22,8 @@ class BaseLoginRequiredView(LoginRequiredMixin, View):
     A base view that requires users to be logged in.
     All views inheriting from this must define the 'template_name'.
     """
-    login_url = 'account_login'  # Ensure it matches the LOGIN_URL in settings.py
+    # Ensure it matches the LOGIN_URL in settings.py
+    login_url = 'account_login'
     redirect_field_name = 'next'
 
 
@@ -38,6 +39,9 @@ class HomeView(TemplateView,
         context['item_status_choices'] = OrderItem.STATUS_CHOICES
         context['priority_level_choices'] = OrderItem.PRIORITY_CHOICES
         context['paid_status_choices'] = Order.PAID_CHOICES
+
+        # include a list of products for the filter
+        context['products'] = Product.objects.all().order_by('name')
 
         # Serialize choices to JSON for JavaScript
         context['item_status_choices_json'] = json.dumps(

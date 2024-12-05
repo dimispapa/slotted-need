@@ -173,22 +173,10 @@ th.not-sortable {
   font-size: 0.8rem;
 }
 
-/* Home dashboard */
-.input-group-text {
-  font-size: smaller;
-}
-
 /* Order item table */
 #orderitem-home-table_wrapper {
   /* set font-size */
   font-size: 10px;
-}
-
-#orderitem-home-table-title {
-  /* font-size */
-  font-size: 1.4rem;
-  font-weight: bold;
-  color: dimgray;
 }
 
 /* for larger screens limit the width of the metric banners */
@@ -196,6 +184,24 @@ th.not-sortable {
   .metric-banner {
     max-width: 60%;
   }
+}
+
+/* HOME DASHBOARD */
+
+/* inputs text */
+.input-group-text {
+  font-size: smaller;
+}
+
+#orderItemStatusConfigChart {
+  max-height: 100vh; /* Set a maximum height to constrain chart size */
+}
+
+.home-table-title {
+  /* font-size */
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: dimgray;
 }
 
 /********* General data table styles *************/

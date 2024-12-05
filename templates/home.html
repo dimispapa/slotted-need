@@ -17,8 +17,10 @@
 <!-- Main content -->
 {% block content %}
 <div class="container-fluid">
+
   <!-- 1ST ROW -->
   <div class="row">
+
     <!-- DEBTORS -->
     <div class="col-12 col-md-4 border pb-3">
       <!-- Debtors Chart -->
@@ -27,10 +29,11 @@
       <div class="input-group mt-2 mt-md-4 metric-banner">
         <span class="input-group-text fs-6 fs-md-5 bg-primary text-light">Total Owed by Clients</span>
         <span class="input-group-text fs-6 fs-md-5">€</span>
-        <input type="text" name="total_debtor_bal" class="form-control fw-bolder" id="total-debtor-bal" aria-label="readonly"
-          readonly disabled>
+        <input type="text" name="total_debtor_bal" class="form-control fw-bolder" id="total-debtor-bal"
+          aria-label="readonly" readonly disabled>
       </div>
     </div>
+
     <!-- ORDER ITEM STATUS BY PRODUCT -->
     <div class="col-12 col-md-4 border pb-3">
       <!-- Order Item Status Chart -->
@@ -39,10 +42,11 @@
       <div class="input-group mt-2 mt-md-4 metric-banner text-center">
         <span class="input-group-text fs-6 fs-md-5 bg-primary text-light">Total Open Items</span>
         <span class="input-group-text fs-6 fs-md-5">Count</span>
-        <input type="text" name="total_open_items" class="form-control fw-bolder" id="total-open-items" aria-label="readonly"
-          readonly disabled>
+        <input type="text" name="total_open_items" class="form-control fw-bolder" id="total-open-items"
+          aria-label="readonly" readonly disabled>
       </div>
     </div>
+
     <!-- PRODUCT REVENUE -->
     <div class="col-12 col-md-4 border pb-3">
       <!-- Product Revenue Chart -->
@@ -70,20 +74,42 @@
       </div>
     </div>
   </div>
+
   <!-- 2ND ROW -->
   <div class="row pb-sm-4">
+
     <!-- ORDER ITEM STATUS BY CONFIGURATION -->
     <div class="col-12 col-md-6 border pb-3">
+      <h1 class="display-6 mt-1 mt-md-2 text-center home-table-title">Open Items by Configuration</h1>
+      <!-- Product Filter Dropdown -->
+      <div class="d-flex justify-content-center">
+        <label for="product-filter" hidden>Filter by Product</label>
+        <select id="product-filter" class="form-select form-select-sm mb-1 mt-2 w-25">
+          <option value="">All Products</option>
+          <!-- Options will be populated dynamically using JavaScript or Django template -->
+          {% for product in products %}
+          <option value="{{ product.id }}">{{ product.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
       <!-- Order Item Status Chart -->
       <canvas id="orderItemStatusConfigChart"></canvas>
     </div>
+
     <!-- ORDER ITEMS DATA TABLE - FILTERED -->
     <div class="col-12 col-md-6 border pb-3">
-      <h1 class="display-6 mt-1 mt-md-2 text-center" id="orderitem-home-table-title"><i
-          class="fa-solid fa-circle-exclamation text-danger"></i> Critical Items</h1>
-      <p class="text-center"><a class="btn btn-sm btn-primary" href="{% url 'order_item_tracker' %}?filter_type=critical"
-          role="button" target="_blank">Edit
-          Items</a></p>
+      <h1 class="display-6 mt-1 mt-md-2 text-center home-table-title"><i
+          class="fa-solid fa-circle-exclamation text-danger"></i> Critical Items
+        <!-- Tooltip -->
+        <span class="text-center align-baseline mb-2" data-toggle="tooltip" data-bs-html="true" title="Critical items with status:<br>
+          1. Fully Paid but Not Started<br>
+          2. Delivered but Not Paid<br>
+          3. High Priority level" aria-label="Info on table tooltip">
+          <i class="fa-solid fa-circle-info text-primary fs-4 fw-bolder"></i>
+        </span></h1>
+      <p class="text-center"><a class="btn btn-sm btn-primary"
+          href="{% url 'order_item_tracker' %}?filter_type=critical" role="button" target="_blank">Edit Items</a></p>
       <!-- Filtering and DataTable -->
       <table id="orderitem-home-table" class="display table table-bordered table-responsive table-striped">
         <thead>
