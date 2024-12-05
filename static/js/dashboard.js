@@ -284,10 +284,18 @@ $(document).ready(function () {
         $.ajax({
             url: '/api/item-status-config-data/',
             type: 'GET',
+            data: filters,  // Include filter parameters
             dataType: 'json',
             success: function (data) {
                 let ctx = document.getElementById('orderItemStatusConfigChart').getContext('2d');
-                let orderItemsStatusChart = new Chart(ctx, {
+
+                // Destroy existing chart if it exists to prevent duplication
+                if (window.orderItemsStatusChart instanceof Chart) {
+                    window.orderItemsStatusChart.destroy();
+                }
+                
+                // Initialise new char
+                window.orderItemsStatusChart = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         labels: data.labels,
@@ -531,5 +539,18 @@ $(document).ready(function () {
 
     // initialize tooltips
     initTooltips();
+
+    // Handle product filter dropdown change
+    $('#product-filter').on('change', function () {
+        let productId = $(this).val();
+        let filters = {};
+
+        if (productId) {
+            filters.product_id = productId;
+        }
+
+        // Fetch and render chart with the selected product filter
+        RenderItemStatusConfigChart(filters);
+    });
 
 });

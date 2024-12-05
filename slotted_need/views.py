@@ -230,12 +230,24 @@ class ItemStatusConfigAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
+        # Get product_id from query parameters if provided
+        product_id = request.query_params.get('product_id', None)
+
         # Fetch OrderItems filtering out made, delivered and archived orders
         order_items = OrderItem.objects.filter(
             completed=False).select_related(
             'product').prefetch_related(
             'option_values', 'item_component_finishes').order_by(
             'id')
+
+        # If product_id is provided, filter further by product
+        if product_id:
+            order_items = order_items.filter(product_id=product_id)
+
+        # Optimize the queryset to avoid N+1 problems
+        order_items = order_items.select_related('product').prefetch_related(
+            'option_values', 'item_component_finishes'
+        ).order_by('id')
 
         # Aggregate item counts by their unique configuration combo
         config_counts = {}
