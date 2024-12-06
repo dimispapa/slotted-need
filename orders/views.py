@@ -55,7 +55,7 @@ def check_client(request):
             return JsonResponse({'partial_match': {
                 'id': partial_match.id,
                 'name': partial_match.client_name,
-                'phone': partial_match.client_phone,
+                'phone': str(partial_match.client_phone),
                 'email': partial_match.client_email
             }})
 

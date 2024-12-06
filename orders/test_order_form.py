@@ -53,7 +53,7 @@ class TestCreateOrderView(TestCase):
         """
         data = {
             'client_name': 'Test Client',
-            'client_phone': '1234567890',
+            'client_phone': '+35799999999',
             'client_email': 'testclient@example.com',
             'order_value': '700.00',
             'deposit': '20.00',
@@ -105,7 +105,7 @@ class TestCreateOrderView(TestCase):
         """
         data = {
             'client_name': '',  # Missing client name
-            'client_phone': '1234567890',
+            'client_phone': '+35799999999',
             'client_email': 'invalidemail',  # Invalid email format
             'order_value': '-100.00',
             'deposit': '20.00',
@@ -145,13 +145,13 @@ class TestCreateOrderView(TestCase):
         # Create an existing client to trigger conflict
         existing_client = baker.make(ClientModel,
                                      client_name='Existing Client',
-                                     client_phone='1234567890',
+                                     client_phone='+35799999999',
                                      client_email='existingclient@example.com')
 
         # Use the same details for a new order to trigger the conflict modal
         data = {
             'client_name': 'Existing Client',
-            'client_phone': '1234567890',
+            'client_phone': '+35799999999',
             'client_email': 'existingclient@example.com',
             'order_value': '100.00',
             'deposit': '20.00',
@@ -182,13 +182,13 @@ class TestCreateOrderView(TestCase):
         # Create an existing client to trigger conflict
         existing_client = baker.make(ClientModel,
                                      client_name='Existing Client',
-                                     client_phone='1234567890',
+                                     client_phone='+35799999999',
                                      client_email='existclient@example.com')
 
         # Use the same details for a new order to trigger the conflict modal
         data = {
             'client_name': 'Existing Client',  # matching
-            'client_phone': '1234567890',  # matching
+            'client_phone': '+35799999999',  # matching
             'client_email': 'existingcustomer@example.com',  # non-matching
             'order_value': '100.00',
             'deposit': '20.00',
