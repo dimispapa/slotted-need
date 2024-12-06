@@ -48,50 +48,50 @@
                 <th></th>
             </tr>
             <tr id="filter-row">
-                <th><input type="number" class="form-control" id="filter-id" placeholder="Filter" /></th>
-                <th><input type="number" class="form-control" id="filter-order" placeholder="Filter" /></th>
+                <th><input type="number" class="form-control filter" id="filter-id" placeholder="Filter" /></th>
+                <th><input type="number" class="form-control filter" id="filter-order" placeholder="Filter" /></th>
                 <th>
                     <!-- Order Date created filter -->
                     <div class="input-group">
                         <span class="input-group-text p-1">From</span>
                         <input type="date" name="filter_date_from" id="filter-date-from"
-                            class="form-control form-control-sm">
+                            class="form-control form-control-sm filter">
                     </div>
                     <div class="input-group mt-1 mt-md-2">
                         <span class="input-group-text pl-1 pr-1">To</span>
                         <input type="date" name="filter_date_to" id="filter-date-to"
-                            class="form-control form-control-sm">
+                            class="form-control form-control-sm filter">
                     </div>
                 </th>
-                <th><input type="text" class="form-control" id="filter-client" placeholder="Filter" /></th>
-                <th><input type="text" class="form-control" id="filter-product" placeholder="Filter" /></th>
+                <th><input type="text" class="form-control filter" id="filter-client" placeholder="Filter" /></th>
+                <th><input type="text" class="form-control filter" id="filter-product" placeholder="Filter" /></th>
                 <th>
                     <!-- Tooltip -->
                     <div class="text-center align-baseline mb-2" data-toggle="tooltip" data-bs-html="true"
                         title="Use comma to separate multiple filter criteria" aria-label="Info on filter tooltip">
                         <i class="fa-solid fa-circle-info text-primary fs-4 fw-bolder"></i>
                     </div>
-                    <input type="text" class="form-control" id="filter-design-options" placeholder="Filter" />
+                    <input type="text" class="form-control filter" id="filter-design-options" placeholder="Filter" />
                 </th>
-                <th><input type="text" class="form-control" id="filter-product-finish" placeholder="Filter" /></th>
+                <th><input type="text" class="form-control filter" id="filter-product-finish" placeholder="Filter" /></th>
                 <th>
                     <!-- Tooltip -->
                     <div class="text-center align-baseline mb-2" data-toggle="tooltip" data-bs-html="true" title="Use comma to separate multiple filter criteria. Each criteria can be: <br>1. a
                         Component <br>2. a Finish Option <br>3. Both<br>, separated by a hyphen." aria-label="Info on filter tooltip">
                         <i class="fa-solid fa-circle-info text-primary fs-4 fw-bolder"></i>
                     </div>
-                    <input type="text" class="form-control" id="filter-component-finishes" placeholder="Filter" />
+                    <input type="text" class="form-control filter" id="filter-component-finishes" placeholder="Filter" />
                 </th>
                 <th>
-                    <input type="number" class="form-control form-control-sm" id="filter-value-min" placeholder="Min" />
-                    <input type="number" class="form-control form-control-sm mt-1 mt-md-2" id="filter-value-max"
+                    <input type="number" class="form-control form-control-sm filter" id="filter-value-min" placeholder="Min" />
+                    <input type="number" class="form-control form-control-sm filter mt-1 mt-md-2" id="filter-value-max"
                         placeholder="Max" />
                 </th>
                 <th>
-                    {% include 'orders/partials/dropdown.html' with options=priority_level_choices selected="" class="filter-priority-level form-select" id="filter-priority-level" %}
+                    {% include 'orders/partials/dropdown.html' with options=priority_level_choices selected="" class="filter-priority-level form-select filter" id="filter-priority-level" %}
                 </th>
                 <th>
-                    {% include 'orders/partials/dropdown.html' with options=item_status_choices selected="" class="filter-item-status form-select" id="filter-item-status" %}
+                    {% include 'orders/partials/dropdown.html' with options=item_status_choices selected="" class="filter-item-status form-select filter" id="filter-item-status" %}
                 </th>
                 <th>
                     <!-- Tooltip -->
@@ -99,11 +99,11 @@
                         Click the button to view the order and make changes." aria-label="Info on filter tooltip">
                         <i class="fa-solid fa-circle-info text-primary fs-4 fw-bolder"></i>
                     </div>
-                    {% include 'orders/partials/dropdown.html' with options=paid_status_choices selected="" class="filter-paid-status form-select" id="filter-paid-status" %}
+                    {% include 'orders/partials/dropdown.html' with options=paid_status_choices selected="" class="filter-paid-status form-select filter" id="filter-paid-status" %}
                 </th>
                 <th>
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="filter-exclude-completed" checked>
+                        <input class="form-check-input filter" type="checkbox" id="filter-exclude-completed" checked>
                         <label class="form-check-label" for="filter-exclude-completed"
                             id="filter-exclude-completed-label">Hide
                             completed items</label>
@@ -127,7 +127,7 @@
 
 <!-- Paid Status Modal -->
 <div class="modal fade" id="paidStatusModal" tabindex="-1" role="dialog" aria-labelledby="paidStatusModalLabel"
-    aria-hidden="true">
+    aria-modal="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -143,7 +143,7 @@
 
 <!-- Delete confirmation modal -->
 <div class="modal fade" id="DeleteOrderItemConfirmationModal" data-bs-backdrop="static" data-bs-keyboard="false"
-    tabindex="-1" aria-labelledby="DeleteOrderItemConfirmationModal" aria-hidden="true">
+    tabindex="-1" aria-labelledby="DeleteOrderItemConfirmationModal" aria-modal="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">

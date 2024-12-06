@@ -11,7 +11,7 @@ import {
 } from './utils.js'
 
 $(document).ready(function () {
-
+    console.log('order_archive.js loaded');
     // Constant definitions
     const deleteModalElement = document.getElementById('DeleteOrderConfirmationModal');
     const deleteModal = new bootstrap.Modal(document.getElementById('DeleteOrderConfirmationModal'));
@@ -29,6 +29,7 @@ $(document).ready(function () {
 
     // Initialize DataTable with AJAX source and server-side processing
     let table = $('#order-archive-table').DataTable({
+
         serverSide: true, // Enable server-side processing
         processing: true, // Enables processing animation
         orderCellsTop: true, // Place sorting icons to top row
@@ -200,22 +201,14 @@ $(document).ready(function () {
         drawCallback: function (settings) {
             // update status styles
             updateStatusStyle();
+            // initialize tooltips
+            initTooltips();
+            // add event listeners
+            processEventListeners();
+            console.log('data table loaded');
         },
-    });
 
-    // Prevent triggering sorting when a user clicks in any of the inputs.
-    // Sorting should apply when the user clicks any of the column headers
-    $('#order-archive-table').on('click mousedown touchstart', 'input, select, button', function (e) {
-        e.stopPropagation();
     });
-
-    // Event listeners for filter inputs with debounce
-    $('#filter-id, #filter-client, #filter-discount-min, #filter-discount-max, ' +
-        '#filter-deposit-min, #filter-deposit-max, #filter-value-min, #filter-value-max, ' +
-        '#filter-order-status, #filter-paid-status, #filter-date-from, #filter-date-to').on('keyup change', debounce(function () {
-        // apply filters
-        table.ajax.reload();
-    }, 300));
 
     // Function that deletes an order
     function deleteOrder(orderId) {
@@ -281,75 +274,90 @@ $(document).ready(function () {
         });
     };
 
-    // initialize tooltips
-    initTooltips();
-
     // ************** SECTION B: EVENT LISTENERS & HANDLERS *****************************************************************
+    function processEventListeners() {
 
-    // add event listener that handles first delete button that will trigger the modal
-    document.addEventListener("click", (event) => {
-        // get delete button as reference point. Allow clicking on icon inside
-        let deleteBtn = event.target.closest('.delete-order-btn');
-        if (deleteBtn) {
-            // get orderId from the button value
-            let orderId = deleteBtn.value;
-            // Set orderId as attribute for the modal to be used for front-end deletion
-            deleteModalElement.setAttribute('data-order-id', orderId);
-            // show the confirmation delete modal
-            deleteModal.show();
-        }
-    });
+        // Prevent triggering sorting when a user clicks in any of the inputs.
+        // Sorting should apply when the user clicks any of the column headers
+        $('#order-archive-table').on('click mousedown touchstart', '.filter', function (e) {
+            e.stopPropagation();
+        });
 
-    // add event listener on confirm delete button that will handle the deletion
-    confirmDeleteBtn.addEventListener('click', () => {
-        // Get order ID from modal attribute
-        let orderId = deleteModalElement.getAttribute('data-order-id');
-        if (orderId) {
-            // Delete item
-            deleteOrder(orderId);
-            // Clear the data attribute
-            deleteModalElement.removeAttribute('data-order-id');
-        }
-    });
+        // Event listeners for filter inputs with debounce
+        $('#filter-id, #filter-client, #filter-discount-min, #filter-discount-max, ' +
+            '#filter-deposit-min, #filter-deposit-max, #filter-value-min, #filter-value-max, ' +
+            '#filter-order-status, #filter-paid-status, #filter-date-from, #filter-date-to').on('keyup change', debounce(function () {
+            // apply filters
+            table.ajax.reload();
+        }, 300));
 
-    // add event listener that handles first archive button that will trigger the modal
-    document.addEventListener("click", (event) => {
-        // get delete button as reference point. Allow clicking on icon inside
-        let unArchiveBtn = event.target.closest('.un-archive-order-btn');
-        if (unArchiveBtn) {
-            // get orderId from the button value
-            let orderId = unArchiveBtn.value;
-            // Set orderId as attribute for the modal to be used for front-end deletion
-            unArchiveModalElement.setAttribute('data-order-id', orderId);
-            // show the confirmation delete modal
-            unArchiveModal.show();
-        }
-    });
+        // add event listener that handles first delete button that will trigger the modal
+        document.addEventListener("click", (event) => {
+            // get delete button as reference point. Allow clicking on icon inside
+            let deleteBtn = event.target.closest('.delete-order-btn');
 
-    // add event listener on confirm delete button that will handle the deletion
-    confirmUnArchiveBtn.addEventListener('click', () => {
-        // Get order ID from modal attribute
-        let orderId = unArchiveModalElement.getAttribute('data-order-id');
-        if (orderId) {
-            // Delete item
-            unArchiveOrder(orderId);
-            // Clear the data attribute
-            unArchiveModalElement.removeAttribute('data-order-id');
-        }
-    });
+            if (deleteBtn) {
+                // get orderId from the button value
+                let orderId = deleteBtn.value;
+                // Set orderId as attribute for the modal to be used for front-end deletion
+                deleteModalElement.setAttribute('data-order-id', orderId);
+                // show the confirmation delete modal
+                deleteModal.show();
+            }
+        });
 
-    // add event listener to show/hide the row child with item details
-    $('#order-archive-table tbody').on('click', 'td.details-control', function () {
-        let tr = $(this).closest('tr');
-        let row = table.row(tr);
+        // add event listener on confirm delete button that will handle the deletion
+        confirmDeleteBtn.addEventListener('click', () => {
+            // Get order ID from modal attribute
+            let orderId = deleteModalElement.getAttribute('data-order-id');
+            if (orderId) {
+                // Delete item
+                deleteOrder(orderId);
+                // Clear the data attribute
+                deleteModalElement.removeAttribute('data-order-id');
+            }
+        });
 
-        toggleChildRow(tr, row, true);
-    });
+        // add event listener that handles first archive button that will trigger the modal
+        document.addEventListener("click", (event) => {
+            // get delete button as reference point. Allow clicking on icon inside
 
-    // Add event listener for clicks on clear filter btn
-    $('#clear-filters-btn').on('click', function () {
-        // clear filters on front-end and reload table
-        clearDataTableFilters(table);
-    });
+            let unArchiveBtn = event.target.closest('.un-archive-order-btn');
+            if (unArchiveBtn) {
+                // get orderId from the button value
+                let orderId = unArchiveBtn.value;
+                // Set orderId as attribute for the modal to be used for front-end deletion
+                unArchiveModalElement.setAttribute('data-order-id', orderId);
+                // show the confirmation delete modal
+                unArchiveModal.show();
+            }
+        });
 
+        // add event listener on confirm delete button that will handle the deletion
+        confirmUnArchiveBtn.addEventListener('click', () => {
+            // Get order ID from modal attribute
+            let orderId = unArchiveModalElement.getAttribute('data-order-id');
+            if (orderId) {
+                // Delete item
+                unArchiveOrder(orderId);
+                // Clear the data attribute
+                unArchiveModalElement.removeAttribute('data-order-id');
+            }
+        });
+
+        // add event listener to show/hide the row child with item details
+        $('#order-archive-table tbody').on('click', 'td.details-control', function () {
+            let tr = $(this).closest('tr');
+            let row = table.row(tr);
+
+            toggleChildRow(tr, row, true);
+
+        });
+
+        // Add event listener for clicks on clear filter btn
+        $('#clear-filters-btn').on('click', function () {
+            // clear filters on front-end and reload table
+            clearDataTableFilters(table);
+        });
+    };
 });

@@ -217,179 +217,14 @@ $(document).ready(function () {
                 let row = $(`#order-${data.id}`);
                 // update row styles
                 updateRowStyle(row, data);
+                // initialize tooltips
+                initTooltips();
+                // add event listeners
+                processEventListeners();
+                console.log('data table loaded');
             })
 
         },
-    });
-
-    // Prevent triggering sorting when a user clicks in any of the inputs.
-    // Sorting should apply when the user clicks any of the column headers
-    $('#orderitem-table').on('click mousedown touchstart', 'input, select, button', function (e) {
-        e.stopPropagation();
-    });
-
-    // Event listeners for filter inputs with debounce
-    $('#filter-id, #filter-client, #filter-discount-min, #filter-discount-max, ' +
-        '#filter-deposit-min, #filter-deposit-max, #filter-value-min, #filter-value-max, ' +
-        '#filter-order-status, #filter-paid-status, #filter-date-from, #filter-date-to').on('keyup change', debounce(function () {
-        // apply filters
-        table.ajax.reload();
-    }, 300));
-
-    // Handle change for paid_status and update the backend with AJAX call
-    $('#orders-table').on('change', '.paid-status', function () {
-        // get order id and new status
-        let orderId = $(this).data('id');
-        let newStatus = $(this).val();
-
-        // show spinner
-        let spinner = document.getElementById(`paid-status-spinner-${orderId}`);
-        toggleSpinner(spinner);
-
-        // API AJAX patch call
-        $.ajax({
-            url: `/api/orders/${orderId}/`,
-            type: 'PATCH',
-            data: JSON.stringify({
-                'paid': newStatus
-            }),
-            contentType: 'application/json',
-            success: function (response) {
-                // hide the spinner on completion
-                toggleSpinner(spinner);
-                // Get order details
-                let orderData = response;
-                // Find the DataTable row
-                let row = $(`#order-${orderId}`)
-                // Refresh the row styles
-                updateRowStyle(row, orderData);
-            },
-            error: function (xhr, status, error) {
-                console.error('Error updating paid status:', error);
-                // Reload the table to revert changes
-                table.ajax.reload(toggleSpinner(spinner), false);
-            },
-        });
-    });
-
-    // Handle change for item_status and update the backend with AJAX call
-    $('#orders-table').on('change', '.item-status', function () {
-        // get order item id and new status
-        let orderitemId = $(this).data('id');
-        let newStatus = $(this).val();
-
-        // show spinner
-        let spinner = document.getElementById(`item-status-spinner-${orderitemId}`);
-        toggleSpinner(spinner);
-
-        // API AJAX patch call
-        $.ajax({
-            url: `/api/order-items/${orderitemId}/`,
-            type: 'PATCH',
-            data: JSON.stringify({
-                'item_status': newStatus
-            }),
-            contentType: 'application/json',
-            success: function (response) {
-                // Get order details
-                let orderData = response.order;
-                // Find the DataTable row
-                let row = $(`#order-${orderData.id}`)
-                // get the new order status badge html
-                let orderStatusBadgeHTML = renderOrderStatus(orderData.id, orderData.order_status, orderData.paid);
-                // Update the badge
-                let orderStatusBadge = $(`#order-status-badge-${orderData.id}`);
-                let orderStatusDiv = document.createElement('div');
-                orderStatusDiv.innerHTML = orderStatusBadgeHTML;
-                orderStatusBadge.replaceWith(orderStatusDiv);
-                // get the new badge element
-                let newOrderStatusBadge = $(`#order-status-badge-${orderData.id}`);
-                // Refresh badge status styles
-                updateItemStatusStyle(newOrderStatusBadge[0]);
-                // Refresh the row styles
-                updateRowStyle(row, orderData);
-
-                // hide the spinner on completion
-                toggleSpinner(spinner);
-            },
-            error: function (xhr, status, error) {
-                console.error('Error updating paid status:', error);
-                // Reload the table to revert changes
-                table.ajax.reload(toggleSpinner(spinner), false);
-            },
-        });
-    });
-
-    // Handle change for item_status and update the backend with AJAX call
-    $('#orders-table').on('change', '.priority-status', function () {
-        // get order item id and new status
-        let orderitemId = $(this).data('id');
-        let newStatus = $(this).val();
-
-        // show spinner
-        let spinner = document.getElementById(`priority-status-spinner-${orderitemId}`);
-        toggleSpinner(spinner);
-
-        // API AJAX patch call
-        $.ajax({
-            url: `/api/order-items/${orderitemId}/`,
-            type: 'PATCH',
-            data: JSON.stringify({
-                'priority_level': newStatus
-            }),
-            contentType: 'application/json',
-            success: function (response) {
-                // hide the spinner on completion
-                toggleSpinner(spinner);
-            },
-            error: function (xhr, status, error) {
-                console.error('Error updating paid status:', error);
-                // Reload the table to revert changes
-                table.ajax.reload(toggleSpinner(spinner), false);
-            },
-        });
-    });
-
-    // Handle change for paid_status and update the backend with AJAX call
-    $('#orders-table').on('change', '.paid-status', function () {
-        // get order id and new status
-        let orderId = $(this).data('id');
-        let newStatus = $(this).val();
-
-        // show spinner
-        let spinner = document.getElementById(`paid-status-spinner-${orderId}`);
-        toggleSpinner(spinner);
-
-        // API AJAX patch call
-        $.ajax({
-            url: `/api/orders/${orderId}/`,
-            type: 'PATCH',
-            data: JSON.stringify({
-                'paid': newStatus
-            }),
-            contentType: 'application/json',
-            success: function (response) {
-                // hide the spinner on completion
-                toggleSpinner(spinner);
-                // Get order details
-                let orderData = response;
-                // Find the DataTable row
-                let row = $(`#order-${orderId}`)
-                // Refresh the row styles
-                updateRowStyle(row, orderData);
-            },
-            error: function (xhr, status, error) {
-                console.error('Error updating paid status:', error);
-                // Reload the table to revert changes
-                table.ajax.reload(toggleSpinner(spinner), false);
-            },
-        });
-    });
-
-    // Add event listener for clicks on clear filter btn
-    $('#clear-filters-btn').on('click', function () {
-        // clear filters on front-end and reload table
-        clearDataTableFilters(table);
     });
 
     // Function that renders the order status
@@ -500,69 +335,240 @@ $(document).ready(function () {
         });
     };
 
-    // initialize tooltips
-    initTooltips();
-
     // ************** SECTION B: EVENT LISTENERS & HANDLERS *****************************************************************
 
-    // add event listener that handles first delete button that will trigger the modal
-    document.addEventListener("click", (event) => {
-        // get delete button as reference point. Allow clicking on icon inside
-        let deleteBtn = event.target.closest('.delete-order-btn');
-        if (deleteBtn) {
-            // get orderId from the button value
-            let orderId = deleteBtn.value;
-            // Set orderId as attribute for the modal to be used for front-end deletion
-            deleteModalElement.setAttribute('data-order-id', orderId);
-            // show the confirmation delete modal
-            deleteModal.show();
-        }
-    });
+    function processEventListeners() {
 
-    // add event listener on confirm delete button that will handle the deletion
-    confirmDeleteBtn.addEventListener('click', () => {
-        // Get order ID from modal attribute
-        let orderId = deleteModalElement.getAttribute('data-order-id');
-        if (orderId) {
-            // Delete item
-            deleteOrder(orderId);
-            // Clear the data attribute
-            deleteModalElement.removeAttribute('data-order-id');
-        }
-    });
+        // Prevent triggering sorting when a user clicks in any of the inputs.
+        // Sorting should apply when the user clicks any of the column headers
+        $('#orderitem-table').on('click mousedown touchstart', '.filter', function (e) {
+            e.stopPropagation();
+        });
 
-    // add event listener that handles first archive button that will trigger the modal
-    document.addEventListener("click", (event) => {
-        // get delete button as reference point. Allow clicking on icon inside
-        let archiveBtn = event.target.closest('.archive-order-btn');
-        if (archiveBtn) {
-            // get orderId from the button value
-            let orderId = archiveBtn.value;
-            // Set orderId as attribute for the modal to be used for front-end deletion
-            archiveModalElement.setAttribute('data-order-id', orderId);
-            // show the confirmation delete modal
-            archiveModal.show();
-        }
-    });
+        // Event listeners for filter inputs with debounce
+        $('#filter-id, #filter-client, #filter-discount-min, #filter-discount-max, ' +
+            '#filter-deposit-min, #filter-deposit-max, #filter-value-min, #filter-value-max, ' +
+            '#filter-order-status, #filter-paid-status, #filter-date-from, #filter-date-to').on('keyup change', debounce(function () {
+            // apply filters
+            table.ajax.reload();
+        }, 300));
 
-    // add event listener on confirm delete button that will handle the deletion
-    confirmArchiveBtn.addEventListener('click', () => {
-        // Get order ID from modal attribute
-        let orderId = archiveModalElement.getAttribute('data-order-id');
-        if (orderId) {
-            // Delete item
-            archiveOrder(orderId);
-            // Clear the data attribute
-            archiveModalElement.removeAttribute('data-order-id');
-        }
-    });
+        // Handle change for paid_status and update the backend with AJAX call
+        $('#orders-table').on('change', '.paid-status', function () {
+            // get order id and new status
+            let orderId = $(this).data('id');
+            let newStatus = $(this).val();
 
-    // add event listener to show/hide the row child with item details
-    $('#orders-table tbody').on('click', 'td.details-control', function () {
-        let tr = $(this).closest('tr');
-        let row = table.row(tr);
+            // show spinner
+            let spinner = document.getElementById(`paid-status-spinner-${orderId}`);
+            toggleSpinner(spinner);
 
-        toggleChildRow(tr, row, false);
-    });
+            // API AJAX patch call
+            $.ajax({
+                url: `/api/orders/${orderId}/`,
+                type: 'PATCH',
+                data: JSON.stringify({
+                    'paid': newStatus
+                }),
+                contentType: 'application/json',
+                success: function (response) {
+                    // hide the spinner on completion
+                    toggleSpinner(spinner);
+                    // Get order details
+                    let orderData = response;
+                    // Find the DataTable row
+                    let row = $(`#order-${orderId}`)
+                    // Refresh the row styles
+                    updateRowStyle(row, orderData);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error updating paid status:', error);
+                    // Reload the table to revert changes
+                    table.ajax.reload(toggleSpinner(spinner), false);
+                },
+            });
+        });
+
+        // Handle change for item_status and update the backend with AJAX call
+        $('#orders-table').on('change', '.item-status', function () {
+            // get order item id and new status
+            let orderitemId = $(this).data('id');
+            let newStatus = $(this).val();
+
+            // show spinner
+            let spinner = document.getElementById(`item-status-spinner-${orderitemId}`);
+            toggleSpinner(spinner);
+
+            // API AJAX patch call
+            $.ajax({
+                url: `/api/order-items/${orderitemId}/`,
+                type: 'PATCH',
+                data: JSON.stringify({
+                    'item_status': newStatus
+                }),
+                contentType: 'application/json',
+                success: function (response) {
+                    // Get order details
+                    let orderData = response.order;
+                    // Find the DataTable row
+                    let row = $(`#order-${orderData.id}`)
+                    // get the new order status badge html
+                    let orderStatusBadgeHTML = renderOrderStatus(orderData.id, orderData.order_status, orderData.paid);
+                    // Update the badge
+                    let orderStatusBadge = $(`#order-status-badge-${orderData.id}`);
+                    let orderStatusDiv = document.createElement('div');
+                    orderStatusDiv.innerHTML = orderStatusBadgeHTML;
+                    orderStatusBadge.replaceWith(orderStatusDiv);
+                    // get the new badge element
+                    let newOrderStatusBadge = $(`#order-status-badge-${orderData.id}`);
+                    // Refresh badge status styles
+                    updateItemStatusStyle(newOrderStatusBadge[0]);
+                    // Refresh the row styles
+                    updateRowStyle(row, orderData);
+
+                    // hide the spinner on completion
+                    toggleSpinner(spinner);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error updating paid status:', error);
+                    // Reload the table to revert changes
+                    table.ajax.reload(toggleSpinner(spinner), false);
+                },
+            });
+        });
+
+        // Handle change for item_status and update the backend with AJAX call
+        $('#orders-table').on('change', '.priority-status', function () {
+            // get order item id and new status
+            let orderitemId = $(this).data('id');
+            let newStatus = $(this).val();
+
+            // show spinner
+            let spinner = document.getElementById(`priority-status-spinner-${orderitemId}`);
+            toggleSpinner(spinner);
+
+            // API AJAX patch call
+            $.ajax({
+                url: `/api/order-items/${orderitemId}/`,
+                type: 'PATCH',
+                data: JSON.stringify({
+                    'priority_level': newStatus
+                }),
+                contentType: 'application/json',
+                success: function (response) {
+                    // hide the spinner on completion
+                    toggleSpinner(spinner);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error updating paid status:', error);
+                    // Reload the table to revert changes
+                    table.ajax.reload(toggleSpinner(spinner), false);
+                },
+            });
+        });
+
+        // Handle change for paid_status and update the backend with AJAX call
+        $('#orders-table').on('change', '.paid-status', function () {
+            // get order id and new status
+            let orderId = $(this).data('id');
+            let newStatus = $(this).val();
+
+            // show spinner
+            let spinner = document.getElementById(`paid-status-spinner-${orderId}`);
+            toggleSpinner(spinner);
+
+            // API AJAX patch call
+            $.ajax({
+                url: `/api/orders/${orderId}/`,
+                type: 'PATCH',
+                data: JSON.stringify({
+                    'paid': newStatus
+                }),
+                contentType: 'application/json',
+                success: function (response) {
+                    // hide the spinner on completion
+                    toggleSpinner(spinner);
+                    // Get order details
+                    let orderData = response;
+                    // Find the DataTable row
+                    let row = $(`#order-${orderId}`)
+                    // Refresh the row styles
+                    updateRowStyle(row, orderData);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error updating paid status:', error);
+                    // Reload the table to revert changes
+                    table.ajax.reload(toggleSpinner(spinner), false);
+                },
+            });
+        });
+
+        // Add event listener for clicks on clear filter btn
+        $('#clear-filters-btn').on('click', function () {
+            // clear filters on front-end and reload table
+            clearDataTableFilters(table);
+        });
+
+        // add event listener that handles first delete button that will trigger the modal
+        document.addEventListener("click", (event) => {
+            // get delete button as reference point. Allow clicking on icon inside
+            let deleteBtn = event.target.closest('.delete-order-btn');
+            if (deleteBtn) {
+                // get orderId from the button value
+                let orderId = deleteBtn.value;
+                // Set orderId as attribute for the modal to be used for front-end deletion
+                deleteModalElement.setAttribute('data-order-id', orderId);
+                // show the confirmation delete modal
+                deleteModal.show();
+            }
+        });
+
+        // add event listener on confirm delete button that will handle the deletion
+        confirmDeleteBtn.addEventListener('click', () => {
+            // Get order ID from modal attribute
+            let orderId = deleteModalElement.getAttribute('data-order-id');
+            if (orderId) {
+                // Delete item
+                deleteOrder(orderId);
+                // Clear the data attribute
+                deleteModalElement.removeAttribute('data-order-id');
+            }
+        });
+
+        // add event listener that handles first archive button that will trigger the modal
+        document.addEventListener("click", (event) => {
+            // get delete button as reference point. Allow clicking on icon inside
+            let archiveBtn = event.target.closest('.archive-order-btn');
+            if (archiveBtn) {
+                // get orderId from the button value
+                let orderId = archiveBtn.value;
+                // Set orderId as attribute for the modal to be used for front-end deletion
+                archiveModalElement.setAttribute('data-order-id', orderId);
+                // show the confirmation delete modal
+                archiveModal.show();
+            }
+        });
+
+        // add event listener on confirm delete button that will handle the deletion
+        confirmArchiveBtn.addEventListener('click', () => {
+            // Get order ID from modal attribute
+            let orderId = archiveModalElement.getAttribute('data-order-id');
+            if (orderId) {
+                // Delete item
+                archiveOrder(orderId);
+                // Clear the data attribute
+                archiveModalElement.removeAttribute('data-order-id');
+            }
+        });
+
+        // add event listener to show/hide the row child with item details
+        $('#orders-table tbody').on('click', 'td.details-control', function () {
+            let tr = $(this).closest('tr');
+            let row = table.row(tr);
+
+            toggleChildRow(tr, row, false);
+        });
+    }
+
 
 });

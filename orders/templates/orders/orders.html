@@ -43,36 +43,36 @@
           <!-- Empty header for dropdown toggle column -->
         </th>
         <!-- ID filter -->
-        <th><input type="number" class="form-control" id="filter-id" placeholder="Filter" /></th>
+        <th><input type="number" class="form-control filter" id="filter-id" placeholder="Filter" /></th>
         <th>
           <!-- Order Date created filter -->
           <div class="input-group">
             <span class="input-group-text p-1">From</span>
-            <input type="date" name="filter_date_from" id="filter-date-from" class="form-control form-control-sm">
+            <input type="date" name="filter_date_from" id="filter-date-from" class="form-control form-control-sm filter">
           </div>
           <div class="input-group mt-1 mt-md-2">
             <span class="input-group-text pl-1 pr-1">To</span>
-            <input type="date" name="filter_date_to" id="filter-date-to" class="form-control form-control-sm">
+            <input type="date" name="filter_date_to" id="filter-date-to" class="form-control form-control-sm filter">
           </div>
         </th>
         <!-- Client filter -->
-        <th><input type="text" class="form-control" id="filter-client" placeholder="Filter" /></th>
+        <th><input type="text" class="form-control filter" id="filter-client" placeholder="Filter" /></th>
         <!-- Discount filter -->
         <th>
-          <input type="number" class="form-control form-control-sm" id="filter-discount-min" placeholder="Min" />
-          <input type="number" class="form-control form-control-sm mt-1 mt-md-2" id="filter-discount-max"
+          <input type="number" class="form-control form-control-sm filter" id="filter-discount-min" placeholder="Min" />
+          <input type="number" class="form-control form-control-sm filter mt-1 mt-md-2" id="filter-discount-max"
             placeholder="Max" />
         </th>
         <!-- Deposit filter -->
         <th>
-          <input type="number" class="form-control form-control-sm" id="filter-deposit-min" placeholder="Min" />
-          <input type="number" class="form-control form-control-sm mt-1 mt-md-2" id="filter-deposit-max"
+          <input type="number" class="form-control form-control-sm filter" id="filter-deposit-min" placeholder="Min" />
+          <input type="number" class="form-control form-control-sm filter mt-1 mt-md-2" id="filter-deposit-max"
             placeholder="Max" />
         </th>
         <!-- Value filter -->
         <th>
-          <input type="number" class="form-control form-control-sm" id="filter-value-min" placeholder="Min" />
-          <input type="number" class="form-control form-control-sm mt-1 mt-md-2" id="filter-value-max"
+          <input type="number" class="form-control form-control-sm filter" id="filter-value-min" placeholder="Min" />
+          <input type="number" class="form-control form-control-sm filter mt-1 mt-md-2" id="filter-value-max"
             placeholder="Max" />
         </th>
         <!-- Order Status filter -->
@@ -83,11 +83,11 @@
             aria-label="Info on filter tooltip">
             <i class="fa-solid fa-circle-info text-primary fs-4 fw-bolder"></i>
           </div>
-          {% include 'orders/partials/dropdown.html' with options=order_status_choices selected="" class="filter-order-status form-select" id="filter-order-status" %}
+          {% include 'orders/partials/dropdown.html' with options=order_status_choices selected="" class="filter-order-status form-select filter" id="filter-order-status" %}
         </th>
         <!-- Paid Status filter -->
         <th>
-          {% include 'orders/partials/dropdown.html' with options=paid_status_choices selected="" class="filter-paid-status form-select" id="filter-paid-status" %}
+          {% include 'orders/partials/dropdown.html' with options=paid_status_choices selected="" class="filter-paid-status form-select filter" id="filter-paid-status" %}
         </th>
         <th>
           <!-- Action spinner -->
@@ -107,7 +107,7 @@
 
 <!-- Delete confirmation modal -->
 <div class="modal fade" id="DeleteOrderConfirmationModal" data-bs-backdrop="static" data-bs-keyboard="false"
-  tabindex="-1" aria-labelledby="DeleteOrderConfirmationModal" aria-hidden="true">
+  tabindex="-1" aria-labelledby="DeleteOrderConfirmationModal" aria-modal="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
@@ -128,7 +128,7 @@
 
 <!-- Archive confirmation modal -->
 <div class="modal fade" id="ArchiveOrderConfirmationModal" data-bs-backdrop="static" data-bs-keyboard="false"
-  tabindex="-1" aria-labelledby="ArchiveOrderConfirmationModal" aria-hidden="true">
+  tabindex="-1" aria-labelledby="ArchiveOrderConfirmationModal" aria-modal="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
