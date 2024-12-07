@@ -30,4 +30,27 @@ class TestOrderItemViewSet(TestCase):
             OrderItem, order=self.order, product=self.product, order__paid=2,
             item_status=1, completed=False
         )
-        self.api_url = reverse('order_item_tracker')
+        self.order_items_url = reverse('order_item_tracker')
+
+    def test_order_item_view_renders_correctly(self):
+        """
+        Test for rendering the order iten view with the correct template
+        """
+        response = self.client.get(self.order_items_url)
+        # Check that the response is 200 OK
+        self.assertEqual(response.status_code, 200, msg='Response NOT OK')
+        # Check that the correct template was used
+        self.assertTemplateUsed(response, 'orders/order_items.html')
+        # Check if context variables are passed to template
+        self.assertIn('item_status_choices', response.context,
+                      msg='Context variable missing')
+        self.assertIn('priority_level_choices', response.context,
+                      msg='Context variable missing')
+        self.assertIn('paid_status_choices', response.context,
+                      msg='Context variable missing')
+        self.assertIn('item_status_choices_json', response.context,
+                      msg='Context variable missing')
+        self.assertIn('priority_level_choices_json', response.context,
+                      msg='Context variable missing')
+        self.assertIn('paid_status_choices_json', response.context,
+                      msg='Context variable missing')
