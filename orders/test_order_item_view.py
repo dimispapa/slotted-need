@@ -119,3 +119,12 @@ class TestOrderItemViewSet(TestCase):
         self.order_item.refresh_from_db()
         self.assertEqual(self.order_item.item_status, 2)
         self.assertEqual(self.order_item.priority_level, 3)
+
+    def test_delete_order_item(self):
+        """
+        Test deleting an order item.
+        """
+        response = self.client.delete(self.detail_api_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(OrderItem.objects.filter(
+            id=self.order_item.id).exists())
