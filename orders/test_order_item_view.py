@@ -38,6 +38,8 @@ class TestOrderItemViewSet(TestCase):
             OrderItem,
             order=self.order2,
             product=self.product2,
+            item_status=1,
+            priority_level=1
         )
 
         self.page_url = reverse('order_item_tracker')
@@ -102,3 +104,18 @@ class TestOrderItemViewSet(TestCase):
         data = response.json()
         self.assertEqual(data['id'], self.order_item.id)
         self.assertEqual(data['product']['id'], self.product2.id)
+
+    def test_update_order_item(self):
+        """
+        Test updating an existing order item.
+        """
+        data = {
+            'item_status': 2,
+            'priority_level': 3
+        }
+        response = self.client.patch(self.detail_api_url, data,
+                                     content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.order_item.refresh_from_db()
+        self.assertEqual(self.order_item.item_status, 2)
+        self.assertEqual(self.order_item.priority_level, 3)
