@@ -191,6 +191,8 @@ class OrderItem(models.Model):
         # call custom methods before saving
         self.calculate_item_value()
         self.update_completed()
+        self.order.update_order_status()
+
         super().save(*args, **kwargs)
 
     def __str__(self):
