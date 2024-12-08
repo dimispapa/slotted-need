@@ -107,7 +107,7 @@ The ERD below was generated using the [graph-models](https://django-extensions.r
 ![erd](documentation/erd/graphviz-models-erd.png)
 
 #### Products app
-This is the focal point of the project, as "slotted need" revolves around design products and its configurations that then lead to orders.
+This is the foundation of the project, as "slotted need" revolves around design products and its configurations that then lead to orders.
 - ##### Product model
     <p>The app's main model, that contains the high-level key information concerning a product, importantly <em>name</em> and <em>base_price</em>.</p>
 - ##### Option & OptionValue models
@@ -157,9 +157,43 @@ The orders app models were implemented in the [orders/models.py](orders/models.p
 
 
 ## Technologies & Tools Stack
-### Progamming languages
+
+This project utilizes a robust stack of technologies and tools to deliver a seamless experience in development and functionality. This stack ensures scalability, maintainability, and ease of development, empowering the project to meet its goals effectively. Below is a breakdown of the key components:
+
+### Programming Languages
+- **[Python](https://www.python.org/)**: The core programming language used for backend logic and full-stack application development facilitated by the python-based Django framework (see below).
+- **[JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)**: For dynamic front-end functionality and interactive features.
+- **[HTML5](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5)**: Structuring web pages with semantic markup.
+- **[CSS3](https://developer.mozilla.org/en-US/docs/Web/CSS)**: For styling the front-end and ensuring a responsive design.
+
 ### Frameworks
-### Third-party libraries
+- **[Django](https://www.djangoproject.com/)**: A high-level, batteries-included, Python web framework that enables rapid development and clean, pragmatic design.
+- **[Django REST Framework (DRF)](https://www.django-rest-framework.org/)**: For building RESTful APIs, facilitating communication between the frontend and backend.
+- **[Bootstrap](https://getbootstrap.com/)**: A front-end framework for developing responsive and mobile-first web interfaces.
+
+### Third-party JavaScript Libraries
+- **[jQuery](https://jquery.com/)**: Simplifying DOM manipulation and AJAX requests for dynamic user interactions.
+- **[Chart.js](https://www.chartjs.org/)**: Generates visually appealing and customizable charts for data visualization.
+
+### Third-party Python Libraries
+- **[pytest-django](https://pytest-django.readthedocs.io/en/latest/)**: Enables concise, readable, and scalable test configurations for Django projects.
+- **[Unittest.mock](https://docs.python.org/3/library/unittest.mock.html)**: Used for mocking during unit testing to isolate and test the email user-invitation process.
+- **[Django Model Bakery](https://model-bakery.readthedocs.io/en/latest/)**: Python library: Simplifying the creation of test data for unit tests.
+- **[django-phonenumber-field](https://github.com/stefanfoulis/django-phonenumber-field)**: Ensures proper validation and formatting of phone numbers.
+- **[crispy-bootstrap5](https://django-crispy-forms.readthedocs.io/en/latest/crispy_tag_forms.html#bootstrap5)**: Simplifies form rendering with Bootstrap 5 styles.
+- **[django-allauth](https://django-allauth.readthedocs.io/en/latest/)**: Provides a robust authentication system, including login, registration, and third-party OAuth integration.
+- **[django-crispy-forms](https://django-crispy-forms.readthedocs.io/en/latest/)**: Enhances Django forms with DRY (Don't Repeat Yourself) principles and flexible styling.
+- **[django-extensions](https://django-extensions.readthedocs.io/en/latest/)**: Adds management commands and additional utilities to ease Django development.
+- **[django-filter](https://django-filter.readthedocs.io/en/stable/)**: Provides filtering capabilities for Django querysets, often used with DRF.
+- **[django-nested-admin](https://github.com/theatlantic/django-nested-admin)**: Adds nested inline editing functionality in the Django admin interface.
+- **[whitenoise](https://whitenoise.evans.io/)**: Simplifies serving static files in production environments.
+
+### Error Tracking/Debugging Tools
+- **[Sentry](https://sentry.io/welcome/)**: For real-time error monitoring and debugging in both Python and JavaScript.
+- **[Heroku](https://devcenter.heroku.com/)**: Facilitates live deployment of the application, ensuring a scalable and accessible platform.
+- **[GitHub](https://docs.github.com/)**: Provides version control, secure code storage, and collaborative tools for development.
+- **[Gitpod Enterprise](https://www.gitpod.io/docs/)**: Automates workspace creation directly from the GitHub repository, streamlining development setup.
+- **[VS Code Desktop](https://code.visualstudio.com/docs)**: The primary IDE for code editing, debugging, and workspace management, with extensions like Python and PEP8 linters for enhanced functionality.
 
 # Functionality & Features deep-dive
 ## Home Dashboard
