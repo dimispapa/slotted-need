@@ -43,8 +43,8 @@ class UserCreateView(LoginRequiredMixin, AdminUserRequiredMixin, CreateView):
     extra_context = {'title': 'Add User'}
 
     def form_valid(self, form):
-        # Extract form data without saving to commit=False
-        user = form.save(commit=False)
+        # Extract form data and save user object
+        user = form.save()
         # Set username to email
         user.username = user.email
         # User is inactive until they set their password
