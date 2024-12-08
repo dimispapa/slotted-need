@@ -104,7 +104,7 @@ Export data from the system in XLS or PDF format | As a user I can export data f
 ### Design
 #### Entity Relationship Diagram (ERD)
 The ERD below was generated using the [graph-models](https://django-extensions.readthedocs.io/en/latest/graph_models.html) django extension which created a .dot file (see [erd_diagram.dot](documentation/erd/erd_diagram.dot)) which was then used by the [dreampuf](https://dreampuf.github.io/GraphvizOnline/) GraphViz generator to generate this diagram.
-![erd](documentation/erd/slotted-need_core-custom-models_erd.png)
+![erd](documentation/erd/graphviz-models-erd.png)
 
 #### Products app
 This is the focal point of the project, as "slotted need" revolves around design products and its configurations that then lead to orders.
