@@ -35,16 +35,27 @@ class TestOrderViewSet(TestCase):
             OrderItem,
             order=self.order2,
             product=self.product2,
-            item_status=1,
+            item_status=2,
             priority_level=1
         )
+        self.order_item3 = baker.make(
+            OrderItem,
+            order=self.order2,
+            product=self.product,
+            item_status=4
+        )
+        self.order.refresh_from_db()
+        self.order2.refresh_from_db()
 
         self.page_url = reverse('order_tracker')
         # For /api/orders/
         self.list_api_url = reverse('order-list')
         # For /api/orders/<id>/
         self.detail_api_url = reverse('order-detail',
-                                      args=[self.order.id])
+                                      args=[self.order2.id])
+        # For /api/order-items/<id>/
+        self.item_api_url = reverse('orderitem-detail',
+                                    args=[self.order_item2.id])
 
     def test_order_view_renders_correctly(self):
         """
@@ -91,8 +102,9 @@ class TestOrderViewSet(TestCase):
         response = self.client.get(self.detail_api_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.json()
-        self.assertEqual(data['id'], self.order.id)
-        self.assertEqual(data['paid'], 1)
+        self.assertEqual(data['id'], self.order2.id)
+        self.assertEqual(data['paid'], 2)
+        self.assertEqual(data['order_status'], 2)
 
     def test_update_order(self):
         """
@@ -104,8 +116,22 @@ class TestOrderViewSet(TestCase):
         response = self.client.patch(self.detail_api_url, data,
                                      content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.order.refresh_from_db()
-        self.assertEqual(self.order.paid, 2)
+        self.order2.refresh_from_db()
+        self.assertEqual(self.order2.paid, 2)
+
+    def test_update_order_status(self):
+        """
+        Test updating an item status of an order's item to
+        see if the order status updates correctly.
+        """
+        data = {
+            'item_status': 4
+        }
+        response = self.client.patch(self.item_api_url, data,
+                                     content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.order2.refresh_from_db()
+        self.assertEqual(self.order2.order_status, 4)
 
     def test_delete_order(self):
         """
@@ -114,4 +140,4 @@ class TestOrderViewSet(TestCase):
         response = self.client.delete(self.detail_api_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertFalse(OrderItem.objects.filter(
-            id=self.order.id).exists())
+            id=self.order2.id).exists())
