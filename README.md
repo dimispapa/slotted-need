@@ -229,6 +229,91 @@ This project utilizes a robust stack of technologies and tools to deliver a seam
 # Testing & Monitoring
 ## Manual Testing
 ## Automated Testing
+
+The Slotted-Need application includes a comprehensive suite of automated tests to ensure robustness and reliability. These tests are divided into multiple modules, each targeting specific views, APIs, and functionalities.
+
+### Test Modules
+
+#### **1. `test_home.py`**
+
+- **Purpose**: Tests the Home view and related APIs for rendering and data accuracy.
+- **Highlights**:
+  - Verifies the correct template (`home.html`) is used and necessary context variables (e.g., item status, priority levels) are passed.
+  - Ensures unauthorized access to the home view and APIs is denied.
+  - Validates API responses for product revenue, debtor balances, and item status configurations against expected results.
+
+#### **2. `test_orders_view.py`**
+
+- **Purpose**: Tests the functionality of the `OrderViewSet` and the associated order tracker page.
+- **Highlights**:
+  - Ensures the `orders.html` template is rendered correctly with required context variables.
+  - Tests list, retrieve, update, and delete endpoints for orders.
+  - Validates the functionality for dynamically updating order statuses when an order item's status changes.
+
+#### **3. `test_order_items_view.py`**
+
+- **Purpose**: Tests the `OrderItemViewSet` and its related tracker view.
+- **Highlights**:
+  - Confirms the `order_items.html` template renders correctly and computes critical item counts.
+  - Verifies CRUD operations for `OrderItem` objects, including updates to priority levels and item statuses.
+  - Ensures APIs correctly return order item lists and details.
+
+#### **4. `test_order_archive_view.py`**
+
+- **Purpose**: Focuses on testing the archive and unarchive actions for orders.
+- **Highlights**:
+  - Ensures the archive view (`archive.html`) renders with necessary data.
+  - Tests the ability to archive and unarchive orders via API endpoints.
+  - Validates error handling for invalid archive/unarchive requests (e.g., non-existent order IDs).
+
+#### **5. `test_order_form.py`**
+
+- **Purpose**: Tests the Create Order form and its related view.
+- **Highlights**:
+  - Ensures the `create_order.html` template renders with the correct forms.
+  - Validates form submissions with valid and invalid data, including error handling for duplicate clients, email mismatches, and invalid order item data.
+  - Tests the client conflict resolution logic for exact and partial matches.
+
+#### **6. `test_user_views.py`**
+
+- **Purpose**: Tests user management views, including create, update, delete, and invite resend functionalities.
+- **Highlights**:
+  - Verifies the user list, creation, update, and deletion views render and function correctly.
+  - Tests permissions to ensure non-admin users cannot access admin-only views.
+  - Mocks and validates the `resend_invite` functionality to ensure invitation emails are sent as expected.
+
+#### **7. `test_user_forms.py`**
+
+- **Purpose**: Validates the custom user forms for creating and updating users.
+- **Highlights**:
+  - Ensures the `CustomUserCreationForm` handles valid and invalid data, including mismatched emails and duplicate email errors.
+  - Tests the `CustomUserChangeForm` to ensure non-admin users cannot modify restricted fields like `is_staff`.
+  - Confirms form submissions via the `user_create` view correctly save users and assign them to the appropriate groups.
+
+### Test Framework and Libraries
+
+- **Django TestCase**: Core testing framework for the application.
+- **Model Bakery**: Efficiently creates mock database objects for testing.
+- **Unittest Mock**: Used for mocking functionalities like email sending.
+- **REST Framework Status Codes**: Validates the correctness of API response statuses.
+- **Regex Assertions**: Ensures proper formatting for fields like color strings in API responses.
+
+### Coverage
+
+The tests cover a wide range of functionalities, including:
+- View rendering and template correctness.
+- Context variable inclusion.
+- API CRUD operations and data validation.
+- User and order management workflows.
+- Permissions and access control.
+
+These automated tests ensure the Slotted-Need application functions as intended, reduces regression risks, and maintains a high standard of reliability.
+
+### Test Coverage
+
+The test coverage of this application was analyzed using the `coverage` library. You can view the detailed coverage report [here](https://dimispapa.github.io/slotted-need/).
+
+
 ## Code Validation
 ### HTML
 ### CSS
