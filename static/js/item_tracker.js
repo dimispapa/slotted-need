@@ -231,7 +231,7 @@ $(document).ready(function () {
                         data-order-id="${row.order.id}" data-value="${data}">
                         ${optionStr}
                         </button>
-                        `
+                        `;
                     }
                     // for filtering and sorting, return the underlying data
                     return data;
@@ -244,7 +244,7 @@ $(document).ready(function () {
                 className: 'sortable align-middle',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        return data === true ? '<p class="text-center mb-0"><i class="fa-solid fa-square-check text-success fs-2 fw-bolder" aria-label="Completed"></i></p>' : ''
+                        return data === true ? '<p class="text-center mb-0"><i class="fa-solid fa-square-check text-success fs-2 fw-bolder" aria-label="Completed"></i></p>' : '';
                     }
                     return data;
                 }
@@ -307,7 +307,7 @@ $(document).ready(function () {
                 displayMessage(errorMessage, 'error');
             }
         });
-    };
+    }
 
     // Function that opens the paid status modal and performs an AJAX call for order details
     function openPaidStatusModal(orderId) {
@@ -336,7 +336,7 @@ $(document).ready(function () {
     // Function that populates the paid status modal with order details
     function populatePaidStatusModal(data) {
         // set modal title label
-        $('#paidStatusModalLabel').html(`Order #${data.id}`)
+        $('#paidStatusModalLabel').html(`Order #${data.id}`);
         // Construct HTML content for the modal
         let clientInfo = `
             <h5>Client Details</h5>
@@ -349,9 +349,9 @@ $(document).ready(function () {
         let orderItems = '<h5>Order Items</h5><ul>';
         data.items.forEach(item => {
             // create an array of values from the option_value objects array
-            let ovString = item.option_values.map((ov) => ov.value)
+            let ovString = item.option_values.map((ov) => ov.value);
             // create an array of finish option names from the component finishes objects array
-            let icfString = item.item_component_finishes.map((icf) => icf.component + ' - ' + icf.finish_option.name)
+            let icfString = item.item_component_finishes.map((icf) => icf.component + ' - ' + icf.finish_option.name);
             // create an HTML element with the item details
             orderItems += `<li><strong>#${item.id} - ${item.product.name}</strong>
             <ul>
@@ -429,7 +429,7 @@ $(document).ready(function () {
                 displayMessage(errorMessage, 'error');
             }
         });
-    };
+    }
 
     // ************** SECTION B: EVENT LISTENERS & HANDLERS *****************************************************************
     // initialize tooltips
@@ -457,7 +457,7 @@ $(document).ready(function () {
         // clear query parameter to effectively remove all filters in back-end
         if (!($(this).hasClass('active'))) {
             params.delete('filter_type');
-        };
+        }
 
         // Refresh DataTable with the new filter state
         table.ajax.reload();
@@ -517,7 +517,7 @@ $(document).ready(function () {
             contentType: 'application/json',
             success: function (response) {
                 // hide spinner
-                toggleSpinner(spinner)
+                toggleSpinner(spinner);
             },
             // Error handling
             error: function (xhr, status, error) {
@@ -553,7 +553,7 @@ $(document).ready(function () {
     // add event listener that handles first delete button that will trigger the modal
     document.addEventListener("click", (event) => {
         // get delete button as reference point. Allow clicking on icon inside
-        let deleteBtn = event.target.closest('.delete-order-item-btn')
+        let deleteBtn = event.target.closest('.delete-order-item-btn');
         if (deleteBtn) {
             // get orderId from the button value
             let orderItemId = deleteBtn.value;

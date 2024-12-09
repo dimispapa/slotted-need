@@ -10,7 +10,7 @@ import {
     toggleSpinner,
     clearDataTableFilters
 
-} from './utils.js'
+} from './utils.js';
 
 $(document).ready(function () {
 
@@ -169,7 +169,7 @@ $(document).ready(function () {
                                 <div class="spinner-border text-primary d-none" role="status" id="paid-status-spinner-${row.id}">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
-                            </span>`
+                            </span>`;
                         return select;
                     }
                     return data;
@@ -208,7 +208,7 @@ $(document).ready(function () {
             // update status styles
             updateStatusStyle();
             // get the rows from the API
-            let rows = this.api().rows()
+            let rows = this.api().rows();
             // Iterate through the rows
             rows.every(function (rowIdx, tableLoop, rowLoop) {
                 // get the row data
@@ -217,7 +217,7 @@ $(document).ready(function () {
                 let row = $(`#order-${data.id}`);
                 // update row styles
                 updateRowStyle(row, data);
-            })
+            });
             console.log('data table loaded');
         },
     });
@@ -240,7 +240,7 @@ $(document).ready(function () {
 
         return badge + exclamation + '</span>';
 
-    };
+    }
 
     // Function that styles the row based on status
     function updateRowStyle(row, data) {
@@ -264,7 +264,7 @@ $(document).ready(function () {
             $(`#exclamation-${data.id}`).addClass('d-none');
             $(`#archive-order-btn-${data.id}`).addClass('d-none');
         }
-    };
+    }
 
     // Function that deletes an order
     function deleteOrder(orderId) {
@@ -296,7 +296,7 @@ $(document).ready(function () {
                 displayMessage(errorMessage, 'error');
             }
         });
-    };
+    }
 
     // Function that archives an order
     function archiveOrder(orderId) {
@@ -328,7 +328,7 @@ $(document).ready(function () {
                 displayMessage(errorMessage, 'error');
             }
         });
-    };
+    }
 
     // ************** SECTION B: EVENT LISTENERS & HANDLERS *****************************************************************
     // initialize tooltips
@@ -372,7 +372,7 @@ $(document).ready(function () {
                 // Get order details
                 let orderData = response;
                 // Find the DataTable row
-                let row = $(`#order-${orderId}`)
+                let row = $(`#order-${orderId}`);
                 // Refresh the row styles
                 updateRowStyle(row, orderData);
             },
@@ -406,7 +406,7 @@ $(document).ready(function () {
                 // Get order details
                 let orderData = response.order;
                 // Find the DataTable row
-                let row = $(`#order-${orderData.id}`)
+                let row = $(`#order-${orderData.id}`);
                 // get the new order status badge html
                 let orderStatusBadgeHTML = renderOrderStatus(orderData.id, orderData.order_status, orderData.paid);
                 // Update the badge
@@ -486,7 +486,7 @@ $(document).ready(function () {
                 // Get order details
                 let orderData = response;
                 // Find the DataTable row
-                let row = $(`#order-${orderId}`)
+                let row = $(`#order-${orderId}`);
                 // Refresh the row styles
                 updateRowStyle(row, orderData);
             },

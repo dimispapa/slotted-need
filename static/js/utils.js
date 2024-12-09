@@ -26,7 +26,7 @@ function displayMessage(message, type) {
                  </div>`;
     // Append to a container in your HTML
     $('#msg-container').html(alert);
-};
+}
 
 function displayMessages(messages) {
 
@@ -71,7 +71,7 @@ function displayMessages(messages) {
         // Append the message to the container
         messageContainer.appendChild(messageDiv);
     });
-};
+}
 
 // Define function that updates statuses bg colour with default parameters set initially
 function updateStatusStyle() {
@@ -111,7 +111,7 @@ function updateStatusStyle() {
             status.addEventListener('change', (event) => updatePriorityStatusStyle(event.target));
         }
     }
-};
+}
 
 function updateItemStatusStyle(status) {
     // remove existing style classes
@@ -132,7 +132,7 @@ function updateItemStatusStyle(status) {
     } else if (statusValue == 4) {
         status.classList.add('bg-secondary', 'text-light');
     }
-};
+}
 
 function updatePaidStatusStyle(status) {
     // Set boostrap class prefix dynamically based on element type and also get status value integer
@@ -149,7 +149,7 @@ function updatePaidStatusStyle(status) {
     } else if (statusValue == 2) {
         status.classList.add(`${bsTag}-secondary`, 'text-light');
     }
-};
+}
 
 function updatePriorityStatusStyle(status) {
     // remove existing style classes
@@ -167,12 +167,12 @@ function updatePriorityStatusStyle(status) {
     } else if (statusValue == 3) {
         status.classList.add('bg-danger', 'text-light');
     }
-};
+}
 
 // initialize tooltips
 function initTooltips() {
-    $('[data-toggle="tooltip"]').tooltip()
-};
+    $('[data-toggle="tooltip"]').tooltip();
+}
 
 // Function that generates options for select html element
 function generateSelectOptions(choices, selectedValue) {
@@ -198,10 +198,10 @@ function generateOptionsList(type, data) {
         } else {
             list += '<li>' + option.name + '</li>';
         }
-    };
+    }
     list += '</ul>';
     return list;
-};
+}
 
 //*********** Util functions related to DataTables and AJAX operations *********************
 
@@ -215,7 +215,7 @@ function ajaxSetupToken(csrftoken) {
             }
         }
     });
-};
+}
 
 // Debounce function to limit the rate of function execution
 function debounce(func, delay) {
@@ -223,17 +223,17 @@ function debounce(func, delay) {
     return function (...args) {
         clearTimeout(timeout);
         timeout = setTimeout(() => func.apply(this, args), delay);
-    }
-};
+    };
+}
 
 // Function to hide spinner
 function toggleSpinner(spinner) {
     if (spinner.classList.contains('d-none')) {
-        spinner.classList.remove('d-none')
+        spinner.classList.remove('d-none');
     } else {
-        spinner.classList.add('d-none')
+        spinner.classList.add('d-none');
     }
-};
+}
 
 // Function that formats the order item data into html tr and td elements
 function formatOrderItems(orderItems) {
@@ -292,7 +292,7 @@ function formatOrderItems(orderItems) {
 
     html += '</tbody></table>';
     return html;
-};
+}
 
 // Function that formats the order item data into html tr and td elements
 function formatOrderItemsArchive(orderItems) {
@@ -331,7 +331,7 @@ function formatOrderItemsArchive(orderItems) {
 
     html += '</tbody></table>';
     return html;
-};
+}
 
 // Function that uses the order_items API to fetch item details for an order
 function fetchOrderItems(orderId, archive, callback) {
@@ -358,7 +358,7 @@ function fetchOrderItems(orderId, archive, callback) {
             callback('<div>Error loading order items.</div>');
         }
     });
-};
+}
 
 // Show/hide the child rows to show order items of orders
 function toggleChildRow(tr, row, archive) {
@@ -377,7 +377,7 @@ function toggleChildRow(tr, row, archive) {
             updateStatusStyle();
         });
     }
-};
+}
 
 // Function that formats a number into a string with thousand separator commas
 function formatWithThousandsSeparator(num) {
@@ -389,7 +389,7 @@ function formatWithThousandsSeparator(num) {
         parts.unshift(part);
     }
     return parts.join(",");
-};
+}
 
 // Function that clear filters on the DataTable
 function clearDataTableFilters(table) {
@@ -397,18 +397,18 @@ function clearDataTableFilters(table) {
     let inputs = $('#filter-row th input.form-control');
     for (let input of inputs) {
         input.value = '';
-    };
+    }
     // get select elements and clear the values
     let selects = $('#filter-row th select');
     for (let select of selects) {
         select.value = 'All';
-    };
+    }
     // deactivate critical filter btn
     $('#critical-filter-btn').removeClass('active btn-warning btn-pressed').addClass('btn-outline-warning btn-unpressed');
 
     // Reload the table
     table.ajax.reload();
-};
+}
 
 export {
     displayMessages,

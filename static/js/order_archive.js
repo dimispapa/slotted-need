@@ -8,7 +8,7 @@ import {
     toggleSpinner,
     clearDataTableFilters
 
-} from './utils.js'
+} from './utils.js';
 
 $(document).ready(function () {
     console.log('order_archive.js loaded');
@@ -236,7 +236,7 @@ $(document).ready(function () {
                 displayMessage(errorMessage, 'error');
             }
         });
-    };
+    }
 
     // Function that archives an order
     function unArchiveOrder(orderId) {
@@ -268,7 +268,7 @@ $(document).ready(function () {
                 displayMessage(errorMessage, 'error');
             }
         });
-    };
+    }
 
     // ************** SECTION B: EVENT LISTENERS & HANDLERS *****************************************************************
 

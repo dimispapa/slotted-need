@@ -90,7 +90,7 @@ $(document).ready(function () {
                 displayMessage(errorMessage, 'error');
             }
         });
-    };
+    }
 
     // Handle Apply Product Revenue Filters Button Click
     $('#apply-prod-rev-filters').on('click', function () {
@@ -203,7 +203,7 @@ $(document).ready(function () {
                 displayMessage(errorMessage, 'error');
             }
         });
-    };
+    }
 
     // Function to fetch and render the Item Status by Product chart
     function RenderItemStatusProductChart(filters = {}) {
@@ -276,7 +276,7 @@ $(document).ready(function () {
                 displayMessage(errorMessage, 'error');
             }
         });
-    };
+    }
 
     // Function to fetch and render the Item Status by Product chart
     function RenderItemStatusConfigChart(filters = {}) {
@@ -337,7 +337,7 @@ $(document).ready(function () {
                 displayMessage(errorMessage, 'error');
             }
         });
-    };
+    }
 
     // Initialize DataTable with AJAX source and server-side processing
     let table = $('#orderitem-home-table').DataTable({
@@ -403,7 +403,7 @@ $(document).ready(function () {
                         data-order-id="${row.order.id}" data-value="${data}">
                         ${optionStr}
                         </span>
-                        `
+                        `;
                     }
                     return data;
                 }
@@ -420,7 +420,7 @@ $(document).ready(function () {
                         data-order-id="${row.order.id}" data-value="${data}">
                         ${optionStr}
                         </span>
-                        `
+                        `;
                     }
                     return data;
                 }
@@ -439,7 +439,7 @@ $(document).ready(function () {
                         data-order-id="${row.order.id}" data-value="${data}">
                         ${optionStr}
                         </span>
-                        `
+                        `;
                     }
                     // for filtering and sorting, return the underlying data
                     return data;

@@ -171,11 +171,12 @@ This project utilizes a robust stack of technologies and tools to deliver a seam
 - **[Django REST Framework (DRF)](https://www.django-rest-framework.org/)**: For building RESTful APIs, facilitating communication between the frontend and backend.
 - **[Bootstrap](https://getbootstrap.com/)**: A front-end framework for developing responsive and mobile-first web interfaces.
 
-### Third-party JavaScript Libraries
+### JavaScript Libraries
 - **[jQuery](https://jquery.com/)**: Simplifying DOM manipulation and AJAX requests for dynamic user interactions.
 - **[Chart.js](https://www.chartjs.org/)**: Generates visually appealing and customizable charts for data visualization.
+- **[Moment.js](https://momentjs.com/)**: For parsing, validating, manipulating, and formatting dates.
 
-### Third-party Python Libraries
+### Python Libraries
 - **[pytest-django](https://pytest-django.readthedocs.io/en/latest/)**: Enables concise, readable, and scalable test configurations for Django projects.
 - **[Unittest.mock](https://docs.python.org/3/library/unittest.mock.html)**: Used for mocking during unit testing to isolate and test the email user-invitation process.
 - **[Django Model Bakery](https://model-bakery.readthedocs.io/en/latest/)**: Python library: Simplifying the creation of test data for unit tests.
@@ -364,13 +365,44 @@ HTML files were validated using the recommended [HTML W3C Validator](https://val
 | ------- | ---------------------------------------------------------------- | --------------- |
 | Home   | ![screenshot](documentation/validation/html/html-w3c-validation-home.png)   | Pass: No Errors. |
 | Create Order | ![screenshot](documentation/validation/html/html-w3c-validation-create-order.png) | Pass: No Errors. |
-| Order Tracker | ![screenshot](documentation/validation/html/html-w3c-validation-item-tracker.png) | Pass: No Errors. |
+| Order Tracker | ![screenshot](documentation/validation/html/html-w3c-validation-order-tracker.png) | Pass: No Errors. |
 | Item Tracker | ![screenshot](documentation/validation/html/html-w3c-validation-item-tracker.png) | Pass: No Errors. |
-| Order Archive | ![screenshot](documentation/validation/html/html-w3c-validation-item-tracker.png) | Pass: No Errors. |
+| Order Archive | ![screenshot](documentation/validation/html/html-w3c-validation-order-archive.png) | Pass: No Errors. |
 | Item Tracker | ![screenshot](documentation/validation/html/html-w3c-validation-item-tracker.png) | Pass: No Errors. |
+| User Management | ![screenshot](documentation/validation/html/html-w3c-validation-users.png) | Pass: No Errors. |
+| Add New User | ![screenshot](documentation/validation/html/html-w3c-validation-add-user.png) | Pass: No Errors. |
+| Edit User | ![screenshot](documentation/validation/html/html-w3c-validation-edit-user.png) | Pass: No Errors. |
+| Delete User | ![screenshot](documentation/validation/html/html-w3c-validation-delete-user.png) | Pass: No Errors. |
+| Login | ![screenshot](documentation/validation/html/html-w3c-validation-login.png) | Pass: No Errors. |
+| Logout | ![screenshot](documentation/validation/html/html-w3c-validation-logout.png) | Pass: No Errors. |
+| 404 | ![screenshot](documentation/validation/html/html-w3c-validation-404.png) | Pass: No Errors. |
+| 403 | ![screenshot](documentation/validation/html/html-w3c-validation-403.png) | Pass: No Errors. |
+| 400 | ![screenshot](documentation/validation/html/html-w3c-validation-400.png) | Pass: No Errors. |
+| 500 | ![screenshot](documentation/validation/html/html-w3c-validation-500.png) | Pass: No Errors. |
 
 ### CSS
+
+The CSS stylesheet was validated using the recommended [W3C CSS "Jigsaw" Validator](https://jigsaw.w3.org/css-validator).
+
+| File      | Jigsaw URL | Screenshot | Notes | 
+| --------- | ---------- | ---------- | ----- | 
+| style.css | [Jigsaw](https://jigsaw.w3.org/css-validator/validator?uri=https%3A%2F%2Fslotted-need-bcccd2a52a21.herokuapp.com%2Fstatic%2Fcss%2Fstyle.7a4365cd9d54.css&profile=css3svg&usermedium=all&warning=1&vextwarning=&lang=en) | ![screenshot](documentation/validation/css/css-w3c-validation.png) | Pass: No Errors. | 
+
 ### JavaScript
+
+The JavaScript scripts were validated using the recommended [JSHint Validator](https://jshint.com/).
+
+| File      | Screenshot | Notes |
+| --------- | ---------- | ----- |
+| dashboard.js  | ![screenshot](documentation/validation/js/jshint-validation-dashboard.png) | Pass: No errors. | 
+| order_form.js | ![screenshot](documentation/validation/js/jshint-validation-order-form.png) | Pass: No errors. |
+| client_search.js | ![screenshot](documentation/validation/js/jshint-validation-client-search.png) | Pass: No errors. |
+| order_form.js | ![screenshot](documentation/validation/js/jshint-validation-order-form.png) | Pass: No errors. |
+| order_tracker.js | ![screenshot](documentation/validation/js/jshint-validation-order-tracker.png) | Pass: No errors. |
+| item_tracker.js | ![screenshot](documentation/validation/js/jshint-validation-item-tracker.png) | Pass: No errors. |
+| order_archive.js | ![screenshot](documentation/validation/js/jshint-validation-order-archive.png) | Pass: No errors. |
+| utils.js | ![screenshot](documentation/validation/js/jshint-validation-utils.png) | Pass: No errors. |
+
 ### Python
 ### Lighthouse Audit
 ## Error Logging

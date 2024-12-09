@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let productId = target.value;
         let orderItem = target.closest('.order-item-form');
         let formIndex = orderItem.getAttribute('data-form-index');
-        let configurationContainer = orderItem.querySelector('.config-form-container')
+        let configurationContainer = orderItem.querySelector('.config-form-container');
         let basePriceField = document.getElementById(`id_items-${formIndex}-base_price`);
         let discountField = document.getElementById(`id_items-${formIndex}-discount`);
         let itemValueField = document.getElementById(`id_items-${formIndex}-item_value`);
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (configurationContainer.childElementCount > 0) {
                             // Show the options container
                             configurationContainer.classList.remove('d-none');
-                        };
+                        }
 
                         // Once the product details have been updated, resolve the promise
                         resolve();
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // resolve the promise with an empty selection
             return Promise.resolve();
         }
-    };
+    }
 
     // Define function to populate product options
     function populateProductOptions(data, productId, formIndex, configurationContainer) {
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // create columns for options
                 let optionCol = document.createElement('div');
                 optionCol.classList.add(...OPTION_COL_STYLES);
-                optionCol.innerHTML += `<h4>${option.name}</h4>`
+                optionCol.innerHTML += `<h4>${option.name}</h4>`;
 
                 let optionDiv = document.createElement('div');
                 optionDiv.classList.add('row');
@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     finishDivHTML += '</select>';
                     finishDiv.innerHTML += finishDivHTML;
                     componentFinishCol.appendChild(finishDiv);
-                })
+                });
 
                 // append the finishes column to the config container
                 configurationContainer.appendChild(componentFinishCol);
@@ -237,8 +237,8 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             // Hide the component finishes containers if no product/option is selected
             finishRow.classList.add('d-none');
-        };
-    };
+        }
+    }
 
     // Define function to deselect other finishes in the same option container
     function deselectOtherFinishes(selectedDropdown, targetClass) {
@@ -250,10 +250,10 @@ document.addEventListener('DOMContentLoaded', function () {
             // If it's not the dropdown that was selected, reset its value
             if (dropdown !== selectedDropdown) {
                 dropdown.value = '';
-                dropdown.classList.add('unselected')
+                dropdown.classList.add('unselected');
             } else {
                 dropdown.classList.remove('unselected');
-            };
+            }
         });
     }
 
@@ -268,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (formCount < maxFormCount || maxFormCount === 0) { // 0 means no max
             // Clone the empty form template. Replace placeholders with appropriate index values and item heading number
-            let newFormHtml = emptyFormTemplate.replace(/__prefix__/g, newFormIndex)
+            let newFormHtml = emptyFormTemplate.replace(/__prefix__/g, newFormIndex);
             newFormHtml = newFormHtml.replace(/__itemnum__/g, itemNum).replace(/items--/g, `items-${newFormIndex}-`).replace(/form--/g, `form-${newFormIndex}-`);
 
             // Append the new form to the container
@@ -279,15 +279,15 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             alert('Maximum number of order items reached.');
         }
-    };
+    }
 
     // Define function that deletes an order item and remaining items index
     function deleteOrderItem(orderItemForm) {
 
         if (orderItemForm) {
             // formset management update
-            let newFormCount = totalForms.value - 1
-            totalForms.setAttribute('value', newFormCount)
+            let newFormCount = totalForms.value - 1;
+            totalForms.setAttribute('value', newFormCount);
 
             // remove orderItemForm from container
             orderItemsContainer.removeChild(orderItemForm);
@@ -298,7 +298,7 @@ document.addEventListener('DOMContentLoaded', function () {
             orderItemForms.forEach((form, index) => {
                 form.setAttribute('data-form-index', index);
                 // Update Order Item heading (+1 as not zero indexing)
-                form.querySelector('h4').innerText = `Order Item #${index+1}`
+                form.querySelector('h4').innerText = `Order Item #${index+1}`;
                 // update select and input elements
                 form.querySelectorAll('input, select').forEach(field => {
                     // Update field names and IDs to maintain the correct formset structure
@@ -317,7 +317,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             });
         }
-    };
+    }
 
     // Define function that updates the item value based on discount
     function updateOrderValue(target) {
@@ -340,7 +340,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // update the running total
             updateOrderTotals();
         }
-    };
+    }
 
     // Define function that updates order total based on order item values
     function updateOrderTotals() {
@@ -349,8 +349,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // Select all elements with class .order-item-form but exclude those inside #empty-form-template
         document.querySelectorAll('.order-item-form:not(#empty-form-template .order-item-form)').forEach((_, index) => {
 
-            let itemValueField = document.getElementById(`id_items-${index}-item_value`)
-            let itemValue = parseFloat(itemValueField.value) || 0
+            let itemValueField = document.getElementById(`id_items-${index}-item_value`);
+            let itemValue = parseFloat(itemValueField.value) || 0;
 
             // Sum up item values for the order
             totalOrderValue += itemValue;
@@ -358,7 +358,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Update the Order form with the calculated totals
         orderFormOrderValueField.value = totalOrderValue.toFixed(2);
-    };
+    }
 
     // ************** SECTION B: EVENT LISTENERS & HANDLERS *****************************************************************
 
@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('click', function (event) {
 
         // get add item button as reference point. Allow clicking on icon inside
-        let addItemBtn = event.target.closest('#add-order-item')
+        let addItemBtn = event.target.closest('#add-order-item');
         if (addItemBtn) {
             // Create a new empty form
             addNewOrderItemForm();
@@ -377,7 +377,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('click', function (event) {
 
         // get delete button as reference point. Allow clicking on icon inside
-        let deleteBtn = event.target.closest('.delete-order-item')
+        let deleteBtn = event.target.closest('.delete-order-item');
         if (deleteBtn) {
             // Set order item delete button as attribute for the modal
             deleteModalElement.setAttribute('data-target', deleteBtn.id);
@@ -411,7 +411,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .catch(error => {
                     console.error('Error in updating totals:', error);
                 });
-        };
+        }
     });
 
     // Add Input event listener to trigger update of item & order values 
@@ -419,7 +419,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('input', function (event) {
 
         // execute the updateOrderValue function
-        updateOrderValue(event.target)
+        updateOrderValue(event.target);
     });
 
 
