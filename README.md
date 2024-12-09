@@ -187,13 +187,16 @@ This project utilizes a robust stack of technologies and tools to deliver a seam
 - **[django-filter](https://django-filter.readthedocs.io/en/stable/)**: Provides filtering capabilities for Django querysets, often used with DRF.
 - **[django-nested-admin](https://github.com/theatlantic/django-nested-admin)**: Adds nested inline editing functionality in the Django admin interface.
 - **[whitenoise](https://whitenoise.evans.io/)**: Simplifies serving static files in production environments.
+- **[Coverage](https://coverage.readthedocs.io/)**: For analyzing test coverage in the codebase.
 
-### Error Tracking/Debugging Tools
+### Tools
 - **[Sentry](https://sentry.io/welcome/)**: For real-time error monitoring and debugging in both Python and JavaScript.
 - **[Heroku](https://devcenter.heroku.com/)**: Facilitates live deployment of the application, ensuring a scalable and accessible platform.
 - **[GitHub](https://docs.github.com/)**: Provides version control, secure code storage, and collaborative tools for development.
 - **[Gitpod Enterprise](https://www.gitpod.io/docs/)**: Automates workspace creation directly from the GitHub repository, streamlining development setup.
 - **[VS Code Desktop](https://code.visualstudio.com/docs)**: The primary IDE for code editing, debugging, and workspace management, with extensions like Python and PEP8 linters for enhanced functionality.
+- **[SendGrid](https://docs.sendgrid.com/)**: For sending transactional emails such as user invitations and notifications.
+- **[Google OAuth](https://developers.google.com/identity)**: To enable secure authentication for users via Google accounts.
 
 # Functionality & Features deep-dive
 ## Home Dashboard
@@ -220,9 +223,45 @@ This project utilizes a robust stack of technologies and tools to deliver a seam
 
 ## Development & Deployment
 ### Agile development process
+This project follows an **Agile development process**, emphasizing iterative progress, frequent feedback, and adaptability. Key aspects of the workflow include:
+- **Scrum-based sprints**: Short development cycles to deliver functional increments.
+- **Daily standups**: Regular check-ins to discuss progress and address roadblocks.
+- **Issue tracking**: Managed through tools like GitHub Issues or Trello for task prioritization and monitoring.
+- **Continuous Integration (CI)**: Automated testing and code quality checks ensure reliability at every stage.
+
 ### Deployment to Heroku
-#### How to Deploy
-#### How to Clone
+The application is deployed on **[Heroku](https://www.heroku.com/)**, a cloud platform that simplifies the deployment and scaling of web applications. 
+
+### How to deploy
+
+  - Log in to Heroku.
+  - Create a new application in Heroku.
+  - Select "New" and then "Create new app".
+  - Name the app, choose a region, and click "Create app".
+  - Navigate to the "Settings" tab at the top.
+  - In the "Reveal Config Vars" section, enter the environment variables required by the app:
+    - KEY: PORT, VALUE: 8000.
+    - DATABASE CREDENTIALS (URL & KEY)
+    - SENDGRID API KEY
+    - GOOGLE OAUTH API KEY
+  - In the buildpacks section, click "Add buildpack" and choose Python.
+  - Ensure your project includes a Procfile with the necessary commands to run the application.
+  - Add a runtime.txt with the required Python version (closer to the compatible Heroku versions).
+  - Run database migrations.
+  - Go to the "Deploy" tab at the top.
+  - Under "Deployment Method", select "GitHub" to connect the two.
+  - Click "Connect" to link to the desired GitHub repository.
+  - Deploy the required branch.
+  - If desirable, subsequent deployments can be handled automatically whenever changes are pushed to GitHub, by enabling "Automatic Deploys" (with CI optional).
+
+### How to clone
+
+- Navigate to this GitHub repository: https://github.com/dimispapa/crag-leader
+- Click on the 'Code' button at the top right, then select 'HTTPs'.
+- Copy the URL provided.
+- Open VS Code, create a new project folder, and open the terminal.
+- In the terminal, type "git clone", paste the copied URL, and press 'Enter'.
+- This will start the cloning process.
 
 
 
@@ -311,7 +350,9 @@ These automated tests ensure the Slotted-Need application functions as intended,
 
 ### Test Coverage
 
-The test coverage of this application was analyzed using the `coverage` library. You can view the detailed coverage report [here](https://dimispapa.github.io/slotted-need/).
+The test coverage of this application was analyzed using the `coverage` library. Below is a summary of the coverage report:
+
+![Test Coverage Report](documentation/coverage-report.png)
 
 
 ## Code Validation
