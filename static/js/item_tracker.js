@@ -273,10 +273,6 @@ $(document).ready(function () {
         drawCallback: function (settings) {
             // update status styles
             updateStatusStyle();
-            // initialize tooltips
-            initTooltips();
-            // add event listeners
-            processEventListeners();
             console.log('data table loaded');
         },
     });
@@ -436,163 +432,162 @@ $(document).ready(function () {
     };
 
     // ************** SECTION B: EVENT LISTENERS & HANDLERS *****************************************************************
-    function processEventListeners() {
+    // initialize tooltips
+    initTooltips();
 
-        // Prevent triggering sorting when a user clicks in any of the inputs.
-        // Sorting should apply when the user clicks any of the column headers
-        $('#orderitem-table').on('click mousedown touchstart', '.filter', function (e) {
-            e.stopPropagation();
-        });
+    // Prevent triggering sorting when a user clicks in any of the inputs.
+    // Sorting should apply when the user clicks any of the column headers
+    $('#orderitem-table').on('click mousedown touchstart', '.filter', function (e) {
+        e.stopPropagation();
+    });
 
-        // Event listeners for filter inputs with debounce
-        $('#filter-id, #filter-order, #filter-client, #filter-product, #filter-value-min, ' +
-            '#filter-value-max, #filter-item-status, #filter-priority-level, #filter-paid-status, ' +
-            '#filter-design-options, #filter-product-finish, #filter-component-finishes, ' +
-            '#filter-exclude-completed, #filter-date-from, #filter-date-to'
-        ).on('keyup change',
-            debounce(function () {
-                table.ajax.reload();
-            }, 300));
-
-        // Handle filter button click
-        $('#critical-filter-btn').on('click', function () {
-            $(this).toggleClass('active btn-warning btn-pressed btn-outline-warning btn-unpressed');
-            // clear query parameter to effectively remove all filters in back-end
-            if (!($(this).hasClass('active'))) {
-                params.delete('filter_type');
-            };
-
-            // Refresh DataTable with the new filter state
+    // Event listeners for filter inputs with debounce
+    $('#filter-id, #filter-order, #filter-client, #filter-product, #filter-value-min, ' +
+        '#filter-value-max, #filter-item-status, #filter-priority-level, #filter-paid-status, ' +
+        '#filter-design-options, #filter-product-finish, #filter-component-finishes, ' +
+        '#filter-exclude-completed, #filter-date-from, #filter-date-to'
+    ).on('keyup change',
+        debounce(function () {
             table.ajax.reload();
-        });
+        }, 300));
 
-        // Handle change for item_status
-        $('#orderitem-table').on('change', '.item-status', function () {
-            // get order item id and new status
-            let orderItemId = $(this).data('id');
-            let newStatus = $(this).val();
-            // show spinner
-            let spinner = document.getElementById(`item-status-spinner-${orderItemId}`);
-            toggleSpinner(spinner);
+    // Handle filter button click
+    $('#critical-filter-btn').on('click', function () {
+        $(this).toggleClass('active btn-warning btn-pressed btn-outline-warning btn-unpressed');
+        // clear query parameter to effectively remove all filters in back-end
+        if (!($(this).hasClass('active'))) {
+            params.delete('filter_type');
+        };
 
-            // API AJAX patch call to update item status in the backend
-            $.ajax({
-                url: `/api/order-items/${orderItemId}/`,
-                type: 'PATCH',
-                data: JSON.stringify({
-                    'item_status': newStatus
-                }),
-                contentType: 'application/json',
-                success: function (response) {
-                    // hide the spinner
-                    toggleSpinner(spinner);
-                },
-                // Error handling
-                error: function (xhr, status, error) {
-                    // Reload the table to revert changes
-                    table.ajax.reload(toggleSpinner(spinner), false);
-                    // display message
-                    let errorMessage = `
+        // Refresh DataTable with the new filter state
+        table.ajax.reload();
+    });
+
+    // Handle change for item_status
+    $('#orderitem-table').on('change', '.item-status', function () {
+        // get order item id and new status
+        let orderItemId = $(this).data('id');
+        let newStatus = $(this).val();
+        // show spinner
+        let spinner = document.getElementById(`item-status-spinner-${orderItemId}`);
+        toggleSpinner(spinner);
+
+        // API AJAX patch call to update item status in the backend
+        $.ajax({
+            url: `/api/order-items/${orderItemId}/`,
+            type: 'PATCH',
+            data: JSON.stringify({
+                'item_status': newStatus
+            }),
+            contentType: 'application/json',
+            success: function (response) {
+                // hide the spinner
+                toggleSpinner(spinner);
+            },
+            // Error handling
+            error: function (xhr, status, error) {
+                // Reload the table to revert changes
+                table.ajax.reload(toggleSpinner(spinner), false);
+                // display message
+                let errorMessage = `
                                     Error updating item status for order item ${orderItemId}:
                                     ${xhr.responseJSON.detail}
                                     ` || 'An error occurred while deleting the order item.';
-                    displayMessage(errorMessage, 'error');
-                }
-            });
+                displayMessage(errorMessage, 'error');
+            }
         });
+    });
 
-        // Handle change for priority_level to update backend data
-        $('#orderitem-table').on('change', '.priority-status', function () {
-            // Get order item id and new priority status
-            var orderitemId = $(this).data('id');
-            var newPriority = $(this).val();
-            // show spinner
-            let spinner = document.getElementById(`priority-status-spinner-${orderitemId}`);
-            toggleSpinner(spinner);
+    // Handle change for priority_level to update backend data
+    $('#orderitem-table').on('change', '.priority-status', function () {
+        // Get order item id and new priority status
+        var orderitemId = $(this).data('id');
+        var newPriority = $(this).val();
+        // show spinner
+        let spinner = document.getElementById(`priority-status-spinner-${orderitemId}`);
+        toggleSpinner(spinner);
 
-            // API AJAX patch call to update priority status
-            $.ajax({
-                url: `/api/order-items/${orderitemId}/`,
-                type: 'PATCH',
-                data: JSON.stringify({
-                    'priority_level': newPriority
-                }),
-                contentType: 'application/json',
-                success: function (response) {
-                    // hide spinner
-                    toggleSpinner(spinner)
-                },
-                // Error handling
-                error: function (xhr, status, error) {
-                    // Reload the table to revert changes
-                    table.ajax.reload(toggleSpinner(spinner), false);
-                    // display message
-                    let errorMessage = `
+        // API AJAX patch call to update priority status
+        $.ajax({
+            url: `/api/order-items/${orderitemId}/`,
+            type: 'PATCH',
+            data: JSON.stringify({
+                'priority_level': newPriority
+            }),
+            contentType: 'application/json',
+            success: function (response) {
+                // hide spinner
+                toggleSpinner(spinner)
+            },
+            // Error handling
+            error: function (xhr, status, error) {
+                // Reload the table to revert changes
+                table.ajax.reload(toggleSpinner(spinner), false);
+                // display message
+                let errorMessage = `
                                     Error updating priority level for order item ${orderItemId}:
                                     ${xhr.responseJSON.detail}
                                     ` || 'An error occurred while deleting the order item.';
-                    displayMessage(errorMessage, 'error');
-                }
-            });
-        });
-
-        // Event delegation for delete buttons within the DataTable
-        $('#orderitem-table tbody').on('click', '.delete-order-item-btn, .delete-order-item-btn *', (event) => {
-            // Use .closest() to find the button in case the icon is clicked
-            let deleteBtn = $(event.target).closest('.delete-order-item-btn');
-            if (deleteBtn.length) {
-                // stop propagation to prevent event bubbling up the parents
-                event.preventDefault();
-                event.stopPropagation();
-                // Get order item ID from the button value
-                let orderItemId = deleteBtn.val();
-                // Set the order item ID as an attribute on the modal
-                deleteModalElement.setAttribute('data-order-item-id', orderItemId);
-                // Show the confirmation modal
-                deleteModal.show();
+                displayMessage(errorMessage, 'error');
             }
         });
+    });
 
-        // add event listener that handles first delete button that will trigger the modal
-        document.addEventListener("click", (event) => {
-            // get delete button as reference point. Allow clicking on icon inside
-            let deleteBtn = event.target.closest('.delete-order-item-btn')
-            if (deleteBtn) {
-                // get orderId from the button value
-                let orderItemId = deleteBtn.value;
-                // Set orderId as attribute for the modal to be used for front-end deletion
-                deleteModalElement.setAttribute('data-order-item-id', orderItemId);
-                // show the confirmation delete modal
-                deleteModal.show();
-            }
-        });
+    // Event delegation for delete buttons within the DataTable
+    $('#orderitem-table tbody').on('click', '.delete-order-item-btn, .delete-order-item-btn *', (event) => {
+        // Use .closest() to find the button in case the icon is clicked
+        let deleteBtn = $(event.target).closest('.delete-order-item-btn');
+        if (deleteBtn.length) {
+            // stop propagation to prevent event bubbling up the parents
+            event.preventDefault();
+            event.stopPropagation();
+            // Get order item ID from the button value
+            let orderItemId = deleteBtn.val();
+            // Set the order item ID as an attribute on the modal
+            deleteModalElement.setAttribute('data-order-item-id', orderItemId);
+            // Show the confirmation modal
+            deleteModal.show();
+        }
+    });
 
-        // add event listener on confirm delete button that will handle the deletion
-        confirmDeleteBtn.addEventListener('click', () => {
-            // Get order ID from modal attribute
-            let orderItemId = deleteModalElement.getAttribute('data-order-item-id');
-            if (orderItemId) {
-                // Delete item
-                deleteOrderItem(orderItemId);
-                // Clear the data attribute
-                deleteModalElement.removeAttribute('data-order-item-id');
-            }
-        });
+    // add event listener that handles first delete button that will trigger the modal
+    document.addEventListener("click", (event) => {
+        // get delete button as reference point. Allow clicking on icon inside
+        let deleteBtn = event.target.closest('.delete-order-item-btn')
+        if (deleteBtn) {
+            // get orderId from the button value
+            let orderItemId = deleteBtn.value;
+            // Set orderId as attribute for the modal to be used for front-end deletion
+            deleteModalElement.setAttribute('data-order-item-id', orderItemId);
+            // show the confirmation delete modal
+            deleteModal.show();
+        }
+    });
 
-        // Event delegation for dynamically added buttons
-        $('#orderitem-table tbody').on('click', '.paid-status', function () {
-            let orderId = $(this).data('order-id');
-            openPaidStatusModal(orderId);
-        });
+    // add event listener on confirm delete button that will handle the deletion
+    confirmDeleteBtn.addEventListener('click', () => {
+        // Get order ID from modal attribute
+        let orderItemId = deleteModalElement.getAttribute('data-order-item-id');
+        if (orderItemId) {
+            // Delete item
+            deleteOrderItem(orderItemId);
+            // Clear the data attribute
+            deleteModalElement.removeAttribute('data-order-item-id');
+        }
+    });
 
-        // Add event listener for clicks on clear filter btn
-        $('#clear-filters-btn').on('click', function () {
-            // clear query parameter to effectively remove all filters in back-end
-            params.delete('filter_type');
-            // clear filters on front-end and reload table
-            clearDataTableFilters(table);
-        });
+    // Event delegation for dynamically added buttons
+    $('#orderitem-table tbody').on('click', '.paid-status', function () {
+        let orderId = $(this).data('order-id');
+        openPaidStatusModal(orderId);
+    });
 
-    }
+    // Add event listener for clicks on clear filter btn
+    $('#clear-filters-btn').on('click', function () {
+        // clear query parameter to effectively remove all filters in back-end
+        params.delete('filter_type');
+        // clear filters on front-end and reload table
+        clearDataTableFilters(table);
+    });
 
 });
