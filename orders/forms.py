@@ -156,8 +156,7 @@ class OrderItemForm(forms.ModelForm):
                 Column(
                     # Item value field
                     PrependedText('item_value', '€', active=True,
-                                  css_class='item-value-field',
-                                  readonly=True),
+                                  css_class='item-value-field'),
                     css_class='form-group col-12'
                 ),
                 css_class="row bg-secondary text-white mb-1"
