@@ -12,15 +12,18 @@ class OrderForm(forms.Form):
     client_name = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control',
         'autocomplete': 'off',  # Disable browser autocomplete
-        'id': 'client_name'
+        'id': 'client_name',
+        'placeholder': 'e.g. John Doherty'
     }), required=True)
     client_phone = PhoneNumberField(widget=RegionalPhoneNumberWidget(attrs={
         'class': 'form-control',
-        'id': 'client_phone'
+        'id': 'client_phone',
+        'placeholder': "e.g. 99223344 (for CY) or +35313441111 (for int'l.)"
     }), required=True)
     client_email = forms.EmailField(widget=forms.EmailInput(attrs={
         'class': 'form-control',
-        'id': 'client_email'
+        'id': 'client_email',
+        'placeholder': 'e.g. john_doherty@email.com'
     }), required=True)
 
     # read-only deposit and order_value fields
