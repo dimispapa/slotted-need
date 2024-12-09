@@ -136,11 +136,10 @@ class DebtorBalancesAPIView(APIView):
         # Calculate total debtor balance per client using reverse relationship
         debtors = Client.objects.filter(orders__paid=1).annotate(
             balance_owed=Coalesce(
-                Sum('orders__order_value'), 0,
+                Sum('orders__order_value') - Sum('orders__deposit'), 0,
                 output_field=DecimalField()
             )
-        ).order_by('-balance_owed')
-
+        ).filter(balance_owed__gt=0).order_by('-balance_owed')
         # prepare data
         debtor_names = [debtor.client_name for debtor in debtors]
         debtor_values = [float(debtor.balance_owed) for debtor in debtors]
