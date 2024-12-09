@@ -4,11 +4,11 @@
 
 {% block extra_head %}
 <!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js" type="text/javascript"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" type="text/css">
 <!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js" type="text/javascript"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 <!-- Moment JS -->
 <script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
 {% endblock %}
@@ -43,12 +43,13 @@
           <!-- Empty header for dropdown toggle column -->
         </th>
         <!-- ID filter -->
-        <th><input type="number" class="form-control filter" id="filter-id" placeholder="Filter" /></th>
+        <th><input type="number" class="form-control filter" id="filter-id" placeholder="Filter"></th>
         <th>
           <!-- Order Date created filter -->
           <div class="input-group">
             <span class="input-group-text p-1">From</span>
-            <input type="date" name="filter_date_from" id="filter-date-from" class="form-control form-control-sm filter">
+            <input type="date" name="filter_date_from" id="filter-date-from"
+              class="form-control form-control-sm filter">
           </div>
           <div class="input-group mt-1 mt-md-2">
             <span class="input-group-text pl-1 pr-1">To</span>
@@ -56,31 +57,30 @@
           </div>
         </th>
         <!-- Client filter -->
-        <th><input type="text" class="form-control filter" id="filter-client" placeholder="Filter" /></th>
+        <th><input type="text" class="form-control filter" id="filter-client" placeholder="Filter"></th>
         <!-- Discount filter -->
         <th>
-          <input type="number" class="form-control form-control-sm filter" id="filter-discount-min" placeholder="Min" />
+          <input type="number" class="form-control form-control-sm filter" id="filter-discount-min" placeholder="Min">
           <input type="number" class="form-control form-control-sm filter mt-1 mt-md-2" id="filter-discount-max"
-            placeholder="Max" />
+            placeholder="Max">
         </th>
         <!-- Deposit filter -->
         <th>
-          <input type="number" class="form-control form-control-sm filter" id="filter-deposit-min" placeholder="Min" />
+          <input type="number" class="form-control form-control-sm filter" id="filter-deposit-min" placeholder="Min">
           <input type="number" class="form-control form-control-sm filter mt-1 mt-md-2" id="filter-deposit-max"
-            placeholder="Max" />
+            placeholder="Max">
         </th>
         <!-- Value filter -->
         <th>
-          <input type="number" class="form-control form-control-sm filter" id="filter-value-min" placeholder="Min" />
+          <input type="number" class="form-control form-control-sm filter" id="filter-value-min" placeholder="Min">
           <input type="number" class="form-control form-control-sm filter mt-1 mt-md-2" id="filter-value-max"
-            placeholder="Max" />
+            placeholder="Max">
         </th>
         <!-- Order Status filter -->
         <th>
           <!-- Tooltip -->
           <div class="text-center align-baseline mb-2" data-toggle="tooltip" data-bs-html="true"
-            title="The order status is set automatically as it reflects the underlying status of its items"
-            aria-label="Info on filter tooltip">
+            title="The order status is set automatically as it reflects the underlying status of its items">
             <i class="fa-solid fa-circle-info text-primary fs-4 fw-bolder"></i>
           </div>
           {% include 'orders/partials/dropdown.html' with options=order_status_choices selected="" class="filter-order-status form-select filter" id="filter-order-status" %}
@@ -107,8 +107,8 @@
 
 <!-- Delete confirmation modal -->
 <div class="modal fade" id="DeleteOrderConfirmationModal" data-bs-backdrop="static" data-bs-keyboard="false"
-  tabindex="-1" aria-labelledby="DeleteOrderConfirmationModal" aria-modal="true">
-  <div class="modal-dialog modal-dialog-centered">
+  tabindex="-1" aria-labelledby="DeleteOrderConfirmationModal" aria-modal="true" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="DeleteOrderConfirmationModalLabel">Confirm Delete Action</h1>
@@ -128,8 +128,8 @@
 
 <!-- Archive confirmation modal -->
 <div class="modal fade" id="ArchiveOrderConfirmationModal" data-bs-backdrop="static" data-bs-keyboard="false"
-  tabindex="-1" aria-labelledby="ArchiveOrderConfirmationModal" aria-modal="true">
-  <div class="modal-dialog modal-dialog-centered">
+  tabindex="-1" aria-labelledby="ArchiveOrderConfirmationModal" aria-modal="true" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="ArchiveOrderConfirmationModalLabel">Confirm Archive Action</h1>

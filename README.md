@@ -256,7 +256,7 @@ The application is deployed on **[Heroku](https://www.heroku.com/)**, a cloud pl
 
 ### How to clone
 
-- Navigate to this GitHub repository: https://github.com/dimispapa/crag-leader
+- Navigate to this GitHub repository: https://github.com/dimispapa/slotted-need
 - Click on the 'Code' button at the top right, then select 'HTTPs'.
 - Copy the URL provided.
 - Open VS Code, create a new project folder, and open the terminal.
@@ -357,6 +357,18 @@ The test coverage of this application was analyzed using the `coverage` library.
 
 ## Code Validation
 ### HTML
+
+HTML files were validated using the recommended [HTML W3C Validator](https://validator.w3.org). Due to authentication required to access the pages, the rendered source code from the browser was used as a direct input in the validator to yield the test results.
+
+| Page    | Screenshot                                                       | Notes           |
+| ------- | ---------------------------------------------------------------- | --------------- |
+| Home   | ![screenshot](documentation/validation/html/html-w3c-validation-home.png)   | Pass: No Errors. |
+| Create Order | ![screenshot](documentation/validation/html/html-w3c-validation-create-order.png) | Pass: No Errors. |
+| Order Tracker | ![screenshot](documentation/validation/html/html-w3c-validation-item-tracker.png) | Pass: No Errors. |
+| Item Tracker | ![screenshot](documentation/validation/html/html-w3c-validation-item-tracker.png) | Pass: No Errors. |
+| Order Archive | ![screenshot](documentation/validation/html/html-w3c-validation-item-tracker.png) | Pass: No Errors. |
+| Item Tracker | ![screenshot](documentation/validation/html/html-w3c-validation-item-tracker.png) | Pass: No Errors. |
+
 ### CSS
 ### JavaScript
 ### Python
