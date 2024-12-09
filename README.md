@@ -350,7 +350,7 @@ These automated tests ensure the Slotted-Need application functions as intended,
 
 ### Test Coverage
 
-The test coverage of this application was analyzed using the `coverage` library. Below is a summary of the coverage report:
+The test coverage of this application was analyzed using the `coverage` library. A coverage of 87% of the codebase was achieved through automated testing, which is complemented by thorough manual testing. Below is a summary of the coverage report:
 
 ![Test Coverage Report](documentation/coverage-report.png)
 
