@@ -22,9 +22,7 @@
   <!-- Sentry error logging configuration for JS -->
   {% include 'partials/sentry_js.html' %}
   <!-- Favicons -->
-  <link rel="icon" sizes="192x192" href="{% static 'favicon/favicon-tns.png' %}" type="image/png">
-  <link rel="shortcut icon" href="{% static 'favicon/shortcun-icon-tns.png' %}" type="image/png">
-  <link rel="apple-touch-icon" href="{% static 'favicon/apple-touch-icon-tns.png' %}" type="image/png">
+  <link rel="icon" href="{% static 'favicon/cog-logo-sm.png' %}" type="image/png">
   <!-- Font Awesome script -->
   <script src="https://kit.fontawesome.com/3f60c2fc78.js" crossorigin="anonymous"></script>
   <!-- Bootstrap CSS -->
@@ -40,7 +38,7 @@
   <header>
     <nav class="navbar navbar-expand-lg bg-primary fixed-top" data-bs-theme="dark">
       <div class="container-fluid">
-        <a class="navbar-brand" href="{% url 'home' %}"><img src="{% static 'favicon/apple-touch-icon-tns.png' %}"
+        <a class="navbar-brand" href="{% url 'home' %}"><img src="{% static 'favicon/cog-logo-md.png' %}"
             width="30" height="24" alt="TNS logo" class="align-text-top"> Slotted Need</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
           aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation"><span
