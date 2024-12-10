@@ -5,9 +5,9 @@
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- DataTables CSS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" type="text/css">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css" type="text/css">
 <!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
 <!-- Moment JS -->
 <script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
 {% endblock %}
@@ -52,14 +52,14 @@
                 <th>
                     <!-- Order Date created filter -->
                     <div class="input-group">
-                        <span class="input-group-text p-1">From</span>
+                        <label for="filter-date-from" class="input-group-text p-1">From</label>
                         <input type="date" name="filter_date_from" id="filter-date-from"
-                            class="form-control form-control-sm filter">
+                            class="form-control form-control-sm filter" aria-label="Filter date from">
                     </div>
                     <div class="input-group mt-1 mt-md-2">
-                        <span class="input-group-text pl-1 pr-1">To</span>
+                        <label for="filter-date-to" class="input-group-text pl-1 pr-1">To</label>
                         <input type="date" name="filter_date_to" id="filter-date-to"
-                            class="form-control form-control-sm filter">
+                            class="form-control form-control-sm filter" aria-label="Filter date to">
                     </div>
                 </th>
                 <th><input type="text" class="form-control filter" id="filter-client" placeholder="Filter"></th>
@@ -67,7 +67,7 @@
                 <th>
                     <!-- Tooltip -->
                     <div class="text-center align-baseline mb-2" data-toggle="tooltip" data-bs-html="true"
-                        title="Use comma to separate multiple filter criteria">
+                        data-bs-title="Use comma to separate multiple filter criteria">
                         <i class="fa-solid fa-circle-info text-primary fs-4 fw-bolder"></i>
                     </div>
                     <input type="text" class="form-control filter" id="filter-design-options" placeholder="Filter">
@@ -75,7 +75,7 @@
                 <th><input type="text" class="form-control filter" id="filter-product-finish" placeholder="Filter"></th>
                 <th>
                     <!-- Tooltip -->
-                    <div class="text-center align-baseline mb-2" data-toggle="tooltip" data-bs-html="true" title="Use comma to separate multiple filter criteria. Each criteria can be: <br>1. a
+                    <div class="text-center align-baseline mb-2" data-toggle="tooltip" data-bs-html="true" data-bs-title="Use comma to separate multiple filter criteria. Each criteria can be: <br>1. a
                         Component <br>2. a Finish Option <br>3. Both<br>, separated by a hyphen.">
                         <i class="fa-solid fa-circle-info text-primary fs-4 fw-bolder"></i>
                     </div>
@@ -94,7 +94,7 @@
                 </th>
                 <th>
                     <!-- Tooltip -->
-                    <div class="text-center align-baseline mb-2" data-toggle="tooltip" data-bs-html="true" title="The payment status displayed corresponds to the order that this item belongs to.
+                    <div class="text-center align-baseline mb-2" data-toggle="tooltip" data-bs-html="true" data-bs-title="The payment status displayed corresponds to the order that this item belongs to.
                         Click the button to view the order and make changes.">
                         <i class="fa-solid fa-circle-info text-primary fs-4 fw-bolder"></i>
                     </div>
@@ -102,7 +102,7 @@
                 </th>
                 <th>
                     <div class="form-check form-switch">
-                        <input class="form-check-input filter" type="checkbox" id="filter-exclude-completed" checked>
+                        <input class="form-check-input filter" type="checkbox" id="filter-exclude-completed" checked aria-label="Exclude completed filter">
                         <label class="form-check-label" for="filter-exclude-completed"
                             id="filter-exclude-completed-label">Hide
                             completed items</label>

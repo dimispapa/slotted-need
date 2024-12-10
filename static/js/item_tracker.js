@@ -176,7 +176,7 @@ $(document).ready(function () {
                 className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        let select = '<select class="form-select-sm priority-status fw-bolder text-wrap" data-id="' + row.id + '">';
+                        let select = '<select class="form-select-sm priority-status fw-bolder text-wrap" data-id="' + row.id + '" aria-label="Priority status">';
                         // Use global variable passed from context into JS and generate select options
                         let options = generateSelectOptions(priorityLevelChoices, data);
                         select += options;
@@ -199,7 +199,7 @@ $(document).ready(function () {
                 className: 'sortable',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        let select = `<select class="form-select-sm item-status fw-bolder text-wrap" data-id="${row.id}">`;
+                        let select = `<select class="form-select-sm item-status fw-bolder text-wrap" data-id="${row.id}" aria-label="Select item status">`;
                         // Use global variable passed from context into JS and generate select options
                         let options = generateSelectOptions(itemStatusChoices, data);
                         select += options;
@@ -228,7 +228,7 @@ $(document).ready(function () {
                         let optionStr = paidStatusChoices[data];
                         return `
                         <button class="btn btn-sm fw-bolder text-wrap paid-status"
-                        data-order-id="${row.order.id}" data-value="${data}">
+                        data-order-id="${row.order.id}" data-value="${data}" aria-label="Paid status button">
                         ${optionStr}
                         </button>
                         `;
@@ -258,7 +258,7 @@ $(document).ready(function () {
                 render: function (data, type, row) {
                     return `
                     <button type="button" id="delete-order-item-btn-${row.id}" name="delete_order"
-                    class="btn btn-sm btn-danger delete-order-item-btn" value="${row.id}">
+                    class="btn btn-sm btn-danger delete-order-item-btn" value="${row.id}" aria-label="Delete order item button">
                     <i class="fa-solid fa-trash"></i>
                     </button>
                     `;
