@@ -196,10 +196,10 @@ class TestDebtorBalancesAPI(TestCase):
         # create the debtors objects based on the same API criteria
         debtors = ClientModel.objects.filter(orders__paid=1).annotate(
             balance_owed=Coalesce(
-                Sum('orders__order_value'), 0,
+                Sum('orders__order_value') - Sum('orders__deposit'), 0,
                 output_field=DecimalField()
             )
-        ).order_by('-balance_owed')
+        ).filter(balance_owed__gt=0).order_by('-balance_owed')
 
         # prepare expected data
         expected_labels = [debtor.client_name for debtor in debtors]
