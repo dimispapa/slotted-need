@@ -93,12 +93,14 @@ Export data from the system in XLS or PDF format | As a user I can export data f
 
 
 ## Wireframes
-### Mobile frames
-### Desktop frames
+Various hand sketches were made to illustrate possible layouts for the many views in this app. At the design and initial development stage, hands-on meetings were held with the intented primary user (Thalis Nicolaou), to experiment with layouts and design, refining them in an agile process as they were developed.
 
 ## Typography & Colours
 ### Fonts
+Default fonts were used with not great emphasis on specific font usage. This is an area that can be further researched in the future to improve styling, however due to the advanced feature complexities and intented use as an internal tool and not a public website, this was deemed as lower priority for the time-being.
+
 ### Colour palette
+The colour palette is mainly determined by the [Bootstrap 5 background colours](https://getbootstrap.com/docs/5.0/utilities/background/), bg-primary and bg-light colours being more dominant colours accross the app. 
 
 ## Database
 ### Design
@@ -201,26 +203,218 @@ This project utilizes a robust stack of technologies and tools to deliver a seam
 
 # Functionality & Features deep-dive
 ## Home Dashboard
+The **Home Dashboard** provides an overview of key metrics and insights for the application. Features include:
+- A summary of item statuses and order priorities displayed through interactive charts.
+- Key performance indicators (KPIs) such as revenue and outstanding balances.
+- A quick-access navigation panel for common management tasks.
+- Filters allow for "slicing" of data insights.
+- The "Critical Items" data table on the bottom right is a filtered view of the "Order Item Tracker", whereas certain filters are applied to show only items that are considered critical in status. i.e. Paid but Not Started, Delivered but Not Paid or with High Priority Level set.
+- An "Edit Items" button opens the Order Item Tracker view with the "critical filter" pre-applied which also allows further editing and filtering within that view. It is the only button that is designed to open in a new tab as it considers better UX to keep the user in the main home view while pursuing further investigation or changes in the critical items. All other navigation buttons in the navbar redirect to the selected view.
+- There are API views set up to feed each chart or data table in this view with pre-prepared data.
+
+![screenshot](documentation/features/home-dashboard1.png)
+![screenshot](documentation/features/home-dashboard2.png)
 
 ## Order Management
-### Create Order form
+
+### Create Order Form
+The **Create Order Form** allows users to:
+- Add new orders for clients by entering details such as client information, order items, and deposits.
+- Dynamically add multiple order items with product selections, options, and quantities.
+- Validate form fields and specific client data handling to prevent duplicates or conflicts, using exact and partial match handling.
+
+Notable features deep-dive:
+- A client search functionality exists for better UX, whereas the user can find existing users by simply typing and a dynamic dropdown appears as they type for possible matches.
+
+![screenshot](documentation/features/search-client-func.png)
+
+- Client phone is handled using the django-phone-field extension library, which handles regional codes and applies phone-specific validation for international numbers too. If a number has the wrong number of digits for the country/region (determined by the prefix coutry code), a validation error is raised. The default region is Cyprus, therefore when no region code is applied, then it is assumed as +357 which is the Cyprus region code.
+
+![screenshot](documentation/features/client-phone.png)
+
+- When partially matching client details are detected in the entered client information, a modal appears to notify the user that there is a potential client conflict, giving the options to handle it gracefully. The user can either, use existing client, update client details or cancel. This prevents any potential confusion from client duplicates or clients sharing the same contact information. If completely new client details are entered, then a new client is created and saved in the database automatically.
+
+![screenshot](documentation/features/client-conflict.png)
+
+- Following through an example order submission, after entering the client information, the user can select a product which will dynamically then populate the relevant design options and their associated finish options (if any).
+
+![screenshot](documentation/features/product-selection.png)
+
+- Once the user selects a design option, in this case for the "Plank" component, the associated finish options then appear. In this case once "Linseed oil" is selected, the other options for "Varnish" are grayed out for better UX, so that it is clearer to the user what has been selected and make the form less "noisy". The "Varnish" option can still be selected however if deciding to change.
+
+![screenshot](documentation/features/design-option.png)
+![screenshot](documentation/features/finish-selection.png)
+
+- The user then must select the second design option, for the "Base" component in this case, following with the associated finish option (in this case being only "Paint").
+
+![screenshot](documentation/features/design-option2.png)
+
+- The form allows adding further order items to the order, by clicking the "plus" button, which allows another set of item selections. 
+
+![screenshot](documentation/features/plus-delete-buttons.png)
+![screenshot](documentation/features/add-second-item.png)
+
+- An item can also be deleted from the order.
+
+![screenshot](documentation/features/delete-item.png)
+
+- An item can be discounted, which automatically is reflected by the item value (readonly field). The base price is pulled from the database product information, but can be however edited by the user to allow flexibility. The total order value is a readonly field which automatically reflects the sum of the item values in the order. The deposit is an optional field.
+
+![screenshot](documentation/features/add-discount.png)
+
+- Finally if the form passes all validation and required fields, the user is notified of the successful order submission.
+
+![screenshot](documentation/features/order-success.png)
+
 ### Order Tracker view
-### Item Tracker view
+The **Order Tracker View** enables users to:
+- View and manage all active orders and their items, categorized by their status and priority levels.
+- Inline edit specific order/item details and statuses for real-time updates.
+- Delete or archive orders.
+- Filter and sort orders by various attributes, such as paid status and due date.
+
+Notable features deep-dive:
+- Order items are neatly grouped and nested in a sub-table, that works like a dropdown when the toggle button is pressed. This allows further management of the items status and priority levels with real-time updates.
+
+![screenshot](documentation/features/nested-items.png)
+
+- The order items' status determines what the order status is, based on certain rules. If for example at least one item is in progress, then the order status is also set as in progress (like the example above). Once **all** items are set to delivered, then the order status changes automatically to delivered, as seen below. Additionally if an order is both delivered and fully paid, then the order is greyd out and an archive button appears, which allows the user to move it to the order archive. For better UX, spinners appears when the AJAX patch calls are in process, to give feedback to the user when the changes are updated in the backend.
+
+![screenshot](documentation/features/order-status-change.png)
+
+- Once the user decides to archive the order, they can do so by clicking the archive button. Like Order #94 in this example, the order is then moved out of the view and to the order archive.
+
+![screenshot](documentation/features/archive-button.png)
+![screenshot](documentation/features/order-archived.png)
+
+- A user can sort the table by clicking on a column heading (the little arrows show which column is sorting, in this case client field).
+
+![screenshot](documentation/features/sort-client.png)
+
+- Can also apply one or more filters to investigate the orders. All filters can be cleared via the clear filters button.
+
+![screenshot](documentation/features/filter-single.png)
+![screenshot](documentation/features/filter-multiple.png)
+
 ### Order Archive view
+The **Order Archive View** allows users to:
+- Manage archived orders, including restoring or permanently deleting records.
+- Maintain a clean active orders list by transitioning completed or old orders to the archive.
+
+Notable features deep-dive:
+- The example Order #94 from above can be seen in the order archive table. This order can also be un-archived by clicking the yellow un-archive button. This will move it back to the order tracker.
+
+![screenshot](documentation/features/archive.png)
+![screenshot](documentation/features/un-archive-button.png)
+![screenshot](documentation/features/order-un-archived.png)
+
+
+### Item Tracker view
+The **Item Tracker View** provides detailed insights into:
+- Individual order items and their current statuses.
+- Critical item tracking, highlighting items marked as urgent or delayed.
+- Dynamic filtering and search for easier navigation, with the focus on order item fulfillment.
+
+Notable features deep-dive:
+- As the hovered-over tooltip below indicates, there are a few fields that require a bit more complex filtering, such as the Component Finishes field, that allows a mix of comma separated values to filter on component, finishes or both.
+
+![screenshot](documentation/features/complex-filtering.png)
+
+- A special on/off filter allows hiding of completed items (i.e. delivered and fully paid) to keep the item list cleaner. This filter is set on by default. Below it is unset that shows items with a green tick being marked as complete.
+
+![screenshot](documentation/features/hide-completed.png)
+
+- As mentioned above in the home view, critical items are those that either are paid but not started, delivered but not paid or marked as high priority. The critical items filter indicates how many there are and when pressed filters to show only those.
+
+![screenshot](documentation/features/critical-items.png)
+
+- Payment status is determined at order level not item level. However the payment status of the relevant order is displayed in the item tracker and allows the user to click on the payment status to make changes, without the need to switch to the order tracker to do so. An example is below where the payment status is set to fully paid, as well as seeing the full order details associated with this item.
+
+![screenshot](documentation/features/paid-status-modal.png)
+![screenshot](documentation/features/changed-to-paid.png)
+
 
 ## Admin Portal
 ### Product Build Management
+The **Product Build Management** system supports:
+- Defining and managing product builds, including their components, finishes, and configuration options.
+- Assigning costs and tracking inventory for components and their sub-components, laying the foundations for future enhanced features in cost and stock tracking.
+- Streamlined product setup for order creation with the allowed flexibility and dynamic population of options.
+
+Notable features deep-dive:
+- The built-in django administration page is utilised to offer an intuitive product building process. As seen below, for an admin user but not a superuser, the admin page is limited to the essential parts relating to Order and Product apps. This is done via an Admin Group controlling permissions. The admin base template was also modified to insert a navigation button (top-right) allowing users to return back to home, for a better UX.
+
+![screenshot](documentation/features/admin-page.png)
+
+- The use of nested and inline admin django extensions allows for an intuitive product build experience and accurate associations of Design options with specific component and associated finishes, to allow what we see at the order creation level. Components can be associated with design options (hence being optional) while other are essential part of the product build in any case. The depth of this product build structure is done with the idea of expanding the application to allow integrating stock management of components and costing at component or component-part level.
+
+![screenshot](documentation/features/product-build1.png)
+![screenshot](documentation/features/product-build2.png)
+![screenshot](documentation/features/product-build3.png)
+
+- Finishes are created normally before any products and can be reused accross products. An example finish being "Paint" below.
+
+![screenshot](documentation/features/finishes.png)
+
+- Components are also expected to be created before any products (but can still be created on the main product admin page) and can be reused accross products if applicable. Selected finishes can be associated with a component to determine what is shown in the order creation form. Unit cost and unit of measurement fields allow for future costing and stock management integration.
+
+![screenshot](documentation/features/components.png)
+![screenshot](documentation/features/components2.png)
+
 
 ## User Access Management
 ### Access Privileges
-### Logging In/Out
-### Add/Invite New User
-### Edit User
-### Delete User
+The application enforces strict role-based access:
+- Admin users can manage all system data, including orders, products, and users.
+- Regular users have restricted access based on their roles, without access to admin page and product builds.
 
-## UX
+![screenshot](documentation/features/user-list.png)
+
+### Logging In/Out
+- Secure login/logout functionality for all users.
+- Authentication integrates with the Django Allauth library for easy account management and Google authentication option.
+
+![screenshot](documentation/features/log-in-out.png)
+![screenshot](documentation/features/signed-in.png)
+
+### Add/Invite, Edit or Delete Users
+Admins can:
+- Add new users by filling in the required details via a simple form. An email is sent to the invited users asking them to setup their account.
+- Edit or delete existing users (non-admin users only). Only a superuser app administrator can edit or delete admin users.
+- Send invitation emails to new users with instructions for account activation and password setup. An inviation can be resent once expired.
+
+![screenshot](documentation/features/add-user.png)
+![screenshot](documentation/features/edit-user.png)
+![screenshot](documentation/features/delete-user.png)
+
 
 ## Future Features
+The following features are planned for future development to enhance the functionality and user experience of the application:
+
+- **Advanced Order and Item Management**:  
+  - Enable editing of item configurations directly from the item tracker.  
+  - Drill down into accrued revenue charts to view detailed debtor balances.  
+
+- **Stock Management Enhancements**:  
+  - Introduce a stock list view to monitor inventory levels.  
+  - Add functionality to view stock gaps for order fulfillment.  
+  - Allow the addition of stock items (components or products).  
+  - Automatically update stock numbers when an order is placed.  
+
+- **Enhanced Client and Order Communication**:  
+  - Generate pro-forma invoices based on order details.  
+  - Send templated emails to clients about their orders.  
+
+- **Product and Component Tracking**:  
+  - Indicate the availability of components/products for a selected product in the order form.  
+  - Define and track processing stages for components and work-in-progress (WIP) items.  
+
+- **Historical Data Tracking**:  
+  - Keep a record of product price histories.  
+  - Maintain a history of unit costs for each component.  
+
+- **Data Import/Export**:  
+  - Import legacy data or Export system data in XLS or PDF format for reporting and offline use. 
 
 ## Development & Deployment
 ### Agile development process
@@ -267,7 +461,6 @@ The application is deployed on **[Heroku](https://www.heroku.com/)**, a cloud pl
 
 
 # Testing & Monitoring
-## Manual Testing
 ## Automated Testing
 
 The Slotted-Need application includes a comprehensive suite of automated tests to ensure robustness and reliability. These tests are divided into multiple modules, each targeting specific views, APIs, and functionalities.
@@ -355,6 +548,75 @@ The test coverage of this application was analyzed using the `coverage` library.
 
 ![Test Coverage Report](documentation/coverage-report.png)
 
+## Manual Testing
+To complement the automated tests, thorough manual testing was conducted for the Slotted-Need application to validate its functionalities and ensure a seamless user experience. Below is a breakdown of the manual testing process based on key features and views:
+
+### Home Dashboard
+- **Tested Features**:
+  - Verified interactive charts display accurate metrics (e.g., item statuses, revenue).
+  - Ensured data filters apply correctly to refine insights.
+  - Confirmed that the "Critical Items" table shows relevant data and navigates to the Item Tracker view with the critical filter pre-applied.
+  - Checked navigation buttons redirect correctly, with the "Edit Items" button opening a new tab.
+- **Edge Cases**:
+  - Verified empty or no critical items display an appropriate message.
+  - Ensured responsiveness and functionality on different devices.
+
+### Create Order Form
+- **Tested Features**:
+  - Verified dynamic dropdowns populate design options and finish options based on product selection.
+  - Ensured client conflict handling works as expected for exact and partial matches, including modal interaction.
+  - Tested validation errors for missing or invalid data (e.g., incorrect phone number format).
+  - Checked dynamic addition and deletion of order items, including automatic calculations for discounts and total value.
+- **Edge Cases**:
+  - Entered a very high number of order items to ensure form handles large data gracefully.
+
+### Order Tracker View
+- **Tested Features**:
+  - Verified orders and items display correctly in the table, with expandable nested items.
+  - Ensured inline edits for item statuses and priorities reflect in the database.
+  - Checked sorting and filtering functionality, including clearing filters.
+  - Tested archiving completed orders and their removal from the active list.
+- **Edge Cases**:
+  - Tried concurrent updates to ensure data consistency.
+  - Checked UX feedback during asynchronous updates (e.g., spinners).
+
+### Item Tracker View
+- **Tested Features**:
+  - Verified item status updates and critical item highlighting.
+  - Tested complex filtering scenarios, such as filtering by specific component finishes.
+  - Ensured the "Hide Completed Items" toggle functions correctly.
+  - Checked payment status updates through modals without switching views.
+- **Edge Cases**:
+  - Simulated scenarios with no matching items for applied filters.
+  - Tested behavior when many items are marked critical.
+
+### Order Archive View
+- **Tested Features**:
+  - Confirmed archived orders display in the table with appropriate status.
+  - Tested unarchiving functionality to move orders back to the active tracker.
+  - Verified deleting archived orders removes them permanently.
+- **Edge Cases**:
+  - Checked navigation between archive and tracker views for smooth transitions.
+  - Verified handling of large volumes of archived orders.
+
+### Product Build Management
+- **Tested Features**:
+  - Verified intuitive product creation and management through the Django admin interface.
+  - Tested nested configurations for components, options, and finishes.
+  - Ensured accurate cost and inventory tracking fields are populated.
+
+### User Access Management
+- **Tested Features**:
+  - Confirmed role-based access controls prevent unauthorized actions.
+  - Verified user login/logout functionality.
+  - Tested user invitations, updates, and deletions.
+
+### General Error Handling
+- Verified graceful handling of errors, such as form validation errors and missing data.
+- Checked logging of errors in the backend for debugging purposes.
+
+### Summary
+The manual testing process ensures all critical and edge-case scenarios are validated, complementing the robust automated test suite. This combination provides confidence in the stability, usability, and reliability of the application.
 
 ## Code Validation
 ### HTML
@@ -472,5 +734,29 @@ Errors and bugs were encountered in development, that were logged as issues on t
 | Javascript issue with looping event listeners #47  | An issue was discovered in the JS code of the trackers (data tables), whereas the event listeners are added/fired with exponential loops, causing unexpected results and even fatal error.| issue resolved by removing listeners code outside the callback function of the data tables initialization. |
 
 # Credits
+## Technical
+| Source                                        | Use                       | Notes                                                  |
+| --------------------------------------------- | ------------------------- | ------------------------------------------------------ |
+| [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#summary) | Version Control | Help write Git commit messages |
+| [GraphModels](https://fontjoy.com/) | Font Pairing | Used to generate font combinations |
+| [Django Documentation](https://docs.djangoproject.com/en/5.0/) | Extensive research in concepts/extensions around Forms, Admin, APIs, Logging, Authentication, Templating, Filtering, Serializers, URLs, Testing and more! |  |
+| [jQuery AJAX](https://api.jquery.com/jQuery.ajax/) | Use of asynchronous AJAX calls to fetch data from API real-time | Very useful accross the views, for data tables and chart rendering, as well as real-time database CRUD operations |
+| [AJAX sourced data tables](https://datatables.net/manual/ajax) | More info on use of AJAX for DataTables |  |
+| [Medium.com](https://ahmedyasin487.medium.com/mastering-querying-in-django-a-comprehensive-guide-to-the-q-object-31d50a66524e#:~:text=What%20is%20the%20'Q'%20object,to%20create%20more%20complex%20queries.) | Understanding querying further in Django | |
+|[Django REST framework](https://www.django-rest-framework.org/tutorial/quickstart/)| Understanding the use of DRF to build intuitive and powerful APIs viewsets that work nicely with filters and serializers | |
+| [Adamj.eu](https://adamj.eu/tech/2020/06/15/how-to-unit-test-a-django-form/) | Understanding further how to test forms |  |
+| [Query optimisation](https://medium.com/@ericmoss08/optimizing-queries-in-django-rest-framework-7100525904d7) | Extremely useful to improve performance due to the complex models | also helped fix N+1 query issues from sub-optimal queries of related tables/fields
+| [Stack overflow](https://stackoverflow.com/questions/39478482/how-to-create-development-branch-from-master-on-github) | Github branching to use dev branch as staging | Encouraged by my mentor Rory to look into using this feature |
+| Code Institute | Using the very useful Django "cheatsheet" for setting up and general django commands |  |
+
+## Content
+| Source | Use | Notes | 
+| ---- | ---- | ----|
+| [FontAwesome](https://fontawesome.com/) | Icons | For buttons |
+| [Flaticon](<a href="https://www.flaticon.com/free-icons/digital-transformation" title="digital transformation icons">Digital transformation icons created by Freepik - Flaticon</a>) | Icons | Cogs Icon/Logo |
 
 # Acknowledgements
+* I would like to thank my Code Institute mentor, Rory Patrick Sheridan, for the support, very useful advanced tips in terms of testing coverage, github management and comprehensive reviews/testing during this project.
+* I would like to also thank Thalis Nicolaou, for giving me the opportunity to create the **Slotted Need tool** based on his business' products/needs, with the aim of rolling this out in production for his operational benefit following the submission of this project.
+* Also thanks to my partner, Georgina Christou, and my friends Stelios Kyprou and Marios Ellinas for logging in as users and testing from their devices to ensure that everything is working as expected.
+* I would also like to thank Code Institute for the great Django course content that inspired me to go out there and research further to build on my skills!
