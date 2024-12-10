@@ -405,7 +405,7 @@ The JavaScript scripts were validated using the recommended [JSHint Validator](h
 
 ### Python
 
-All Python code was validated real-time as soon as they were written, adhering to PEP8 standards, through the use of VS Code extensions "autopep8" and "Flake8". Any issues were highlighted in the IDE's "PROBLEMS" ribbon and dealt with immediately.
+All Python code was validated real-time as soon as they were written, adhering to PEP8 standards, through the use of VS Code extensions "autopep8" and "Flake8". Any issues were highlighted in the IDE's "PROBLEMS" ribbon and dealt with immediately. This was deemed more efficient than validating python code at the end, due to the sheer number of python backend scripts existing in the codebase.
 
 A select code can be tested with [PEP8-CI Python Linter](https://pep8ci.herokuapp.com/).
 
@@ -429,7 +429,34 @@ A test was carried out on the deployed website, for the relevant areas using the
 | User Management        | Desktop | ![screenshot](documentation/validation/lighthouse/lighthouse-audit-users-desktop.png)   | No major problems. |
 
 ## Error Logging
-## Error Monitoring
+
+The **Slotted Need** application uses Django's built-in logging framework to track and manage errors and warnings in both development and production environments. The logging configuration ensures that errors are captured and handled appropriately through various handlers. Here's a breakdown of the logging setup:
+
+- **Console Logging**: In development mode, debug and warning messages are displayed in the console for real-time visibility.
+- **File Logging**: A file-based logging system is used to store warnings and errors in a `logs/app.log` file for reference and troubleshooting. This helps in debugging issues that may not be immediately visible in the console.
+- **Email Notifications**: Critical errors are sent to the application's administrators via email using a customized `AdminEmailHandler`. This ensures that urgent issues in production are addressed promptly.
+
+### Benefits
+- Provides visibility into application behavior during both development and production.
+- Maintains a history of logs for postmortem analysis.
+- Alerts administrators to critical issues, reducing downtime.
+
+## Error Monitoring with Sentry
+
+In addition to Django's logging system, **Sentry** is integrated into the application for comprehensive error monitoring and tracking. Sentry is configured for both backend (Django-Python) and frontend (JavaScript) error reporting in production.
+
+### Features of Sentry Integration:
+- **Real-Time Error Tracking**: Captures and displays errors as they occur in production, providing insights into the root cause.
+- **Contextual Information**: Automatically includes stack traces, user data, and request context in error reports.
+- **JavaScript Error Tracking**: Frontend issues, such as runtime JavaScript errors, are logged, ensuring a seamless debugging process for client-side code.
+- **Alerts and Notifications**: Configured to send alerts for specific error types, ensuring developers can act swiftly on critical issues.
+
+### How It Works
+- **Django-Python Integration**: Sentry captures server-side exceptions and logs them to a centralised dashboard.
+- **JavaScript Integration**: Sentry's JavaScript SDK is included in the frontend, tracking browser errors and reporting them with full stack traces.
+
+By combining Django's logging with Sentry's advanced monitoring capabilities, **Slotted Need** ensures robust error detection and quick resolution, enhancing application reliability and user satisfaction.
+
 ## Fixed Bugs
 
 # Credits
