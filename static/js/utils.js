@@ -130,7 +130,7 @@ function updateItemStatusStyle(status) {
         status.classList.add('bg-success', 'text-light');
         // Delivered
     } else if (statusValue == 4) {
-        status.classList.add('bg-secondary', 'text-light');
+        status.classList.add('bg-dark', 'text-light');
     }
 }
 
@@ -144,10 +144,10 @@ function updatePaidStatusStyle(status) {
 
     // Not Paid
     if (statusValue == 1) {
-        status.classList.add(`${bsTag}-danger`, 'text-light');
+        status.classList.add(`${bsTag}-danger`, `${bsTag}-gradient`, 'text-light');
         // Fully Paid
     } else if (statusValue == 2) {
-        status.classList.add(`${bsTag}-secondary`, 'text-light');
+        status.classList.add(`${bsTag}-dark`, 'text-light');
     }
 }
 

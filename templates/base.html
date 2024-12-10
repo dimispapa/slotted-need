@@ -38,8 +38,8 @@
   <header>
     <nav class="navbar navbar-expand-lg bg-primary fixed-top" data-bs-theme="dark">
       <div class="container-fluid">
-        <a class="navbar-brand" href="{% url 'home' %}"><img src="{% static 'favicon/cog-logo-md.png' %}"
-            width="30" height="24" alt="TNS logo" class="align-text-top"> Slotted Need</a>
+        <a class="navbar-brand fw-bolder" href="{% url 'home' %}"><img src="{% static 'favicon/cog-logo-md.png' %}"
+            width="24" height="24" alt="TNS logo" class="align-text-top"> Slotted Need</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
           aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation"><span
             class="navbar-toggler-icon"></span></button>
@@ -96,7 +96,7 @@
             </li>
             <!-- Logout form (needs a post request) -->
             <li class="nav-item">
-              <a class="nav-link btn btn-link" href="{% url 'account_logout' %}">
+              <a class="nav-link" href="{% url 'account_logout' %}">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
             </li>
             {% else %}
