@@ -18,7 +18,7 @@ class OrderForm(forms.Form):
     client_phone = PhoneNumberField(widget=RegionalPhoneNumberWidget(attrs={
         'class': 'form-control',
         'id': 'client_phone',
-        'placeholder': "e.g. 99223344 (for CY) or +35313441111 (for int'l.)"
+        'placeholder': "e.g. 99223344 (CY) or +35313441111 (intl.)"
     }), required=True)
     client_email = forms.EmailField(widget=forms.EmailInput(attrs={
         'class': 'form-control',
