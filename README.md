@@ -405,17 +405,18 @@ The JavaScript scripts were validated using the recommended [JSHint Validator](h
 
 ### Python
 
-All Python code was validated real-time as soon as they were written, according to PEP8 standards, through the use of VS Code extensions "autopep8" and "Flake8". Any issues were highlighted in the IDE's "PROBLEMS" ribbon and dealt with immediately.
+All Python code was validated real-time as soon as they were written, adhering to PEP8 standards, through the use of VS Code extensions "autopep8" and "Flake8". Any issues were highlighted in the IDE's "PROBLEMS" ribbon and dealt with immediately.
 
+A select code can be tested with [PEP8-CI Python Linter](https://pep8ci.herokuapp.com/).
 
 ### Lighthouse Audit
 
-A test was carried out on the deployed website, for the relevant areas using the Lighthouse Audit tool within Chrome Dev Tools:
+A test was carried out on the deployed website, for the relevant areas using the Lighthouse Audit tool within Chrome Dev Tools. There are some low performance scores which is expected in data-heavy pages that involve AJAX API calls and rendering of charts and data tables.
 
 | Page             | Size    | Screenshot                                                        | Notes               |
 | ---------------- | ------- | ----------------------------------------------------------------- | ------------------- |
-| Home             | Mobile  | ![screenshot](documentation/validation/lighthouse/lighthouse-audit-home-mobile.png) | No major problems. Some colour choices were maintained for stylistic purposes despite being highlighted as accessibility warning. Performance is low due to AJAX API calls and data-heavy charts rendering in the home dashboard. This is an area for potential improvement. |
-| Home             | Desktop | ![screenshot](documentation/validation/lighthouse/lighthouse-audit-home-desktop.png)    | No major problems. Some colour choices were maintained for stylistic purposes despite being highlighted as accessibility warning. Performance is low due to AJAX API calls and data-heavy charts rendering in the home dashboard. This is an area for potential improvement.   |
+| Home             | Mobile  | ![screenshot](documentation/validation/lighthouse/lighthouse-audit-home-mobile.png) | No major problems. Some colour choices were maintained for stylistic purposes despite being highlighted as accessibility warning. |
+| Home             | Desktop | ![screenshot](documentation/validation/lighthouse/lighthouse-audit-home-desktop.png)    | No major problems. Some colour choices were maintained for stylistic purposes despite being highlighted as accessibility warning.   |
 | Create Order           | Mobile  | ![screenshot](documentation/validation/lighthouse/lighthouse-audit-create-order-mobile.png)    | No major problems   |
 | Create Order           | Desktop | ![screenshot](documentation/validation/lighthouse/lighthouse-audit-create-order-desktop.png)   | No major problems   |
 | Order Tracker           | Mobile | ![screenshot](documentation/validation/lighthouse/lighthouse-audit-order-tracker-mobile.png)   | No major problems. Some colour choices were maintained for stylistic purposes despite being highlighted as accessibility warning.   |
@@ -424,8 +425,8 @@ A test was carried out on the deployed website, for the relevant areas using the
 | Order Item Tracker           | Desktop | ![screenshot](documentation/validation/lighthouse/lighthouse-audit-order-item-tracker-desktop.png)   | No major problems. Some colour choices were maintained for stylistic purposes despite being highlighted as accessibility warning.  |
 | Order Archive         | Mobile | ![screenshot](documentation/validation/lighthouse/lighthouse-audit-order-archive-mobile.png)   | No major problems. Some colour choices were maintained for stylistic purposes despite being highlighted as accessibility warning.   |
 | Order Archive           | Desktop | ![screenshot](documentation/validation/lighthouse/lighthouse-audit-order-archive-desktop.png)   | No major problems. Some colour choices were maintained for stylistic purposes despite being highlighted as accessibility warning.  |
-| User Management         | Mobile | ![screenshot](documentation/validation/lighthouse/lighthouse-audit-users-mobile.png)   | No major problems. Some colour choices were maintained for stylistic purposes despite being highlighted as accessibility warning.   |
-| User Management        | Desktop | ![screenshot](documentation/validation/lighthouse/lighthouse-audit-users-desktop.png)   | No major problems. Some colour choices were maintained for stylistic purposes despite being highlighted as accessibility warning.  |
+| User Management         | Mobile | ![screenshot](documentation/validation/lighthouse/lighthouse-audit-users-mobile.png)   | No major problems. |
+| User Management        | Desktop | ![screenshot](documentation/validation/lighthouse/lighthouse-audit-users-desktop.png)   | No major problems. |
 
 ## Error Logging
 ## Error Monitoring
