@@ -459,6 +459,18 @@ By combining Django's logging with Sentry's advanced monitoring capabilities, **
 
 ## Fixed Bugs
 
+Errors and bugs were encountered in development, that were logged as issues on the GitHub project until resolution. The following bugs were **fixed**. There are **no** current known bugs.
+
+| Issue             | Description | Closing Comment  |
+| ----------------- | -------- | ------------------- |
+| Finishes replaced when a new option is selected #31  | When an option is selected, the associated finishes are rendered but then when a second option is selected, its associated finishes overwrite the previous finishes instead of adding them over.| Issue rectified by changing the method javascript is using and the general structure of the template/html |
+| Issue with total price calculated wrongly when base_price is edited #32  | The item value and total price of the order is calculated wrongly when the base price is edited. The discount and quantity fields though are ok.| Bug is now fixed as javascript function updateOrderValue is now also refactored as well as corrected |
+| Order tracker status style does not update #35  | An error occurs in the updateStatusStyle JS function when changing a status dropdown, the colour does not update.| Fixed: Issue was with event object passing implicitly when triggered from event. Refactored code so that we can handle event triggers more gracefully and use separate functions for on initial load process. |
+| Order tracker page 500 error when saving #36  | When attempting to save all changes in the order tracker, it throws a 500 internal server error. Error says: Reverse for 'orders' not found. 'orders' is not a valid view function or pattern name.| Error fixed. Caused by not aligning the view function name when redirecting below, when the name was changed in the url pattern. |
+| Issue with order tracker + archive body of tables misaligned with header #38  | On desktop view, both table bodies are misaligned from their headers. Item tracker seems to not have that issue.| Issue was apparent only in the order tracker and archive tables, due to the smaller amount of columns that meant the table did not expand enough to take up the horizontal space and align properly, while the item tracker had enough columns to mask the issue. Fixed it by apply width: 100% on the header and body elements as well as the table to avoid margins being added or fixed width being applied by table settings. |
+| Issue with pagination on item tracker #39  | Identified bug when switching to view up to 10 items in the table (resulting to a second page) then DataTables threw an error. Possible bug in other two tables too. Need to investigate further and test pagination as not yet tested enough. Also to test filtering and how it behaves with pagination. Can add automated testing if possible.| Fixed by assigning length to a 'page_size' query parameter and a pagination class (inheriting PageNumberPagination DRF class) with page_size_query_param set to 'page_size' |
+| Javascript issue with looping event listeners #47  | An issue was discovered in the JS code of the trackers (data tables), whereas the event listeners are added/fired with exponential loops, causing unexpected results and even fatal error.| issue resolved by removing listeners code outside the callback function of the data tables initialization. |
+
 # Credits
 
 # Acknowledgements
