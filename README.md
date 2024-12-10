@@ -404,7 +404,23 @@ The JavaScript scripts were validated using the recommended [JSHint Validator](h
 | utils.js | ![screenshot](documentation/validation/js/jshint-validation-utils.png) | Pass: No errors. |
 
 ### Python
+
+All Python code was validated real-time as soon as they were written, according to PEP8 standards, through the use of VS Code extensions "autopep8" and "Flake8". Any issues were highlighted in the IDE's "PROBLEMS" ribbon and dealt with immediately.
+
+
 ### Lighthouse Audit
+
+A test was carried out on the deployed website, for the relevant areas using the Lighthouse Audit tool within Chrome Dev Tools:
+
+| Page             | Size    | Screenshot                                                        | Notes               |
+| ---------------- | ------- | ----------------------------------------------------------------- | ------------------- |
+| Home             | Mobile  | ![screenshot](documentation/validation/lighthouse/lighthouse-audit-home-mobile.png) | No major problems. Some colour choices were maintained for stylistic purposes despite being highlighted as accessibility warning. Performance is low due to AJAX API calls and data-heavy charts rendering in the home dashboard. This is an area for potential improvement. |
+| Home             | Desktop | ![screenshot](documentation/validation/lighthouse/lighthouse-audit-home-desktop.png)    | No major problems. Some colour choices were maintained for stylistic purposes despite being highlighted as accessibility warning. Performance is low due to AJAX API calls and data-heavy charts rendering in the home dashboard. This is an area for potential improvement.   |
+| Create Order           | Mobile  | ![screenshot](documentation/validation/lighthouse/lighthouse-audit-create-order-mobile.png)    | No major problems   |
+| Create Order           | Desktop | ![screenshot](documentation/validation/lighthouse/lighthouse-audit-create-order-desktop.png)   | No major problems   |
+| Order Tracker           | Mobile | ![screenshot](documentation/validation/lighthouse/lighthouse-audit-order-tracker-mobile.png)   | No major problems   |
+| Order Tracker           | Desktop | ![screenshot](documentation/validation/lighthouse/lighthouse-audit-order-tracker-desktop.png)   | No major problems   |
+
 ## Error Logging
 ## Error Monitoring
 ## Fixed Bugs
