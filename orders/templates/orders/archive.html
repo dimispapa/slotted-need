@@ -6,9 +6,9 @@
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- DataTables CSS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" type="text/css">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css" type="text/css">
 <!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
 <!-- Moment JS -->
 <script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
 {% endblock %}
@@ -47,12 +47,14 @@
         <th>
           <!-- Order Date created filter -->
           <div class="input-group">
-            <span class="input-group-text p-1">From</span>
-            <input type="date" name="filter_date_from" id="filter-date-from" class="form-control form-control-sm filter">
+            <label for="filter-date-from" class="input-group-text p-1">From</label>
+            <input type="date" name="filter_date_from" id="filter-date-from" class="form-control form-control-sm filter"
+              aria-label="Filter date from">
           </div>
           <div class="input-group mt-1 mt-md-2">
-            <span class="input-group-text pl-1 pr-1">To</span>
-            <input type="date" name="filter_date_to" id="filter-date-to" class="form-control form-control-sm filter">
+            <label for="filter-date-to" class="input-group-text pl-1 pr-1">To</label>
+            <input type="date" name="filter_date_to" id="filter-date-to" class="form-control form-control-sm filter"
+              aria-label="Filter date to">
           </div>
         </th>
         <!-- Client filter -->
@@ -60,23 +62,26 @@
         <!-- Discount filter -->
         <th>
           <input type="number" class="form-control form-control-sm filter" id="filter-discount-min" placeholder="Min">
-          <input type="number" class="form-control form-control-sm filter mt-1 mt-md-2" id="filter-discount-max" placeholder="Max">
+          <input type="number" class="form-control form-control-sm filter mt-1 mt-md-2" id="filter-discount-max"
+            placeholder="Max">
         </th>
         <!-- Deposit filter -->
         <th>
           <input type="number" class="form-control form-control-sm filter" id="filter-deposit-min" placeholder="Min">
-          <input type="number" class="form-control form-control-sm filter mt-1 mt-md-2" id="filter-deposit-max" placeholder="Max">
+          <input type="number" class="form-control form-control-sm filter mt-1 mt-md-2" id="filter-deposit-max"
+            placeholder="Max">
         </th>
         <!-- Value filter -->
         <th>
           <input type="number" class="form-control form-control-sm filter" id="filter-value-min" placeholder="Min">
-          <input type="number" class="form-control form-control-sm filter mt-1 mt-md-2" id="filter-value-max" placeholder="Max">
+          <input type="number" class="form-control form-control-sm filter mt-1 mt-md-2" id="filter-value-max"
+            placeholder="Max">
         </th>
         <!-- Order Status filter -->
         <th>
           <!-- Tooltip -->
           <div class="text-center align-baseline mb-2" data-toggle="tooltip" data-html="true"
-            title="The order status is set automatically as it reflects the underlying status of its items">
+            data-bs-title="The order status is set automatically as it reflects the underlying status of its items">
             <i class="fa-solid fa-circle-info text-primary fs-4 fw-bolder"></i>
           </div>
           {% include 'orders/partials/dropdown.html' with options=order_status_choices selected="" class="filter-order-status form-select filter" id="filter-order-status" %}
