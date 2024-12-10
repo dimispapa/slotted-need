@@ -2,6 +2,7 @@
 "Usage:
 {% include 'orders/partials/dropdown.html' with options=variable selected=value class='additional-class' id='element-id' %}"
 {% endcomment %}
+<label for="{{ id }}" class="sr-only">Filter: {{ id }}</label>
 <select class="{{ class }}" id="{{ id }}">
     <option value="">All</option>
     {% for option_value, option_display in options.items %}

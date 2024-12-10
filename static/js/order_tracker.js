@@ -101,7 +101,7 @@ $(document).ready(function () {
                 render: function (data, type, row) {
                     if (type === 'display') {
                         return `
-                    <button type="button" class="btn btn-sm btn-info toggle-items-btn" data-bs-toggle="collapse"
+                    <button type="button" aria-label="Expand items toggle button" class="btn btn-sm btn-info toggle-items-btn" data-bs-toggle="collapse"
                       data-bs-target="#order-items-${row.id}" aria-expanded="false"
                       aria-controls="order-items-${row.id}">
                       <i class="fa-solid fa-chevron-down"></i>
@@ -159,7 +159,7 @@ $(document).ready(function () {
                 data: 'paid',
                 render: function (data, type, row) {
                     if (type === 'display') {
-                        let select = `<select class="form-select-sm paid-status fw-bolder text-wrap" data-id="${row.id}">`;
+                        let select = `<select class="form-select-sm paid-status fw-bolder text-wrap" data-id="${row.id}" aria-label="Paid status dropdown">`;
                         // Use global variable passed from context into JS and generate select options
                         let options = generateSelectOptions(paidStatusChoices, data);
                         select += options;

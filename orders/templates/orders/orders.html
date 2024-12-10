@@ -47,22 +47,24 @@
         <th>
           <!-- Order Date created filter -->
           <div class="input-group">
-            <span class="input-group-text p-1">From</span>
+            <label for="filter-date-from"><span class="input-group-text p-1">From</span></label>
             <input type="date" name="filter_date_from" id="filter-date-from"
               class="form-control form-control-sm filter">
           </div>
           <div class="input-group mt-1 mt-md-2">
-            <span class="input-group-text pl-1 pr-1">To</span>
+            <label for="filter-date-to"><span class="input-group-text pl-1 pr-1">To</span></label>
             <input type="date" name="filter_date_to" id="filter-date-to" class="form-control form-control-sm filter">
           </div>
         </th>
         <!-- Client filter -->
-        <th><input type="text" class="form-control filter" id="filter-client" placeholder="Filter"></th>
+        <th><input type="text" class="form-control filter" id="filter-client" placeholder="Filter"
+            aria-label="Client Filter"></th>
         <!-- Discount filter -->
         <th>
-          <input type="number" class="form-control form-control-sm filter" id="filter-discount-min" placeholder="Min">
+          <input type="number" class="form-control form-control-sm filter" id="filter-discount-min" placeholder="Min"
+            aria-label="Discount min filter">
           <input type="number" class="form-control form-control-sm filter mt-1 mt-md-2" id="filter-discount-max"
-            placeholder="Max">
+            placeholder="Max" aria-label="Discount max filter">
         </th>
         <!-- Deposit filter -->
         <th>
